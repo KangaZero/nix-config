@@ -10,21 +10,213 @@ A unified Nix flake monorepo consolidating macOS (nix-darwin) and NixOS configur
 | `wsl` | NixOS WSL2 | x86_64-linux | Migrating |
 | `server` | NixOS headless | x86_64/aarch64-linux | Planned |
 
-## Quick Start
+## Setup & Usage
+
+> **Repo location expected by shell aliases:** `~/.config/nix-config`
+
+---
+
+### macOS — nix-darwin (aarch64-darwin)
+
+**Prerequisites:** Apple Silicon Mac.
+
+**1. Install Nix (Determinate Systems — recommended)**
 
 ```sh
-# macOS
-darwin-rebuild switch --flake .#KangaZero
-
-# NixOS WSL
-sudo nixos-rebuild switch --flake .#wsl
-
-# Run standalone kitty wrapper (macOS)
-nix run .#kitty
-
-# Enter dev shell (installs pre-commit hooks)
-nix develop
+curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
 ```
+
+> This config sets `nix.enable = false` — it works with the Determinate installer instead of a nix-darwin-managed daemon. Do not use the official `sh.nixos.org` installer.
+
+**2. Clone the repo**
+
+```sh
+git clone https://github.com/KangaZero/nix-config ~/.config/nix-config
+cd ~/.config/nix-config
+```
+
+**3. First-time bootstrap** (nix-darwin not yet installed)
+
+```sh
+nix run nix-darwin/master -- switch --flake .#KangaZero
+```
+
+**4. Day-to-day rebuilds**
+
+```sh
+# Shell aliases set by this config (work from anywhere):
+nix-switch   # sudo darwin-rebuild switch --flake ~/.config/nix-config#KangaZero
+nix-build    # darwin-rebuild build   --flake ~/.config/nix-config#KangaZero
+
+# Directly from the repo:
+darwin-rebuild switch --flake .#KangaZero
+```
+
+**5. Dry-run / build check (no activation)**
+
+```sh
+darwin-rebuild build --flake .#KangaZero
+```
+
+**6. Roll back** the last activation if something breaks
+
+```sh
+sudo darwin-rebuild switch --rollback
+```
+
+---
+
+### NixOS WSL2 (x86_64-linux)
+
+**Prerequisites:** Windows 10/11 with WSL2 enabled.
+
+**1. Import NixOS-WSL**
+
+Download the latest tarball from [github.com/nix-community/NixOS-WSL/releases](https://github.com/nix-community/NixOS-WSL/releases), then in PowerShell (admin):
+
+```powershell
+wsl --install --no-distribution
+wsl --import NixOS "$env:LOCALAPPDATA\NixOS" nixos-wsl.tar.gz --version 2
+wsl -d NixOS
+```
+
+**2. Clone the repo inside NixOS WSL**
+
+```sh
+nix-shell -p git --run "git clone https://github.com/KangaZero/nix-config ~/.config/nix-config"
+cd ~/.config/nix-config
+```
+
+**3. First-time activation**
+
+```sh
+sudo nixos-rebuild switch --flake .#wsl
+```
+
+Restart the instance after the first switch so shell and user settings take effect:
+
+```powershell
+wsl --terminate NixOS && wsl -d NixOS
+```
+
+**4. Day-to-day rebuilds**
+
+```sh
+sudo nixos-rebuild switch --flake ~/.config/nix-config#wsl
+# or from inside the repo:
+sudo nixos-rebuild switch --flake .#wsl
+```
+
+**5. Dry-run / build check (no activation)**
+
+```sh
+nix build .#nixosConfigurations.wsl.config.system.build.toplevel
+```
+
+**6. Roll back** if something breaks
+
+```sh
+sudo nixos-rebuild switch --rollback
+# or pick a specific generation:
+sudo nix-env --list-generations --profile /nix/var/nix/profiles/system
+sudo nixos-rebuild switch --profile /nix/var/nix/profiles/system-<N>-link
+```
+
+---
+
+### NixOS bare metal / VM (x86_64-linux or aarch64-linux)
+
+**Prerequisites:** NixOS minimal ISO booted, target partitions mounted at `/mnt`.
+
+**1. Partition and mount** (example — adjust to your disk)
+
+```sh
+parted /dev/nvme0n1 -- mklabel gpt
+parted /dev/nvme0n1 -- mkpart ESP fat32 1MiB 512MiB
+parted /dev/nvme0n1 -- set 1 esp on
+parted /dev/nvme0n1 -- mkpart primary ext4 512MiB 100%
+mkfs.fat -F32 /dev/nvme0n1p1 && mkfs.ext4 /dev/nvme0n1p2
+mount /dev/nvme0n1p2 /mnt && mkdir -p /mnt/boot && mount /dev/nvme0n1p1 /mnt/boot
+```
+
+**2. Generate hardware config**
+
+```sh
+nixos-generate-config --root /mnt
+```
+
+**3. Clone the repo and add the hardware config**
+
+```sh
+nix-shell -p git --run "git clone https://github.com/KangaZero/nix-config /mnt/home/KangaZero/.config/nix-config"
+cp /mnt/etc/nixos/hardware-configuration.nix \
+   /mnt/home/KangaZero/.config/nix-config/hosts/<hostname>/hardware.nix
+```
+
+**4. Register the host in `flake.nix`**
+
+```nix
+nixosConfigurations."<hostname>" = lib.mkNixOS {
+  hostname = "<hostname>";
+  system   = "x86_64-linux";   # or "aarch64-linux"
+  user     = "samuel";
+};
+```
+
+**5. Install**
+
+```sh
+sudo nixos-install --flake /mnt/home/KangaZero/.config/nix-config#<hostname> --root /mnt
+reboot
+```
+
+**6. Day-to-day rebuilds**
+
+```sh
+sudo nixos-rebuild switch --flake ~/.config/nix-config#<hostname>
+```
+
+**7. Roll back**
+
+```sh
+sudo nixos-rebuild switch --rollback
+```
+
+---
+
+### NixOS server / headless (x86_64-linux)
+
+Same flow as bare metal above but reference `hosts/server/default.nix` (sshd enabled, no GUI). Register in `flake.nix`:
+
+```nix
+nixosConfigurations."server" = lib.mkNixOS {
+  hostname = "server";
+  system   = "x86_64-linux";
+  user     = "samuel";
+};
+```
+
+Rebuild remotely after install:
+
+```sh
+nixos-rebuild switch --flake .#server --target-host user@server --use-remote-sudo
+```
+
+---
+
+### Rebuild quick reference
+
+| Platform | Command |
+|---|---|
+| macOS — switch | `darwin-rebuild switch --flake .#KangaZero` |
+| macOS — alias | `nix-switch` |
+| macOS — build only | `darwin-rebuild build --flake .#KangaZero` |
+| macOS — rollback | `sudo darwin-rebuild switch --rollback` |
+| NixOS WSL — switch | `sudo nixos-rebuild switch --flake .#wsl` |
+| NixOS WSL — build only | `nix build .#nixosConfigurations.wsl.config.system.build.toplevel` |
+| NixOS WSL/bare — rollback | `sudo nixos-rebuild switch --rollback` |
+| NixOS server — remote | `nixos-rebuild switch --flake .#server --target-host user@host --use-remote-sudo` |
+| kitty wrapper | `nix run .#kitty` |
 
 ## Repository Structure
 
@@ -112,23 +304,78 @@ nix-config/
 
 ---
 
-## Dev Shell & Pre-commit Hooks
+## Safety & Checks
+
+This repo is set up to catch problems as early as possible — before a commit, before a push, and in CI — so a broken config never makes it to activation.
+
+### Layers of safety
+
+| When | What runs | What it catches |
+|---|---|---|
+| On `cd` | `direnv` + `nix develop` | Activates dev shell automatically via `.envrc` |
+| On every commit | `deadnix`, `nixfmt`, `statix` | Dead code, formatting drift, anti-patterns |
+| On every push | `nix build` for the current platform | Broken builds before they reach the remote |
+| On every PR / push to remote | Full CI matrix (both arches) | Cross-platform regressions |
+| Any time manually | `nix flake check` | Full evaluation + checks for all outputs |
+
+### Dev shell & pre-commit hooks
 
 ```sh
-nix develop        # enters dev shell and installs pre-commit hooks
+cd ~/.config/nix-config
+nix develop        # enter dev shell; installs pre-commit hooks on first run
 nix fmt            # format all .nix files with nixfmt-tree
 ```
 
-Pre-commit hooks run on every commit:
-- `deadnix` — remove dead Nix code
-- `nixfmt` — format with nixfmt-tree
-- `statix` — lint for anti-patterns
+`.envrc` means `nix develop` is entered automatically on `cd` — the hooks install themselves once and stay active.
 
-Pre-push hook per platform:
-- **darwin** — `nix build .#darwinConfigurations.KangaZero.system`
-- **linux** — `nix build .#nixosConfigurations.wsl.config.system.build.toplevel`
+Pre-commit hooks (block the commit if they fail):
 
-`.envrc` wires direnv so `nix develop` is entered automatically on `cd`.
+| Hook | What it does |
+|---|---|
+| `deadnix` | Removes dead Nix code (unused bindings, unused imports) |
+| `nixfmt` | Enforces consistent formatting via nixfmt-tree |
+| `statix` | Lints for anti-patterns — enforces `inherit` over explicit assignment |
+
+Pre-push hooks (block the push if the build fails):
+
+| Platform | Command |
+|---|---|
+| darwin | `nix build .#darwinConfigurations.KangaZero.system` |
+| linux | `nix build .#nixosConfigurations.wsl.config.system.build.toplevel` |
+
+### Manual checks
+
+```sh
+# Evaluate + type-check all outputs for the current system
+nix flake check
+
+# Dry-run build without activating (safe — nothing changes)
+darwin-rebuild build --flake .#KangaZero
+nix build .#nixosConfigurations.wsl.config.system.build.toplevel
+
+# Lint only
+statix check .
+deadnix .
+
+# Format check only (no write)
+nixfmt --check .
+```
+
+### Rollback
+
+Every activation creates a new generation. If something breaks, roll back instantly:
+
+```sh
+# macOS
+sudo darwin-rebuild switch --rollback
+
+# NixOS (all variants)
+sudo nixos-rebuild switch --rollback
+
+# NixOS — pick a specific generation
+nix-env --list-generations --profile /nix/var/nix/profiles/system
+sudo nixos-rebuild switch --profile /nix/var/nix/profiles/system-<N>-link
+```
 
 ---
 
@@ -284,9 +531,12 @@ Platform-only packages stay in `home/modules/darwin/packages.nix` and `home/modu
 
 ## Verification
 
+Run these before any significant change to confirm everything evaluates clean:
+
 ```sh
-darwin-rebuild build --flake .#KangaZero
-nix build .#nixosConfigurations.wsl.config.system.build.toplevel
-nix run .#kitty
-nix flake check
+nix flake check                                                    # all outputs
+darwin-rebuild build --flake .#KangaZero                          # macOS dry-run
+nix build .#nixosConfigurations.wsl.config.system.build.toplevel  # NixOS WSL dry-run
+nix run .#kitty                                                    # kitty wrapper
+statix check . && deadnix . && nixfmt --check .                   # lints
 ```
