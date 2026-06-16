@@ -41,8 +41,8 @@
         show-recents = false;
         tilesize = 36;
         persistent-apps = [
-          "/Applications/kitty.app"
-          "/Applications/Firefox Developer Edition.app"
+          "/Applications/Nix Apps/kitty.app"
+          "/Applications/Nix Apps/Firefox Developer Edition.app"
         ];
       };
       finder = {
