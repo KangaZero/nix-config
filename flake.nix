@@ -58,7 +58,12 @@
   };
 
   outputs =
-    { self, nixpkgs, git-hooks, ... }@inputs:
+    {
+      self,
+      nixpkgs,
+      git-hooks,
+      ...
+    }@inputs:
     let
       lib = import ./lib { inherit inputs; };
     in

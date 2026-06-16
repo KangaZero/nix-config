@@ -5,7 +5,10 @@
     enableZshIntegration = true;
     settings.gui.theme = {
       lightTheme = true;
-      activeBorderColor = [ "blue" "bold" ];
+      activeBorderColor = [
+        "blue"
+        "bold"
+      ];
       inactiveBorderColor = [ "black" ];
       selectedLineBgColor = [ "default" ];
     };

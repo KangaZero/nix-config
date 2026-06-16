@@ -1,4 +1,9 @@
-{ username, userMeta, assetsDir, ... }:
+{
+  username,
+  userMeta,
+  assetsDir,
+  ...
+}:
 {
   imports = [
     ../../modules/common/git.nix

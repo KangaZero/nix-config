@@ -1,20 +1,36 @@
 { inputs }:
-{ hostname, system, user, self ? null }:
+{
+  hostname,
+  system,
+  user,
+  self ? null,
+}:
 let
   userMeta = import ../home/profiles/${user}/default.nix;
   username = userMeta.usernames.darwin;
   pkgs = import inputs.nixpkgs {
     inherit system;
     config.allowUnfreePredicate =
-      pkg: builtins.elem (inputs.nixpkgs.lib.getName pkg) [ "claude-code" "7zz" "discord" ];
+      pkg:
+      builtins.elem (inputs.nixpkgs.lib.getName pkg) [
+        "claude-code"
+        "7zz"
+        "discord"
+      ];
     overlays = [ (import ../overlays/zjstatus { inherit inputs; }) ];
   };
 in
 inputs.darwin.lib.darwinSystem {
   inherit system;
   specialArgs = {
-    inherit inputs username hostname userMeta;
-  } // (if self != null then { inherit self; } else { });
+    inherit
+      inputs
+      username
+      hostname
+      userMeta
+      ;
+  }
+  // (if self != null then { inherit self; } else { });
   modules = [
     ../modules/shared/nix-settings.nix
     ../modules/darwin/homebrew.nix

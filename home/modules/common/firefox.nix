@@ -31,7 +31,10 @@ in
       };
       Preferences = {
         "extensions.pocket.enabled" = lock-false;
-        "browser.newtabpage.pinned" = { Value = ""; Status = "locked"; };
+        "browser.newtabpage.pinned" = {
+          Value = "";
+          Status = "locked";
+        };
         "browser.topsites.contile.enabled" = lock-false;
         "browser.newtabpage.activity-stream.showSponsored" = lock-false;
         "browser.newtabpage.activity-stream.system.showSponsored" = lock-false;

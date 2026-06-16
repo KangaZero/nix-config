@@ -1,5 +1,10 @@
 { inputs }:
-{ hostname, system, user, extraModules ? [ ] }:
+{
+  hostname,
+  system,
+  user,
+  extraModules ? [ ],
+}:
 let
   userMeta = import ../home/profiles/${user}/default.nix;
   username = userMeta.usernames.linux;
@@ -18,7 +23,12 @@ in
 inputs.nixpkgs.lib.nixosSystem {
   inherit system;
   specialArgs = {
-    inherit inputs username hostname userMeta;
+    inherit
+      inputs
+      username
+      hostname
+      userMeta
+      ;
   };
   modules = [
     ../modules/shared/nix-settings.nix
@@ -45,5 +55,6 @@ inputs.nixpkgs.lib.nixosSystem {
         extraGroups = [ "wheel" ];
       };
     }
-  ] ++ extraModules;
+  ]
+  ++ extraModules;
 }

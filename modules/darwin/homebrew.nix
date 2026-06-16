@@ -1,4 +1,9 @@
-{ inputs, username, config, ... }:
+{
+  inputs,
+  username,
+  config,
+  ...
+}:
 {
   nix-homebrew = {
     enable = true;
