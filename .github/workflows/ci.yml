@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  check-darwin:
+    name: Check (aarch64-darwin)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/nix-installer-action@main
+      - uses: DeterminateSystems/magic-nix-cache-action@main
+      - name: Lint
+        run: nix fmt -- --check .
+      - name: Statix
+        run: nix run nixpkgs#statix -- check .
+      - name: Deadnix
+        run: nix run nixpkgs#deadnix -- --fail .
+      - name: Build darwin config
+        run: nix build --no-link --print-build-logs .#darwinConfigurations.KangaZero.system
+
+  check-linux:
+    name: Check (x86_64-linux)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/nix-installer-action@main
+      - uses: DeterminateSystems/magic-nix-cache-action@main
+      - name: Lint
+        run: nix fmt -- --check .
+      - name: Statix
+        run: nix run nixpkgs#statix -- check .
+      - name: Deadnix
+        run: nix run nixpkgs#deadnix -- --fail .
+      - name: Build WSL config
+        run: nix build --no-link --print-build-logs .#nixosConfigurations.wsl.config.system.build.toplevel
