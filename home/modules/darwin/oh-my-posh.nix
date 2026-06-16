@@ -1,7 +1,5 @@
-{ pkgs, ... }:
+{ ... }:
 {
-  home.packages = [ pkgs.oh-my-posh ];
-
   programs.oh-my-posh = {
     enable = true;
     enableZshIntegration = true;

@@ -44,7 +44,6 @@ inputs.nixpkgs.lib.nixosSystem {
         isNormalUser = true;
         extraGroups = [ "wheel" ];
       };
-      security.sudo.wheelNeedsPassword = false;
     }
   ] ++ extraModules;
 }

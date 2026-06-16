@@ -13,10 +13,10 @@ function cdroot() {
 }
 
 function afplayAll() {
-	local sounds=ls
-	for sound in sounds; do
-		afplay sound
-		echo playing "$sound"
-		sleep 1
+	local sounds
+	sounds=$(ls *.aiff *.mp3 2>/dev/null)
+	for sound in $sounds; do
+		echo "playing $sound"
+		afplay "$sound"
 	done
 }

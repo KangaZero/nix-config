@@ -6,7 +6,8 @@
       "flakes"
     ];
     allow-dirty-locks = false;
-    channel.enable = false;
-    registry.nixpkgs.flake = inputs.nixpkgs;
+    "channel.enable" = false;
   };
+
+  nix.registry.nixpkgs.flake = inputs.nixpkgs;
 }

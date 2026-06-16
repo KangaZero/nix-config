@@ -4,7 +4,7 @@
     enable = true;
     lfs.enable = true;
     ignores = [
-      "**/.DS_STORE"
+      "**/.DS_Store"
       ".direnv/"
     ];
     settings = {

@@ -15,7 +15,7 @@ jobs:
       - uses: DeterminateSystems/nix-installer-action@main
       - uses: DeterminateSystems/magic-nix-cache-action@main
       - name: Lint
-        run: nix fmt -- --check .
+        run: nix fmt -- --ci
       - name: Statix
         run: nix run nixpkgs#statix -- check .
       - name: Deadnix
@@ -31,7 +31,7 @@ jobs:
       - uses: DeterminateSystems/nix-installer-action@main
       - uses: DeterminateSystems/magic-nix-cache-action@main
       - name: Lint
-        run: nix fmt -- --check .
+        run: nix fmt -- --ci
       - name: Statix
         run: nix run nixpkgs#statix -- check .
       - name: Deadnix

@@ -2,12 +2,6 @@
 {
   nix.enable = false;
 
-  nix.gc = {
-    automatic = true;
-    interval.Day = 1;
-    options = "--delete-older-than 14d";
-  };
-
   security.pam.services.sudo_local.touchIdAuth = true;
   time.timeZone = "Asia/Tokyo";
 

@@ -11,6 +11,7 @@ mkNixOS (
       ../modules/nixos/nix-ld.nix
       ../modules/nixos/graphics.nix
       ../modules/nixos/wayland/niri.nix
+      { security.sudo.wheelNeedsPassword = false; }
     ];
   }
 )
