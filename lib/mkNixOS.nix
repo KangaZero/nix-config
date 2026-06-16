@@ -22,6 +22,7 @@ inputs.nixpkgs.lib.nixosSystem {
   };
   modules = [
     ../modules/shared/nix-settings.nix
+    ../hosts/${hostname}/hardware.nix
     ../hosts/${hostname}/default.nix
     inputs.home-manager.nixosModules.home-manager
     {
