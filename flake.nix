@@ -67,6 +67,7 @@
         hostname = "KangaZero";
         system = "aarch64-darwin";
         user = "samuel";
+        inherit self;
       };
 
       nixosConfigurations."wsl" = lib.mkWSL {

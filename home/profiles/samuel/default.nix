@@ -6,6 +6,8 @@
     linux = "KangaZero";
   };
 
+  githubUser = "KangaZero";
+
   darwinUid = 501;
   darwinGid = 20;
 

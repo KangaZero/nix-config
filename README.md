@@ -275,11 +275,11 @@ Platform-only packages stay in `home/modules/darwin/packages.nix` and `home/modu
 
 ## Migration Steps
 
-- [x] **Step 1** — README and repo structure plan (this commit)
-- [ ] **Step 2** — Scaffold: create all directories and stub files; verify `nix flake check`
-- [ ] **Step 3** — Migrate darwin: port mac config; verify `darwin-rebuild build .#KangaZero`
+- [x] **Step 1** — README and repo structure plan
+- [x] **Step 2** — Scaffold: full directory structure, lib helpers, CI, `.envrc`
+- [x] **Step 3** — Migrate darwin: all system + home modules ported; `common/` modules written
 - [ ] **Step 4** — Migrate NixOS/WSL: port WSL config; verify `nix build .#nixosConfigurations.wsl.config.system.build.toplevel`
-- [ ] **Step 5** — Merge shared modules: consolidate `common/`; verify both builds pass
+- [ ] **Step 5** — Verify both builds pass end-to-end
 - [ ] **Step 6** — Archive old repos
 
 ## Verification

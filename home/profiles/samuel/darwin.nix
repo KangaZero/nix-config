@@ -1,4 +1,4 @@
-{ username, userMeta, ... }:
+{ username, userMeta, assetsDir, ... }:
 {
   imports = [
     ../../modules/common/git.nix
@@ -17,6 +17,10 @@
     ../../modules/darwin/zoxide.nix
     ../../modules/darwin/lazygit.nix
   ];
+
+  programs.kitty.settings.background_image = "${assetsDir}/cat-watching-the-star_pixelart_purple_animated.gif";
+  programs.kitty.settings.background_image_layout = "scaled";
+  programs.kitty.settings.background_tint = "0.85";
 
   home = {
     inherit username;

@@ -1,5 +1,5 @@
 { inputs }:
-{ hostname, system, user }:
+{ hostname, system, user, self ? null }:
 let
   userMeta = import ../home/profiles/${user}/default.nix;
   username = userMeta.usernames.darwin;
@@ -14,7 +14,7 @@ inputs.darwin.lib.darwinSystem {
   inherit system;
   specialArgs = {
     inherit inputs username hostname userMeta;
-  };
+  } // (if self != null then { inherit self; } else { });
   modules = [
     ../modules/shared/nix-settings.nix
     ../modules/darwin/homebrew.nix
