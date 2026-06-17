@@ -93,8 +93,7 @@
 
       checks."${wslSystem}".pre-commit-check = lib.mkChecks {
         system = wslSystem;
-        # buildTarget = ".#nixosConfigurations.wsl.config.system.build.toplevel";
-        buildTarget = ".#homeConfigurations.${wslUser}.activationPackage";
+        buildTarget = ".#nixosConfigurations.${wslHostname}.config.system.build.toplevel";
       };
 
       devShells."${darwinSystem}".default = lib.mkDevShell {
