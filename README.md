@@ -24,6 +24,32 @@ nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
 
 ---
 
+## Defaults
+
+| Category | Common | macOS (darwin) | NixOS WSL |
+|---|---|---|---|
+| **Shell** | zsh + oh-my-zsh | — | — |
+| **Prompt** | — | oh-my-posh (external TOML config) | catppuccin oh-my-zsh (mocha, time + hostname) |
+| **Editor** | neovim — `defaultEditor`, sideloaded `~/.config/nvim`; `vi`/`vim` aliases | — | root nvim symlinked to user config via activation script |
+| **Terminal** | kitty — Tokyo Night Moon, JetBrains Mono, 85% opacity | animated pixel-art gif bg | static `stars.png` bg |
+| **Font** | `nerd-fonts.jetbrains-mono` | — | `fonts.fontconfig.enable = true` |
+| **Multiplexer** | zellij | — | — |
+| **Nav** | zoxide | — | — |
+| **Browser** | Firefox Developer Edition (declarative — policies + Vimium) | — | — |
+| **Desktop** | — | native macOS | niri (Wayland tiling) → weston (kiosk-shell) → WSLg; `Alt` mod; `LIBGL_ALWAYS_SOFTWARE=1` |
+| **Bar / launcher / notifications** | — | — | noctalia-shell (autostarted by niri) |
+| **Clipboard** | — | — | cliphist + wl-clipboard; rofi picker |
+| **Languages** | `nodejs_26` + `pnpm`, `python3`, `rustup`, `just`, `mise` | — | + `uv` |
+| **Nix LSP** | — | `nixd`, `nixfmt` (home packages) | `nixd` (system package) |
+| **CLI toolkit** | `fzf` `yazi` `eza` `bat` `btop` `ripgrep` `fd` `jq` `curl` `gh` `claude-code` | + `vim` `fastfetch` `tree` `ffmpeg-full` `imagemagick` `_7zz` `yt-dlp` `resvg` `poppler` `odysseus` | + `wget` `openssh` `tldr` `ffmpeg-full` `unzip` `uv` `azure-cli` (+ DevOps ext) |
+| **Git** | LFS, `pull.rebase = true`, `autoSetupRemote = true`, identity from `userMeta` | — | — |
+| **Nix daemon** | — | Determinate Systems installer (`nix.enable = false`) | NixOS-managed |
+| **GC** | — | — | daily, `--delete-older-than 7d` |
+| **Timezone** | — | — | Asia/Tokyo |
+| **Extras** | direnv + nix-direnv, nix-search wrapper | Discord, nix-homebrew, keyboard layouts `us,jp` | xwayland + xwayland-satellite, `nixRebuildStatus`/`nixRebuildKill` aliases |
+
+---
+
 ## Setup & Usage
 
 > **Repo location expected by shell aliases:** `~/.config/nix-config`
