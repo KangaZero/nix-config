@@ -1,23 +1,33 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-#INFO: BASH_SOURCE is script's own path
-REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && git rev-parse --show-toplevel)"
+# BASH_SOURCE[0] = script path; -- protects against dirs starting with -
+REPO_DIR="$(cd "$(dirname -- "${BASH_SOURCE[0]}")" && git rev-parse --show-toplevel)"
 
 cd "$REPO_DIR"
 
-if [[ $(uname) == "Linux" ]]; then
+OS="$(uname)"
+
+if [[ -n "${WSL_DISTRO_NAME:-}" ]]; then
 	nix build .#nixosConfigurations.nixos.config.system.build.toplevel
 	REPORT="$REPO_DIR/CVE_REPORT_WSL.md"
-else
+elif [[ "$OS" == "Linux" ]]; then
+	# TODO: add native Linux build command and REPORT path
+	echo "Native Linux (non-WSL) not yet implemented" >&2
+	exit 1
+elif [[ "$OS" == "Darwin" ]]; then
 	darwin-rebuild build --flake .#samuelwaiweng
 	REPORT="$REPO_DIR/CVE_REPORT_DARWIN.md"
+else
+	echo "Unsupported platform: $OS" >&2
+	exit 1
 fi
+
 echo "## $(date '+%Y-%m-%d %H:%M:%S %Z')" > "$REPORT"
 echo "" >> "$REPORT"
 
 if command -v vulnix &>/dev/null; then
-  vulnix result/ | tee -a "$REPORT"
+	vulnix result/ | tee -a "$REPORT"
 else
-  nix run nixpkgs#vulnix -- result/ | tee -a "$REPORT"
+	nix run nixpkgs#vulnix -- result/ | tee -a "$REPORT"
 fi
