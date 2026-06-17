@@ -2,6 +2,7 @@
   username,
   userMeta,
   assetsDir,
+  lib,
   ...
 }:
 {
@@ -24,10 +25,17 @@
     ../../modules/linux/wayland/niri/default.nix
   ];
 
-  programs.kitty.settings = {
-    background_image = "${assetsDir}/stars.png";
-    background_image_layout = "scaled";
-    background_tint = "0.85";
+  programs = {
+    kitty.settings = {
+      background_image = "${assetsDir}/stars.png";
+      background_image_layout = "scaled";
+      background_tint = "0.85";
+    };
+    # Override userMeta.git.personal
+    git.settings.user = {
+      name = lib.mkForce userMeta.git.work.name;
+      email = lib.mkForce userMeta.git.work.email;
+    };
   };
 
   home = {

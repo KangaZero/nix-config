@@ -5,6 +5,6 @@ let
 in
 pkgs.mkShell {
   inherit (self.checks.${system}.pre-commit-check) shellHook;
-  packages = [ pkgs.nixfmt-tree ];
+  packages = builtins.attrValues { inherit (pkgs) nixfmt-tree vulnix; };
   buildInputs = self.checks.${system}.pre-commit-check.enabledPackages;
 }
