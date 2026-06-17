@@ -8,11 +8,11 @@ cd "$REPO_DIR"
 
 if [[ $(uname) == "Linux" ]]; then
 	nix build .#nixosConfigurations.nixos.config.system.build.toplevel
+	REPORT="$REPO_DIR/CVE_REPORT_WSL.md"
 else
 	darwin-rebuild build --flake .#samuelwaiweng
+	REPORT="$REPO_DIR/CVE_REPORT_DARWIN.md"
 fi
-
-REPORT="$REPO_DIR/CVE_REPORT.md"
 echo "## $(date '+%Y-%m-%d %H:%M:%S %Z')" > "$REPORT"
 echo "" >> "$REPORT"
 

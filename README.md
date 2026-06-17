@@ -568,6 +568,25 @@ Platform-only packages stay in `home/modules/darwin/packages.nix` and `home/modu
 - [ ] **Step 5** — Verify both builds pass end-to-end
 - [ ] **Step 6** — Archive old repos
 
+## Security
+
+CVE scanning is done via [`vulnix`](https://github.com/nix-community/vulnix) against the built store closure.
+
+Run the scanner:
+
+```sh
+bash scripts/vulnix-flake.sh
+```
+
+This builds the current platform's config, then writes a report to:
+
+| Platform | Report file |
+|---|---|
+| NixOS WSL | [`CVE_REPORT_WSL.md`](./CVE_REPORT_WSL.md) |
+| macOS (darwin) | [`CVE_REPORT_DARWIN.md`](./CVE_REPORT_DARWIN.md) |
+
+---
+
 ## Verification
 
 Run these before any significant change to confirm everything evaluates clean:
