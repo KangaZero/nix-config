@@ -63,9 +63,11 @@ inputs.darwin.lib.darwinSystem {
         uid = userMeta.darwinUid;
         gid = userMeta.darwinGid;
       };
-      environment.systemPackages = [ pkgs.mkalias ];
-      environment.systemPath = [ "/opt/homebrew/bin" ];
-      environment.pathsToLink = [ "/Applications" ];
+      environment = {
+        systemPackages = [ pkgs.mkalias ];
+        systemPath = [ "/opt/homebrew/bin" ];
+        pathsToLink = [ "/Applications" ];
+      };
     }
   ];
 }

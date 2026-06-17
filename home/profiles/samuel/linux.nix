@@ -1,4 +1,9 @@
-{ username, userMeta, ... }:
+{
+  username,
+  userMeta,
+  assetsDir,
+  ...
+}:
 {
   imports = [
     ../../modules/common/git.nix
@@ -9,6 +14,9 @@
     ../../modules/common/packages/common.nix
     ../../modules/common/packages/ns-script.nix
     ../../modules/common/shell/zsh-core.nix
+    ../../modules/common/zellij.nix
+    ../../modules/common/zoxide.nix
+    ../../modules/common/lazygit.nix
     ../../modules/linux/packages.nix
     ../../modules/linux/bash.nix
     ../../modules/linux/shell.nix
@@ -16,10 +24,16 @@
     ../../modules/linux/wayland/niri/default.nix
   ];
 
+  programs.kitty.settings = {
+    background_image = "${assetsDir}/stars.png";
+    background_image_layout = "scaled";
+    background_tint = "0.85";
+  };
+
   home = {
     inherit username;
+    inherit (userMeta) stateVersion;
     homeDirectory = "/home/${username}";
-    stateVersion = userMeta.stateVersion;
     keyboard.layout = "us";
     sessionVariables = {
       EDITOR = "nvim";

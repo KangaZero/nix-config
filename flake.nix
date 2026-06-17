@@ -61,51 +61,57 @@
     {
       self,
       nixpkgs,
-      git-hooks,
       ...
     }@inputs:
     let
       lib = import ./lib { inherit inputs; };
+      darwinHostname = "samuelwaiweng";
+      darwinUser = "KangaZero";
+      darwinSystem = "aarch64-darwin";
+      wslHostname = "nixos";
+      wslUser = "KangaZero";
+      wslSystem = "x86_64-linux";
     in
     {
-      darwinConfigurations."KangaZero" = lib.mkDarwin {
-        hostname = "KangaZero";
-        system = "aarch64-darwin";
-        user = "samuel";
+      darwinConfigurations."${darwinHostname}" = lib.mkDarwin {
+        hostname = darwinHostname;
+        system = darwinSystem;
+        user = darwinUser;
         inherit self;
       };
 
-      nixosConfigurations."wsl" = lib.mkWSL {
-        hostname = "wsl";
-        system = "x86_64-linux";
-        user = "samuel";
+      nixosConfigurations."${wslHostname}" = lib.mkWSL {
+        hostname = wslHostname;
+        system = wslSystem;
+        user = wslUser;
       };
 
-      checks."aarch64-darwin".pre-commit-check = lib.mkChecks {
-        system = "aarch64-darwin";
-        buildTarget = ".#darwinConfigurations.KangaZero.system";
+      checks."${darwinSystem}".pre-commit-check = lib.mkChecks {
+        system = darwinSystem;
+        buildTarget = ".#darwinConfigurations.${darwinSystem}.system";
       };
 
-      checks."x86_64-linux".pre-commit-check = lib.mkChecks {
-        system = "x86_64-linux";
-        buildTarget = ".#nixosConfigurations.wsl.config.system.build.toplevel";
+      checks."${wslSystem}".pre-commit-check = lib.mkChecks {
+        system = wslSystem;
+        # buildTarget = ".#nixosConfigurations.wsl.config.system.build.toplevel";
+        buildTarget = ".#homeConfigurations.${wslUser}.activationPackage";
       };
 
-      devShells."aarch64-darwin".default = lib.mkDevShell {
-        system = "aarch64-darwin";
+      devShells."${darwinSystem}".default = lib.mkDevShell {
+        system = darwinSystem;
         inherit self;
       };
 
-      devShells."x86_64-linux".default = lib.mkDevShell {
-        system = "x86_64-linux";
+      devShells."${wslSystem}".default = lib.mkDevShell {
+        system = wslSystem;
         inherit self;
       };
 
-      formatter."aarch64-darwin" = nixpkgs.legacyPackages."aarch64-darwin".nixfmt-tree;
-      formatter."x86_64-linux" = nixpkgs.legacyPackages."x86_64-linux".nixfmt-tree;
+      formatter."${darwinSystem}" = nixpkgs.legacyPackages."${darwinSystem}".nixfmt-tree;
+      formatter."${wslSystem}" = nixpkgs.legacyPackages."${wslSystem}".nixfmt-tree;
 
-      packages."aarch64-darwin".kitty = import ./packages/kitty.nix {
-        pkgs = nixpkgs.legacyPackages."aarch64-darwin";
+      packages."${darwinSystem}".kitty = import ./packages/kitty.nix {
+        pkgs = nixpkgs.legacyPackages."${darwinSystem}";
         inherit (inputs) nix-wrapper-modules;
         assetsDir = ./assets/mac;
       };

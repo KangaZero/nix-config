@@ -1,10 +1,13 @@
-{ ... }:
-{
-  services.xserver.enable = true;
-  services.xserver.windowManager.i3.enable = true;
-  services.xrdp = {
-    enable = true;
-    port = 3390;
-    openFirewall = true;
+_: {
+  services = {
+    xserver = {
+      enable = true;
+      windowManager.i3.enable = true;
+    };
+    xrdp = {
+      enable = true;
+      port = 3390;
+      openFirewall = true;
+    };
   };
 }

@@ -1,8 +1,6 @@
-{ ... }:
-{
+_: {
   programs.lazygit = {
     enable = true;
-    enableZshIntegration = true;
     settings.gui.theme = {
       lightTheme = true;
       activeBorderColor = [

@@ -17,7 +17,10 @@
       push.autoSetupRemote = true;
       pull.rebase = true;
       rebase.autoStash = true;
-      core.autocrlf = "input";
+      core = {
+        autocrlf = "input";
+        editor = "nvim";
+      };
     };
   };
 }

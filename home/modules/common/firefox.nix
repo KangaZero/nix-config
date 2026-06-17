@@ -42,9 +42,9 @@ in
         "browser.aboutConfig.showWarning" = setDefault false;
         "browser.compactmode.show" = setDefault true;
         "widget.use-xdg-desktop-portal.file-picker" = setDefault 1;
-        "signon.rememberSignons" = setDefault true;
-        "browser.cache.disk.enable" = setDefault true;
-        "widget.disable-workspace-management" = setDefault false;
+        "signon.rememberSignons" = setDefault false;
+        "browser.cache.disk.enable" = setDefault false;
+        "widget.disable-workspace-management" = setDefault true;
         "mousewheel.default.delta_multiplier_x" = setDefault 20;
         "mousewheel.default.delta_multiplier_y" = setDefault 20;
         "mousewheel.default.delta_multiplier_z" = setDefault 20;

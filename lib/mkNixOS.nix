@@ -18,6 +18,7 @@ let
         "steam-unwrapped"
         "steam-run"
       ];
+    overlays = [ (import ../overlays/zjstatus { inherit inputs; }) ];
   };
 in
 inputs.nixpkgs.lib.nixosSystem {

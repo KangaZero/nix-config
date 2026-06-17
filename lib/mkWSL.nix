@@ -1,11 +1,10 @@
-{ inputs }:
+{ lib, inputs }:
 args:
 let
   mkNixOS = import ./mkNixOS.nix { inherit inputs; };
 in
 mkNixOS (
-  args
-  // {
+  lib.recursiveUpdate args {
     extraModules = (args.extraModules or [ ]) ++ [
       inputs.nixos-wsl.nixosModules.wsl
       ../modules/nixos/nix-ld.nix

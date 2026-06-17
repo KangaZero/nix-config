@@ -11,7 +11,7 @@
     jq
     curl
     gh
-    nodejs
+    nodejs_26
     pnpm
     rustup
     python3

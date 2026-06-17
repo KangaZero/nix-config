@@ -1,4 +1,4 @@
-{ pkgs, assetsDir, ... }:
+{ pkgs, ... }:
 {
   programs.kitty = {
     enable = true;
