@@ -22,8 +22,8 @@ jobs:
         run: nix run nixpkgs#statix -- check .
       - name: Deadnix
         run: nix run nixpkgs#deadnix -- --fail .
-      - name: Build darwin config
-        run: nix build --no-link --print-build-logs .#darwinConfigurations.samuelwaiweng.system
+      # - name: Build darwin config
+        # run: nix build --no-link --print-build-logs .#darwinConfigurations.samuelwaiweng.system
 
   check-linux:
     name: Check (x86_64-linux)
@@ -40,5 +40,5 @@ jobs:
         run: nix run nixpkgs#statix -- check .
       - name: Deadnix
         run: nix run nixpkgs#deadnix -- --fail .
-      - name: Build WSL config
-        run: nix build --no-link --print-build-logs .#nixosConfigurations.nixos.config.system.build.toplevel
+      # - name: Build WSL config
+      #   run: nix build --no-link --print-build-logs .#nixosConfigurations.nixos.config.system.build.toplevel

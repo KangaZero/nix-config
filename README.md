@@ -10,6 +10,20 @@ A unified Nix flake monorepo consolidating macOS (nix-darwin) and NixOS configur
 | `nixos` | NixOS WSL2 | x86_64-linux | Migrated |
 | `server` | NixOS headless | x86_64/aarch64-linux | Planned |
 
+## Nixpkgs Source
+
+This repo uses [`DeterminateSystems/nixpkgs-weekly`](https://flakehub.com/f/DeterminateSystems/nixpkgs-weekly/0.1) — a mirror of `nixpkgs-unstable` with a **7-day cooldown** before adopting new commits.
+
+This guards against malicious packages reaching users before detection, a growing concern following supply-chain attacks on registries like npm and the AUR. See [the announcement](https://determinate.systems/posts/nixpkgs-cooldown/) for details.
+
+To use raw `nixpkgs-unstable` instead, swap the input in `flake.nix`:
+
+```nix
+nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
+```
+
+---
+
 ## Setup & Usage
 
 > **Repo location expected by shell aliases:** `~/.config/nix-config`
@@ -27,6 +41,8 @@ curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix 
 ```
 
 > This config sets `nix.enable = false` — it works with the Determinate installer instead of a nix-darwin-managed daemon. Do not use the official `sh.nixos.org` installer.
+>
+> macOS system updates can silently remove the `/nix` store. The Determinate installer handles re-mounting and persistence through OS upgrades. See [Nix disappeared from macOS](https://docs.determinate.systems/troubleshooting/nix-disappeared-from-macos/).
 
 **2. Clone the repo**
 
