@@ -9,13 +9,11 @@
             pane size=1 borderless=true {
                 plugin location="file:${pkgs.zjstatus}/bin/zjstatus.wasm" {
                     format_left   "{mode} {tabs}"
-                    format_center "{pipe}{pipe_zjstatus_hints}"
+                    format_center "{pipe_zjstatus_hints}"
                     format_right  "{session} {command_git_branch}"
                     format_space  ""
 
                     pipe_zjstatus_hints_format "#[bg=#cba6f7,fg=#1e1e2e,bold] {output} "
-                    pipe_NAME_format "#[fg=#89B4FA,bg=#181825] {output}"
-                    pipe_NAME_rendermode "static"
                     border_enabled  "true"
                     border_char     ""
                     border_format   "#[fg=#6c7086]{char}"
