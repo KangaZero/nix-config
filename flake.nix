@@ -88,7 +88,7 @@
 
       checks."${darwinSystem}".pre-commit-check = lib.mkChecks {
         system = darwinSystem;
-        buildTarget = ".#darwinConfigurations.${darwinSystem}.system";
+        buildTarget = ".#darwinConfigurations.${darwinHostname}.system";
       };
 
       checks."${wslSystem}".pre-commit-check = lib.mkChecks {

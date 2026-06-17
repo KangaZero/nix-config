@@ -6,8 +6,8 @@ A unified Nix flake monorepo consolidating macOS (nix-darwin) and NixOS configur
 
 | Host | OS | Architecture | Status |
 |---|---|---|---|
-| `KangaZero` | macOS (nix-darwin) | aarch64-darwin | Migrating |
-| `wsl` | NixOS WSL2 | x86_64-linux | Migrated |
+| `samuelwaiweng` | macOS (nix-darwin) | aarch64-darwin | Migrating |
+| `nixos` | NixOS WSL2 | x86_64-linux | Migrated |
 | `server` | NixOS headless | x86_64/aarch64-linux | Planned |
 
 ## Setup & Usage
@@ -38,24 +38,24 @@ cd ~/.config/nix-config
 **3. First-time bootstrap** (nix-darwin not yet installed)
 
 ```sh
-nix run nix-darwin/master -- switch --flake .#KangaZero
+nix run nix-darwin/master -- switch --flake .#samuelwaiweng
 ```
 
 **4. Day-to-day rebuilds**
 
 ```sh
 # Shell aliases set by this config (work from anywhere):
-nix-switch   # sudo darwin-rebuild switch --flake ~/.config/nix-config#KangaZero
-nix-build    # darwin-rebuild build   --flake ~/.config/nix-config#KangaZero
+nix-switch   # sudo darwin-rebuild switch --flake ~/.config/nix-config#samuelwaiweng
+nix-build    # darwin-rebuild build   --flake ~/.config/nix-config#samuelwaiweng
 
 # Directly from the repo:
-darwin-rebuild switch --flake .#KangaZero
+darwin-rebuild switch --flake .#samuelwaiweng
 ```
 
 **5. Dry-run / build check (no activation)**
 
 ```sh
-darwin-rebuild build --flake .#KangaZero
+darwin-rebuild build --flake .#samuelwaiweng
 ```
 
 **6. Roll back** the last activation if something breaks
@@ -110,7 +110,7 @@ sudo nixos-rebuild switch --flake .#wsl
 **5. Dry-run / build check (no activation)**
 
 ```sh
-nix build .#nixosConfigurations.wsl.config.system.build.toplevel
+nix build .#nixosConfigurations.nixos.config.system.build.toplevel
 ```
 
 **6. Roll back** if something breaks
@@ -208,12 +208,12 @@ nixos-rebuild switch --flake .#server --target-host user@server --use-remote-sud
 
 | Platform | Command |
 |---|---|
-| macOS — switch | `darwin-rebuild switch --flake .#KangaZero` |
+| macOS — switch | `darwin-rebuild switch --flake .#samuelwaiweng` |
 | macOS — alias | `nix-switch` |
-| macOS — build only | `darwin-rebuild build --flake .#KangaZero` |
+| macOS — build only | `darwin-rebuild build --flake .#samuelwaiweng` |
 | macOS — rollback | `sudo darwin-rebuild switch --rollback` |
 | NixOS WSL — switch | `sudo nixos-rebuild switch --flake .#wsl` |
-| NixOS WSL — build only | `nix build .#nixosConfigurations.wsl.config.system.build.toplevel` |
+| NixOS WSL — build only | `nix build .#nixosConfigurations.nixos.config.system.build.toplevel` |
 | NixOS WSL/bare — rollback | `sudo nixos-rebuild switch --rollback` |
 | NixOS server — remote | `nixos-rebuild switch --flake .#server --target-host user@host --use-remote-sudo` |
 | kitty wrapper | `nix run .#kitty` |
@@ -338,8 +338,8 @@ Pre-push hooks (block the push if the build fails):
 
 | Platform | Command |
 |---|---|
-| darwin | `nix build .#darwinConfigurations.KangaZero.system` |
-| linux | `nix build .#nixosConfigurations.wsl.config.system.build.toplevel` |
+| darwin | `nix build .#darwinConfigurations.samuelwaiweng.system` |
+| linux | `nix build .#nixosConfigurations.nixos.config.system.build.toplevel` |
 
 ### Manual checks
 
@@ -348,8 +348,8 @@ Pre-push hooks (block the push if the build fails):
 nix flake check
 
 # Dry-run build without activating (safe — nothing changes)
-darwin-rebuild build --flake .#KangaZero
-nix build .#nixosConfigurations.wsl.config.system.build.toplevel
+darwin-rebuild build --flake .#samuelwaiweng
+nix build .#nixosConfigurations.nixos.config.system.build.toplevel
 
 # Lint only
 statix check .
@@ -383,8 +383,8 @@ GitHub Actions runs a matrix across both architectures on every push and PR:
 
 | Job | Runner | Checks |
 |---|---|---|
-| `check-darwin` | `macos-latest` (aarch64) | `nix flake check`, nixfmt, statix, deadnix, `darwin-rebuild build .#KangaZero` |
-| `check-linux` | `ubuntu-latest` (x86_64) | `nix flake check`, nixfmt, statix, deadnix, `nix build .#nixosConfigurations.wsl.config.system.build.toplevel` |
+| `check-darwin` | `macos-latest` (aarch64) | `nix flake check`, nixfmt, statix, deadnix, `darwin-rebuild build .#samuelwaiweng` |
+| `check-linux` | `ubuntu-latest` (x86_64) | `nix flake check`, nixfmt, statix, deadnix, `nix build .#nixosConfigurations.nixos.config.system.build.toplevel` |
 
 Uses `DeterminateSystems/nix-installer-action` with `determinate: false` — the Determinate installer binary, but running standard Nix (avoids FlakeHub authentication requirements).
 
@@ -396,14 +396,14 @@ Uses `DeterminateSystems/nix-installer-action` with `determinate: false` — the
 `flake.nix` only declares inputs and calls lib helpers. No inline modules, no `let primaryUser = ...` blocks.
 
 ```nix
-darwinConfigurations."KangaZero" = lib.mkDarwin {
-  hostname = "KangaZero";
+darwinConfigurations."samuelwaiweng" = lib.mkDarwin {
+  hostname = "samuelwaiweng";
   system   = "aarch64-darwin";
   user     = "KangaZero";       # logical key — resolves to OS username inside lib
 };
 
-nixosConfigurations."wsl" = lib.mkWSL {
-  hostname = "wsl";
+nixosConfigurations."nixos" = lib.mkWSL {
+  hostname = "nixos";
   system   = "x86_64-linux";
   user     = "KangaZero";
 };
@@ -522,7 +522,7 @@ Platform-only packages stay in `home/modules/darwin/packages.nix` and `home/modu
 - [x] **Step 1** — README and repo structure plan
 - [x] **Step 2** — Scaffold: full directory structure, lib helpers, CI, `.envrc`
 - [x] **Step 3** — Migrate darwin: all system + home modules ported; `common/` modules written
-- [x] **Step 4** — Migrate NixOS/WSL: port WSL config; verify `nix build .#nixosConfigurations.wsl.config.system.build.toplevel`
+- [x] **Step 4** — Migrate NixOS/WSL: port WSL config; verify `nix build .#nixosConfigurations.nixos.config.system.build.toplevel`
 - [ ] **Step 5** — Verify both builds pass end-to-end
 - [ ] **Step 6** — Archive old repos
 
@@ -532,8 +532,8 @@ Run these before any significant change to confirm everything evaluates clean:
 
 ```sh
 nix flake check                                                    # all outputs
-darwin-rebuild build --flake .#KangaZero                          # macOS dry-run
-nix build .#nixosConfigurations.wsl.config.system.build.toplevel  # NixOS WSL dry-run
+darwin-rebuild build --flake .#samuelwaiweng                          # macOS dry-run
+nix build .#nixosConfigurations.nixos.config.system.build.toplevel  # NixOS WSL dry-run
 nix run .#kitty                                                    # kitty wrapper
 statix check . && deadnix . && nixfmt --check .                   # lints
 ```
