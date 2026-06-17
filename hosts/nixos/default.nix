@@ -30,9 +30,9 @@
   '';
 
   home-manager.users.${username}.programs.zsh.shellAliases = {
-    edit-nix = "z /etc/nixos && sudoedit flake.nix";
-    home-switch = "home-manager switch --flake /etc/nixos#${username}";
-    nix-switch = "sudo nixos-rebuild switch --flake /etc/nixos#${hostname}";
+    edit-nix = "cd /home/${username}/.config/multi-nix && nvim flake.nix";
+    home-switch = "home-manager switch --flake /home/${username}/.config/multi-nix#${username}";
+    nix-switch = "sudo nixos-rebuild switch --flake /home/${username}/.config/multi-nix#${hostname}";
   };
 
   environment.systemPackages = builtins.attrValues {
