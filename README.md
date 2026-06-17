@@ -7,16 +7,16 @@ A unified Nix flake monorepo consolidating macOS (nix-darwin) and NixOS configur
 | Host | OS | Architecture | Status |
 |---|---|---|---|
 | `samuelwaiweng` | macOS (nix-darwin) | aarch64-darwin | Migrating |
-| `nixos` | NixOS WSL2 | x86_64-linux | Migrated |
+| `nixos` | NixOS WSL2 | x86_64-linux | Active |
 | `server` | NixOS headless | x86_64/aarch64-linux | Planned |
 
 ## Nixpkgs Source
 
-This repo uses [`DeterminateSystems/nixpkgs-weekly`](https://flakehub.com/f/DeterminateSystems/nixpkgs-weekly/0.1) — a mirror of `nixpkgs-unstable` with a **7-day cooldown** before adopting new commits.
+This repo uses [`DeterminateSystems/nixpkgs-weekly`](https://flakehub.com/f/DeterminateSystems/nixpkgs-weekly/0.1) — a mirror of `nixpkgs-unstable`, but with packages released needing to be published for at least **7-days**.
 
 This guards against malicious packages reaching users before detection, a growing concern following supply-chain attacks on registries like npm and the AUR. See [the announcement](https://determinate.systems/posts/nixpkgs-cooldown/) for details.
 
-To use raw `nixpkgs-unstable` instead, swap the input in `flake.nix`:
+To live dangerously, use raw `nixpkgs-unstable` instead, swap the input in `flake.nix`:
 
 ```nix
 nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
@@ -399,8 +399,8 @@ GitHub Actions runs a matrix across both architectures on every push and PR:
 
 | Job | Runner | Checks |
 |---|---|---|
-| `check-darwin` | `macos-latest` (aarch64) | `nix flake check`, nixfmt, statix, deadnix, `darwin-rebuild build .#samuelwaiweng` |
-| `check-linux` | `ubuntu-latest` (x86_64) | `nix flake check`, nixfmt, statix, deadnix, `nix build .#nixosConfigurations.nixos.config.system.build.toplevel` |
+| `check-darwin` | `macos-latest` (aarch64) | `nix flake check`, nixfmt, statix, deadnix |
+| `check-linux` | `ubuntu-latest` (x86_64) | `nix flake check`, nixfmt, statix, deadnix |
 
 Uses `DeterminateSystems/nix-installer-action` with `determinate: false` — the Determinate installer binary, but running standard Nix (avoids FlakeHub authentication requirements).
 
