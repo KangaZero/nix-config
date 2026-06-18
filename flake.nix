@@ -69,7 +69,7 @@
     }@inputs:
     let
       lib = import ./lib { inherit inputs; };
-      darwinHostname = "samuelwaiweng";
+      darwinHostname = "KangaZero";
       darwinUser = "KangaZero";
       darwinSystem = "aarch64-darwin";
       wslHostname = "nixos";

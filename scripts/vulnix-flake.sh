@@ -16,7 +16,7 @@ elif [[ "$OS" == "Linux" ]]; then
 	echo "Native Linux (non-WSL) not yet implemented" >&2
 	exit 1
 elif [[ "$OS" == "Darwin" ]]; then
-	darwin-rebuild build --flake .#samuelwaiweng
+	darwin-rebuild build --flake .#KangaZero
 	REPORT="$REPO_DIR/CVE_REPORT_DARWIN.md"
 else
 	echo "Unsupported platform: $OS" >&2

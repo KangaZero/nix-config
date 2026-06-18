@@ -1,7 +1,6 @@
 {
   inputs,
   username,
-  config,
   ...
 }:
 {
@@ -9,7 +8,11 @@
     enable = true;
     user = username;
     enableRosetta = true;
-    autoMigrate = false;
+    # autoMigrate moves any pre-existing (imperative) Homebrew taps out of the
+    # way on activation so nix-homebrew can own /opt/homebrew/Library/Taps with
+    # mutableTaps = false. Without it, an existing Taps dir aborts the switch
+    # with "An existing /opt/homebrew/Library/Taps is in the way".
+    autoMigrate = true;
     taps = {
       "homebrew/core" = inputs.homebrew-core;
       "homebrew/cask" = inputs.homebrew-cask;
@@ -34,9 +37,10 @@
       autoUpdate = true;
       brewfile = true;
     };
-    taps = builtins.filter (t: t != "homebrew/core" && t != "homebrew/cask") (
-      builtins.attrNames config.nix-homebrew.taps
-    );
+    # Taps are managed declaratively by nix-homebrew above (mutableTaps = false).
+    # Do NOT also set homebrew.taps here — nix-darwin would try to `brew tap`
+    # (git clone) into the read-only nix-store-backed Taps dir and fail with
+    # "Permission denied".
     casks = [
       "linearmouse"
       "omniwm"

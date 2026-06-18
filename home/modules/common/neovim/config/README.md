@@ -218,12 +218,16 @@ This config is managed by **Home Manager** inside the `multi-nix` flake. There i
 manual clone step — HM symlinks `home/modules/common/neovim/config/` to
 `~/.config/nvim` via `xdg.configFile."nvim".source` in `neovim.nix`.
 
-```sh
-# Apply the flake (Linux / WSL)
-home-manager switch --flake .#KangaZero@linux
+Home Manager is integrated into the system configuration (not standalone), so it is
+applied as part of the normal system rebuild — there is no separate
+`home-manager switch`:
 
-# Apply the flake (macOS)
-home-manager switch --flake .#KangaZero@darwin
+```sh
+# macOS — Home Manager runs as part of the darwin system
+sudo darwin-rebuild switch --flake .#KangaZero
+
+# NixOS / WSL — Home Manager runs as part of the NixOS system
+sudo nixos-rebuild switch --flake .#nixos
 ```
 
 On first run `vim.pack` fetches everything in the lockfile, and mason installs the
