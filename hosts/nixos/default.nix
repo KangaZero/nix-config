@@ -15,6 +15,11 @@
 
   time.timeZone = "Asia/Tokyo";
 
+  # WSL has no login session to keep `systemd --user` (and its dbus socket) alive,
+  # so `nixos-rebuild switch` fails to reload user units ("/run/user/1000/bus:
+  # Connection refused"). Lingering starts the user manager at boot, persistently.
+  users.users.${username}.linger = true;
+
   nix.gc = {
     automatic = true;
     dates = "daily";
@@ -23,12 +28,13 @@
 
   environment.variables.EDITOR = "nvim";
 
+  # INFO: No longer in use, migrated over nvim config to this repo !!! finally
   # WARNING: Very bad to do this, will eventually have a truly declarative way to add in my nvim config
-  system.activationScripts.rootNvimConfig = ''
-    mkdir -p /root/.config
-    ln -sfn /home/${username}/Documents/dotfiles-mac/nvim-min /root/.config/nvim
-  '';
-
+  # system.activationScripts.rootNvimConfig = ''
+  #   mkdir -p /root/.config
+  #   ln -sfn /home/${username}/Documents/dotfiles-mac/nvim-min /root/.config/nvim
+  # '';
+  #
   home-manager.users.${username}.programs.zsh.shellAliases = {
     edit-nix = "cd /home/${username}/.config/multi-nix && nvim flake.nix";
     home-switch = "home-manager switch --flake /home/${username}/.config/multi-nix#${username}";
