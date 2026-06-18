@@ -2,6 +2,8 @@
 
 A unified Nix flake monorepo consolidating macOS (nix-darwin) and NixOS configurations into a single, multi-platform, multi-user setup.
 
+> **Just want the Neovim config?** → [`home/modules/common/neovim/config/`](home/modules/common/neovim/config/README.md) — standalone, no Nix required.
+
 ## Supported Platforms
 
 | Host | OS | Architecture | Status |
@@ -30,7 +32,7 @@ nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
 |---|---|---|---|
 | **Shell** | zsh + oh-my-zsh | — | — |
 | **Prompt** | — | oh-my-posh (external TOML config) | catppuccin oh-my-zsh (mocha, time + hostname) |
-| **Editor** | neovim — `defaultEditor`, sideloaded `~/.config/nvim`; `vi`/`vim` aliases | — | root nvim symlinked to user config via activation script |
+| **Editor** | neovim — `defaultEditor`, config HM-managed via `xdg.configFile` → `~/.config/nvim`; `vi`/`vim` aliases | — | root nvim symlinked to user config via activation script |
 | **Terminal** | kitty — Tokyo Night Moon, JetBrains Mono, 85% opacity | animated pixel-art gif bg | static `stars.png` bg |
 | **Font** | `nerd-fonts.jetbrains-mono` | — | `fonts.fontconfig.enable = true` |
 | **Multiplexer** | zellij | — | — |
@@ -304,7 +306,9 @@ nix-config/
 │       │   ├── direnv.nix
 │       │   ├── firefox.nix           # Firefox Dev Edition + policies
 │       │   ├── kitty.nix             # Tokyo Night Moon — bg image from assetsDir
-│       │   ├── neovim.nix            # Sideloaded config
+│       │   ├── neovim/
+│       │   │   ├── neovim.nix        # HM module — symlinks config via xdg.configFile
+│       │   │   └── config/           # Standalone nvim config (init.lua, lua/, scripts/…)
 │       │   ├── ollama.nix            # ollama-vulkan systemd user service (port 11434)
 │       │   ├── packages/
 │       │   │   ├── common.nix        # Shared: fzf, ripgrep, bat, eza, jq, btop,
@@ -377,6 +381,7 @@ Pre-commit hooks (block the commit if they fail):
 | `deadnix` | Removes dead Nix code (unused bindings, unused imports) |
 | `nixfmt` | Enforces consistent formatting via nixfmt-tree |
 | `statix` | Lints for anti-patterns — enforces `inherit` over explicit assignment |
+| `nvim-lua-syntax` | Parses every staged `.lua` file under `neovim/config/` via `nvim --clean`; fails on syntax errors |
 
 Pre-push hooks (block the push if the build fails):
 
@@ -427,8 +432,9 @@ GitHub Actions runs a matrix across both architectures on every push and PR:
 
 | Job | Runner | Checks |
 |---|---|---|
-| `check-darwin` | `macos-latest` (aarch64) | `nix flake check`, nixfmt, statix, deadnix |
-| `check-linux` | `ubuntu-latest` (x86_64) | `nix flake check`, nixfmt, statix, deadnix |
+| `check-darwin` | `macos-latest` (aarch64) | nixfmt, statix, deadnix |
+| `check-linux` | `ubuntu-latest` (x86_64) | nixfmt, statix, deadnix |
+| `check-nvim-config` | `ubuntu-latest` | Lua syntax (`nvim --clean`), stylua fmt check |
 
 Uses `DeterminateSystems/nix-installer-action` with `determinate: false` — the Determinate installer binary, but running standard Nix (avoids FlakeHub authentication requirements).
 
@@ -540,7 +546,7 @@ This repo consolidates two existing configs:
 | `direnv.nix` | Both | WSL version used (adds `enableBashIntegration = true`, harmless on darwin) |
 | `firefox.nix` | Both | Nearly identical policies; canonical pref values chosen |
 | `kitty.nix` | Both | Shared Tokyo Night Moon palette; `background_image = "${assetsDir}/kitty-bg"` |
-| `neovim.nix` | WSL only | Sideloaded config; imported on both platforms going forward |
+| `neovim/neovim.nix` | Both | HM module — `xdg.configFile` symlinks `neovim/config/` to `~/.config/nvim`; originally WSL-only, now shared |
 
 ### Platform-specific modules
 
