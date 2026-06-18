@@ -42,3 +42,17 @@ jobs:
         run: nix run nixpkgs#deadnix -- --fail .
       # - name: Build WSL config
       #   run: nix build --no-link --print-build-logs .#nixosConfigurations.nixos.config.system.build.toplevel
+
+  check-nvim-config:
+    name: Check (neovim config)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/nix-installer-action@main
+        with:
+          determinate: false
+      - uses: DeterminateSystems/magic-nix-cache-action@main
+      - name: Lua syntax check
+        run: nix shell nixpkgs#neovim --command nvim --clean -l home/modules/common/neovim/config/scripts/check-syntax.lua
+      - name: Stylua fmt check
+        run: nix shell nixpkgs#stylua --command stylua --check home/modules/common/neovim/config/

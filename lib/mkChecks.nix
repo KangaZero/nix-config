@@ -1,5 +1,8 @@
 { inputs }:
 { system, buildTarget }:
+let
+  pkgs = inputs.nixpkgs.legacyPackages.${system};
+in
 inputs.git-hooks.lib.${system}.run {
   src = ./..;
   hooks = {
@@ -14,6 +17,14 @@ inputs.git-hooks.lib.${system}.run {
       files = "\\.nix$";
       pass_filenames = false;
       stages = [ "pre-push" ];
+    };
+    nvim-lua-syntax = {
+      enable = true;
+      name = "neovim config lua syntax";
+      entry = "${pkgs.bash}/bin/bash -c '${pkgs.neovim}/bin/nvim --clean --headless -l home/modules/common/neovim/config/scripts/check-syntax.lua </dev/null'";
+      language = "system";
+      files = "^home/modules/common/neovim/config/.*\\.lua$";
+      pass_filenames = false;
     };
   };
 }
