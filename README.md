@@ -40,6 +40,7 @@ nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
 | **Bar / launcher / notifications** | — | — | noctalia-shell (autostarted by niri) |
 | **Clipboard** | — | — | cliphist + wl-clipboard; rofi picker |
 | **Languages** | `nodejs_26` + `pnpm`, `python3`, `rustup`, `just`, `mise` | — | + `uv` |
+| **Local LLM** | — | — | ollama (`ollama-vulkan`, systemd user service) — `qwen2.5:7b` pulled manually post-activation |
 | **Nix LSP** | — | `nixd`, `nixfmt` (home packages) | `nixd` (system package) |
 | **CLI toolkit** | `fzf` `yazi` `eza` `bat` `btop` `ripgrep` `fd` `jq` `curl` `gh` `claude-code` | + `vim` `fastfetch` `tree` `ffmpeg-full` `imagemagick` `_7zz` `yt-dlp` `resvg` `poppler` `odysseus` | + `wget` `openssh` `tldr` `ffmpeg-full` `unzip` `uv` `azure-cli` (+ DevOps ext) |
 | **Git** | LFS, `pull.rebase = true`, `autoSetupRemote = true`, identity from `userMeta` | — | — |
@@ -132,7 +133,7 @@ cd ~/.config/nix-config
 **3. First-time activation**
 
 ```sh
-sudo nixos-rebuild switch --flake .#wsl
+sudo nixos-rebuild switch --flake .#nixos
 ```
 
 Restart the instance after the first switch so shell and user settings take effect:
@@ -144,15 +145,15 @@ wsl --terminate NixOS && wsl -d NixOS
 **4. Day-to-day rebuilds**
 
 ```sh
-sudo nixos-rebuild switch --flake ~/.config/nix-config#wsl
+sudo nixos-rebuild switch --flake ~/.config/nix-config#nixos
 # or from inside the repo:
-sudo nixos-rebuild switch --flake .#wsl
+sudo nixos-rebuild switch --flake .#nixos
 ```
 
 **5. Dry-run / build check (no activation)**
 
 ```sh
-nix build .#nixosConfigurations.nixos.config.system.build.toplevel
+nixos-rebuild dry-build --flake .#nixos
 ```
 
 **6. Roll back** if something breaks
@@ -254,8 +255,8 @@ nixos-rebuild switch --flake .#server --target-host user@server --use-remote-sud
 | macOS — alias | `nix-switch` |
 | macOS — build only | `darwin-rebuild build --flake .#samuelwaiweng` |
 | macOS — rollback | `sudo darwin-rebuild switch --rollback` |
-| NixOS WSL — switch | `sudo nixos-rebuild switch --flake .#wsl` |
-| NixOS WSL — build only | `nix build .#nixosConfigurations.nixos.config.system.build.toplevel` |
+| NixOS WSL — switch | `sudo nixos-rebuild switch --flake .#nixos` |
+| NixOS WSL — build only | `nixos-rebuild dry-build --flake .#nixos` |
 | NixOS WSL/bare — rollback | `sudo nixos-rebuild switch --rollback` |
 | NixOS server — remote | `nixos-rebuild switch --flake .#server --target-host user@host --use-remote-sudo` |
 | kitty wrapper | `nix run .#kitty` |
@@ -304,6 +305,7 @@ nix-config/
 │       │   ├── firefox.nix           # Firefox Dev Edition + policies
 │       │   ├── kitty.nix             # Tokyo Night Moon — bg image from assetsDir
 │       │   ├── neovim.nix            # Sideloaded config
+│       │   ├── ollama.nix            # ollama-vulkan systemd user service (port 11434)
 │       │   ├── packages/
 │       │   │   ├── common.nix        # Shared: fzf, ripgrep, bat, eza, jq, btop,
 │       │   │   │                     #   yazi, nodejs, rustup, python3, mise, just,
@@ -381,7 +383,7 @@ Pre-push hooks (block the push if the build fails):
 | Platform | Command |
 |---|---|
 | darwin | `nix build .#darwinConfigurations.samuelwaiweng.system` |
-| linux | `nix build .#nixosConfigurations.nixos.config.system.build.toplevel` |
+| linux | `nixos-rebuild dry-build --flake .#nixos` |
 
 ### Manual checks
 
@@ -391,7 +393,7 @@ nix flake check
 
 # Dry-run build without activating (safe — nothing changes)
 darwin-rebuild build --flake .#samuelwaiweng
-nix build .#nixosConfigurations.nixos.config.system.build.toplevel
+nixos-rebuild dry-build --flake .#nixos
 
 # Lint only
 statix check .
@@ -593,8 +595,8 @@ Run these before any significant change to confirm everything evaluates clean:
 
 ```sh
 nix flake check                                                    # all outputs
-darwin-rebuild build --flake .#samuelwaiweng                          # macOS dry-run
-nix build .#nixosConfigurations.nixos.config.system.build.toplevel  # NixOS WSL dry-run
+darwin-rebuild build --flake .#samuelwaiweng        # macOS dry-run
+nixos-rebuild dry-build --flake .#nixos            # NixOS WSL dry-run
 nix run .#kitty                                                    # kitty wrapper
 statix check . && deadnix . && nixfmt --check .                   # lints
 ```

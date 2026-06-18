@@ -18,6 +18,7 @@
     ../../modules/common/zellij.nix
     ../../modules/common/zoxide.nix
     ../../modules/common/lazygit.nix
+    ../../modules/common/ollama.nix
     ../../modules/linux/packages.nix
     ../../modules/linux/bash.nix
     ../../modules/linux/shell.nix
