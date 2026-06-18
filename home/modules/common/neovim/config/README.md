@@ -57,7 +57,6 @@ LSP servers are installed/managed by **mason** + **mason-lspconfig** (see
 ├── init.lua                  # entry point: sets leader, message UI, requires modules in order
 ├── nvim-pack-lock.json       # vim.pack lockfile (pinned plugin commits)
 ├── justfile                  # task runner: syntax / fmt / load checks (see Testing & CI)
-├── .stylua.toml              # stylua formatting config
 ├── scripts/                  # check-syntax.lua, load-test.sh, install-hooks.sh, hooks/pre-commit
 │
 ├── lua/
@@ -72,6 +71,7 @@ LSP servers are installed/managed by **mason** + **mason-lspconfig** (see
 │   ├── custom/
 │   │   ├── safemode.lua      # read-only "SAFE" mode toggle (<leader>ts)
 │   │   ├── terminal.lua      # toggleable bottom terminal split (<C-/>)
+│   │   ├── zen.lua           # distraction-free centered window toggle (<leader>zz)
 │   │   └── customlogo.py     # dashboard ASCII-art helper (script)
 │   │
 │   ├── ui/
@@ -100,8 +100,8 @@ LSP servers are installed/managed by **mason** + **mason-lspconfig** (see
 
 ### Load order (`init.lua`)
 
-`core → custom/safemode → custom/terminal → lsp → plugins → colorscheme → statusline
-→ options → autocmds → keymaps → usercmds`
+`core → custom/safemode → custom/terminal → lsp → plugins → options → colorscheme
+→ ui/statusline → autocmds → keymaps → usercmds`
 
 ---
 
@@ -174,10 +174,10 @@ Leader is **`<Space>`**.
 - `<leader>ww/wd/wx/wv` — window next / close / swap / vsplit
 
 **Find / search**
-- `<leader><leader>` — smart picker (snacks) / open yazi
+- `<leader><leader>` — smart picker (snacks)
 - `<leader>ff` — find files · `<leader>sg` — live grep · `<leader>fm` — search `:messages`
 - `<leader>sr` — grug-far search & replace
-- `<leader>E` — yazi at cwd · `<leader>fc` — open Neovim config in yazi
+- `<leader>E` — yazi at cwd · `<leader>e` — yazi at current buffer · `<leader>fc` — open Neovim config in yazi
 
 **LSP / diagnostics**
 - `<leader>gd/gr/gI` — definitions / references / implementations (snacks picker)
@@ -192,6 +192,7 @@ Leader is **`<Space>`**.
 - `<C-/>` — toggle bottom terminal split (`custom/terminal.lua`)
 - `<leader>gg` — floating lazygit
 - `<leader>uu` — undotree
+- `<leader>zz` — toggle **Zen mode** (distraction-free centered window; `custom/zen.lua`)
 - `<leader>ts` — toggle **SAFE mode** (read-only: blocks edits/macros/paste; `<Esc>` exits)
 - `<leader>p` — update plugins (`vim.pack.update()`)
 - `<leader>aa` — execute current line / selection as Lua
