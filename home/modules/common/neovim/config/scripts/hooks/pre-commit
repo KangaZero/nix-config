@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# Versioned pre-commit hook. Install with: just install-hooks (from config dir)
+# Runs checks only when neovim config Lua files are staged.
+set -euo pipefail
+
+config_root="$(git rev-parse --show-toplevel)/home/modules/common/neovim/config"
+
+staged="$(git diff --cached --name-only --diff-filter=ACM | grep -E '^home/modules/common/neovim/config/.*\.lua$' || true)"
+[ -z "$staged" ] && exit 0
+
+echo "[pre-commit] neovim config Lua changed -> running checks"
+
+if command -v just >/dev/null 2>&1; then
+	( cd "$config_root" && just check )
+else
+	echo "[pre-commit] 'just' not found; running scripts directly"
+	(
+		cd "$config_root"
+		nvim --clean -l scripts/check-syntax.lua
+		bash scripts/load-test.sh
+	)
+fi

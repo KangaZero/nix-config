@@ -7,4 +7,9 @@ _: {
     # Lets neovim use the default ~/.config/nvim/init.lua — config managed outside Nix
     sideloadInitLua = true;
   };
+
+  xdg.configFile."nvim" = {
+    source = ./config;
+    recursive = true;
+  };
 }

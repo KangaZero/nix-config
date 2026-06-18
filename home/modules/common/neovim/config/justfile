@@ -1,0 +1,41 @@
+# nvim-min config tasks. `just` (no args) runs the default check suite.
+# Recipes run with their working dir = this file's directory.
+set shell := ["bash", "-uc"]
+
+# List recipes
+_default:
+    @just --list
+
+# Fast local check: syntax + format + load (uses cached plugins)
+check: syntax fmt-check smoke
+
+# Thorough check for CI: syntax + format + isolated fresh load
+ci: syntax fmt-check load
+
+# Offline Lua syntax check (no plugins loaded, hermetic)
+syntax:
+    nvim --clean -l scripts/check-syntax.lua
+
+# Verify formatting with stylua (no changes). Skips if stylua absent.
+fmt-check:
+    @if command -v stylua >/dev/null 2>&1; then \
+        stylua --check . ; \
+    else \
+        echo "stylua not installed - skipping fmt-check (install via nix/mason)"; \
+    fi
+
+# Auto-format all Lua with stylua
+fmt:
+    stylua .
+
+# Load config in the current environment (fast; plugins must be installed)
+smoke:
+    bash scripts/load-test.sh
+
+# Load config in a throwaway XDG env with a fresh plugin clone (CI-grade)
+load:
+    bash scripts/load-test.sh --isolated
+
+# Install the git pre-commit hook for this repo
+install-hooks:
+    bash scripts/install-hooks.sh
