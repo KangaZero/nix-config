@@ -262,6 +262,7 @@ nixos-rebuild switch --flake .#server --target-host user@server --use-remote-sud
 | NixOS WSL/bare — rollback | `sudo nixos-rebuild switch --rollback` |
 | NixOS server — remote | `nixos-rebuild switch --flake .#server --target-host user@host --use-remote-sudo` |
 | kitty wrapper | `nix run .#kitty` |
+| nvim live config (no rebuild) | `nvim-dev` (alias for `NVIM_APPNAME=multi-nix/home/modules/common/neovim/config nvim`) |
 
 ## Repository Structure
 
@@ -575,7 +576,7 @@ Platform-only packages stay in `home/modules/darwin/packages.nix` and `home/modu
 - [x] **Step 2** — Scaffold: full directory structure, lib helpers, CI, `.envrc`
 - [x] **Step 3** — Migrate darwin: all system + home modules ported; `common/` modules written
 - [x] **Step 4** — Migrate NixOS/WSL: port WSL config; verify `nix build .#nixosConfigurations.nixos.config.system.build.toplevel`
-- [ ] **Step 5** — Verify both builds pass end-to-end
+- [x] **Step 5** — Verify both builds pass end-to-end
 - [ ] **Step 6** — Archive old repos
 
 ## Security

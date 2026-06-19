@@ -235,6 +235,21 @@ sudo nixos-rebuild switch --flake .#nixos
 On first run `vim.pack` fetches everything in the lockfile, and mason installs the
 configured LSP servers. Restart once after the initial sync.
 
+### Live development (no rebuild)
+
+`~/.config/nvim` is the rebuilt store copy, so edits to the source here are only
+picked up after a system rebuild. To iterate on the config live, use the `nvim-dev`
+shell alias (defined in `hosts/nixos` and `hosts/KangaZero`):
+
+```sh
+nvim-dev          # == NVIM_APPNAME=multi-nix/home/modules/common/neovim/config nvim
+```
+
+`NVIM_APPNAME` is relative to `$XDG_CONFIG_HOME` (`~/.config`), so it resolves
+straight to this working tree — every edit shows on the next launch, no rebuild.
+Data/state isolate under `~/.local/share/multi-nix/...`, so the dev session clones
+its own plugins once and can't disturb the rebuilt `~/.config/nvim`.
+
 ---
 
 ## Testing & CI
