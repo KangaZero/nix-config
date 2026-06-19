@@ -1,5 +1,7 @@
 vim.pack.add({ "https://github.com/folke/flash.nvim" })
-require("flash").setup({
+
+---@type Flash.Config
+local opts = {
 	labels = "asdfghjklqwertyuiopzxcvbnm",
 	search = {
 		-- search/jump in all windows
@@ -254,4 +256,5 @@ require("flash").setup({
 		-- `nil`: act as `true` for remote windows, `false` for the current window
 		motion = false,
 	},
-})
+}
+require("flash").setup(opts)

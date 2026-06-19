@@ -1,6 +1,10 @@
---- @class Util
-local util = require("util")
+---@class Statusline.ModeInfo
+---@field icon? string
+---@field label string
+---@field safe_mode_label? string
+---@field hl string
 
+---@type table<string, Statusline.ModeInfo>
 local mode_map = {
 	n = { icon = "", label = "NORMAL", safe_mode_label = "SAFE", hl = "StatusLineNormal" },
 	no = { icon = "", label = "O-PENDING", safe_mode_label = "O-SAFE", hl = "StatusLineNormal" },
@@ -25,7 +29,9 @@ vim.api.nvim_create_autocmd({ "BufEnter", "FocusGained" }, {
 	end,
 })
 
-function CustomStatusline()
+-- Global because 'statusline' evaluates it via `v:lua.CustomStatusline()`.
+---@return string
+function _G.CustomStatusline()
 	if vim.g.statusline_winid ~= vim.fn.win_getid() then
 		return "" -- inactive window shows nothing
 	end

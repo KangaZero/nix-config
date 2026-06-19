@@ -1,8 +1,18 @@
+-- Toggleable bottom terminal split.
+-- Module exposes `toggle`; the keymaps that drive it live in keymaps.lua.
+
+---@class Terminal
+local M = {}
+
+---@type integer? scratch/terminal buffer, reused across toggles
 local terminal_buf = nil
+---@type integer? current split window, nil when hidden
 local terminal_win = nil
+---@type integer remembered height so the split reopens at the same size
 local terminal_win_height = 15
 
-local function toggle_terminal()
+---@return nil
+function M.toggle()
 	-- If window is open, hide it
 	if terminal_win and vim.api.nvim_win_is_valid(terminal_win) then
 		terminal_win_height = vim.api.nvim_win_get_height(terminal_win) -- save height for next time
@@ -31,7 +41,4 @@ local function toggle_terminal()
 	vim.cmd("startinsert")
 end
 
-vim.keymap.set({ "n", "v", "t" }, "<C-/>", toggle_terminal, { desc = "Toggle terminal" })
-
--- Esc to go back to normal mode inside terminal
-vim.keymap.set("t", "<Esc>", "<C-\\><C-n>", { desc = "Enter normal mode in terminal" })
+return M

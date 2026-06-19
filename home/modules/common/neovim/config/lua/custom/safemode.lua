@@ -1,14 +1,18 @@
---SPECIAL: safe mode (read-only + navigation)
+-- SPECIAL: safe mode (read-only + navigation).
+-- Module exposes `toggle`; the keymap that drives it lives in keymaps.lua.
 vim.g.safe = false
 
 ---@alias RhsCallback fun(): nil
 ---@alias Rhs string | RhsCallback
 
----@class KeymapEntry
+---@class SafeMode.KeymapEntry
 ---@field lhs string
 ---@field mode string
 
----@type KeymapEntry[]
+---@class SafeMode
+local M = {}
+
+---@type SafeMode.KeymapEntry[]
 local mode_keymaps = {}
 
 ---@param mode string | string[]
@@ -23,6 +27,7 @@ local function set_mode_keymap(mode, lhs, rhs, desc)
 	end
 end
 
+---@return nil
 local function exit_safe_mode()
 	if not vim.g.safe then
 		return
@@ -36,7 +41,8 @@ local function exit_safe_mode()
 	vim.api.nvim_exec_autocmds("ModeChanged", {})
 end
 
-local function toggle_safe_mode()
+---@return nil
+function M.toggle()
 	if vim.g.safe then
 		exit_safe_mode()
 		return
@@ -99,7 +105,7 @@ local function toggle_safe_mode()
 	vim.api.nvim_exec_autocmds("ModeChanged", {})
 end
 
-vim.keymap.set("n", "<leader>ts", toggle_safe_mode, { desc = "Toggle SAFE mode" })
+-- Leaving the buffer/window exits safe mode so it never leaks across buffers.
 vim.api.nvim_create_autocmd({ "BufLeave", "WinLeave" }, {
 	callback = function()
 		if vim.g.safe then
@@ -107,3 +113,5 @@ vim.api.nvim_create_autocmd({ "BufLeave", "WinLeave" }, {
 		end
 	end,
 })
+
+return M

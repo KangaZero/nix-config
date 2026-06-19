@@ -178,6 +178,7 @@ Leader is **`<Space>`**.
 - `<leader>ff` — find files · `<leader>sg` — live grep · `<leader>fm` — search `:messages`
 - `<leader>sr` — grug-far search & replace
 - `<leader>E` — yazi at cwd · `<leader>e` — yazi at current buffer · `<leader>fc` — open Neovim config in yazi
+- `<C-Up>` — resume / toggle the last yazi session
 
 **LSP / diagnostics**
 - `<leader>gd/gr/gI` — definitions / references / implementations (snacks picker)

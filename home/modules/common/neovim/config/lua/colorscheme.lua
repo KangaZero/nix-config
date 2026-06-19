@@ -21,7 +21,7 @@ require("nekonight").setup({
 		all = false,
 		auto = false,
 		-- telescope = true,
-		"which-key" == true,
+		["which-key"] = true,
 	},
 	--- You can override specific highlights to use other groups or a hex color
 	--- function will be called with a Highlights and ColorScheme table

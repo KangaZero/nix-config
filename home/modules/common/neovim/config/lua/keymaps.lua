@@ -46,6 +46,7 @@ vim.keymap.set("n", "<leader>p", function()
 end, { desc = "Pack Manager" })
 vim.keymap.set({ "n", "v" }, "<leader>E", "<cmd>Yazi cwd<cr>", { desc = "Yazi at pwd" })
 vim.keymap.set({ "n", "v" }, "<leader>e", "<cmd>Yazi<cr>", { desc = "Yazi at current buffer" })
+vim.keymap.set("n", "<c-up>", "<cmd>Yazi toggle<cr>", { desc = "Resume the last yazi session" })
 
 -- Flash
 vim.keymap.set({ "n", "x", "o" }, "s", function()
@@ -65,8 +66,18 @@ vim.keymap.set("n", "<leader>zz", function()
 	require("custom.zen").toggle()
 end, { desc = "Toggle Zen Mode" })
 
-if require("snacks") then
-	local Snacks = require("snacks")
+vim.keymap.set("n", "<leader>ts", function()
+	require("custom.safemode").toggle()
+end, { desc = "Toggle SAFE mode" })
+
+-- Terminal: toggle a bottom split, and Esc to leave terminal-insert.
+vim.keymap.set({ "n", "v", "t" }, "<C-/>", function()
+	require("custom.terminal").toggle()
+end, { desc = "Toggle terminal" })
+vim.keymap.set("t", "<Esc>", "<C-\\><C-n>", { desc = "Enter normal mode in terminal" })
+
+local ok_snacks, Snacks = pcall(require, "snacks")
+if ok_snacks then
 	vim.keymap.set({ "n", "v" }, "<leader>gd", function()
 		Snacks.picker.lsp_definitions()
 	end, { desc = "Goto Definition" })
@@ -104,7 +115,7 @@ vim.keymap.set("n", "<leader>fc", function()
 	vim.api.nvim_set_current_dir(current_root_dir or config_dir)
 end, { desc = "Open Config" })
 
-if require("telescope") then
+if pcall(require, "telescope") then
 	--HACK: unrelated but use vim.fn.system to execute shell cmds
 	if vim.fn.executable("rg") == 1 then
 		vim.keymap.set({ "n", "v" }, "<leader>sg", "<cmd>Telescope live_grep<cr>")
@@ -125,11 +136,10 @@ if require("telescope") then
 	end
 end
 
----@class Util
+---@type Util
 local util = require("util")
 
-local undotree = require("undotree")
-if undotree then
+if pcall(require, "undotree") then
 	vim.keymap.set("n", "<leader>uu", function()
 		require("undotree").open({
 			command = "30vnew",
@@ -191,9 +201,6 @@ vim.keymap.set("n", "[w", diag_goto(false, "WARN"), { desc = "Prev Warning" })
 -- Buffers
 vim.keymap.set("n", "<leader>bb", "<cmd>e #<cr>", { desc = "Switch to Other Buffer" })
 
-vim.keymap.set("v", "J", ":<C-u>execute \"'<,'>move '>+\" . v:count1<cr>gv=gv", { desc = "Move line down" })
-vim.keymap.set("v", "K", ":<C-u>execute \"'<,'>move '<-\" . (v:count1 + 1)<cr>gv=gv", { desc = "Move line up" })
-
 -- LSP Specific
 if vim.fn.has("nvim-0.12") == 1 then
 	vim.keymap.set({ "n", "v" }, "<leader>fF", function()
@@ -204,8 +211,8 @@ end
 
 --INFO: See https://github.com/nvim-treesitter/nvim-treesitter-textobjects/blob/main/BUILTIN_TEXTOBJECTS.md
 -- Selects
-local select = require("nvim-treesitter-textobjects.select")
-if select then
+local ok_select, select = pcall(require, "nvim-treesitter-textobjects.select")
+if ok_select then
 	vim.keymap.set({ "x", "o" }, "af", function()
 		select.select_textobject("@function.outer", "textobjects")
 	end, { desc = "function" })

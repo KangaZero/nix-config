@@ -81,13 +81,13 @@ end
 --- @param msg string
 --- @return nil
 function M.warn(msg)
-	vim.notify(msg, vim.log.levels.WARN, { title = "TodoComments" })
+	vim.notify(msg, vim.log.levels.WARN, { title = "Util" })
 end
 
 --- @param msg string
 --- @return nil
 function M.error(msg)
-	vim.notify(msg, vim.log.levels.ERROR, { title = "TodoComments" })
+	vim.notify(msg, vim.log.levels.ERROR, { title = "Util" })
 end
 
 --- @param buf integer
@@ -158,7 +158,6 @@ function M.get_lsp_symbol()
 	if not ok or not result then
 		return ""
 	end
-	print(result)
 
 	local cursor = vim.api.nvim_win_get_cursor(0)
 	local line = cursor[1] - 1

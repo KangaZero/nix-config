@@ -1,6 +1,7 @@
 vim.pack.add({ "https://github.com/folke/snacks.nvim" })
-require("snacks").setup({
-	-- -@type snacks.Config
+
+---@type snacks.Config
+local opts = {
 	bigfile = { enabled = true },
 	-- Disabled: dashboard-nvim + milli own the start screen. Two dashboards both
 	-- render on VimEnter and conflict. Re-enable here only if you drop dashboard.lua.
@@ -15,4 +16,5 @@ require("snacks").setup({
 	scroll = { enabled = true },
 	statuscolumn = { enabled = true },
 	words = { enabled = true },
-})
+}
+require("snacks").setup(opts)
