@@ -10,6 +10,14 @@
     };
 
     initContent = ''
+      weston() {
+        # WSLg creates /tmp/.X11-unix without the sticky bit, breaking
+        # xwayland-satellite's socket creation. Fix it before launching.
+        sudo chmod 1777 /tmp/.X11-unix 2>/dev/null || true
+        # Explicit cursor vars ensure weston and niri both use the same theme,
+        # preventing the double-cursor artifact in nested compositor mode.
+        XCURSOR_THEME=Bibata-Modern-Classic XCURSOR_SIZE=24 command weston --fullscreen -- niri
+      }
       nix-gc() {
         nix-collect-garbage --delete-older-than "$1" && nix store gc;
       }
@@ -32,7 +40,6 @@
     '';
 
     shellAliases = {
-      weston = "weston --fullscreen -- niri";
       nixRebuildStatus = "systemctl --no-pager status nixos-rebuild-switch-to-configuration.service 2>/dev/null; pgrep -af 'nixos-rebuild|switch-to-configuration' || echo 'no rebuild running'";
       nixRebuildKill = "sudo systemctl stop nixos-rebuild-switch-to-configuration.service 2>/dev/null; sudo systemctl reset-failed nixos-rebuild-switch-to-configuration.service 2>/dev/null; echo 'cleared stale activation unit'";
       ez = "eza -laF --icons=always --group-directories-first --git-repos-no-status --octal-permissions --modified --numeric";

@@ -110,11 +110,6 @@ in
 
             prefer-no-csd
 
-            // Replaces embedded XWayland with xwayland-satellite: lazy-starts the X11
-            // server only when an X11 client connects, and isolates crashes from niri.
-            xwayland-satellite {
-            }
-
             // ─── Autostart ───────────────────────────────────────────────────────────
             // Launched via `weston --fullscreen -- niri` (not niri-session), so
             // graphical-session.target never fires. Spawn services directly.
@@ -198,10 +193,6 @@ in
                 // ── Workspace scroll ──────────────────────────────────────────────
                 Alt+WheelScrollDown cooldown-ms=150 { focus-workspace-down; }
                 Alt+WheelScrollUp   cooldown-ms=150 { focus-workspace-up; }
-                Alt+PageDown        { focus-workspace-down; }
-                Alt+PageUp          { focus-workspace-up; }
-                Alt+Shift+PageDown  { move-column-to-workspace-down; }
-                Alt+Shift+PageUp    { move-column-to-workspace-up; }
 
                 // ── Resize ────────────────────────────────────────────────────────
                 Alt+R       { switch-preset-column-width; }
