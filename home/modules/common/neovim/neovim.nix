@@ -1,4 +1,4 @@
-_: {
+{ pkgs, ... }: {
   programs.neovim = {
     enable = true;
     defaultEditor = true;
@@ -12,4 +12,25 @@ _: {
     source = ./config;
     recursive = true;
   };
+
+  # LSP servers, formatters, and linters on PATH so Mason uses these
+  # instead of downloading prebuilt binaries (which break on baremetal NixOS).
+  home.packages = with pkgs; [
+    # LSP servers
+    lua-language-server
+    bash-language-server
+    pyright
+    ruff
+    clang-tools # provides clangd
+    vtsls
+    vscode-langservers-extracted # cssls, jsonls, eslint, html
+    biome
+    tailwindcss-language-server
+    # rust-analyzer omitted — rustup provides it via `rustup component add rust-analyzer`
+    nixd
+
+    # Formatters
+    stylua
+    nixfmt-rfc-style
+  ];
 }

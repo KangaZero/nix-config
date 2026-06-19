@@ -11,8 +11,6 @@
       poppler
       resvg
       yt-dlp
-      nixd
-      nixfmt
     ])
     ++ [
       inputs.odysseus-nix.packages.${pkgs.stdenv.hostPlatform.system}.odysseus-dev

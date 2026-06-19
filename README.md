@@ -39,17 +39,17 @@ nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
 | **Nav** | zoxide | — | — |
 | **Browser** | Firefox Developer Edition (declarative — policies + Vimium) | — | — |
 | **Desktop** | — | native macOS | niri (Wayland tiling) → weston (kiosk-shell) → WSLg; `Alt` mod; `LIBGL_ALWAYS_SOFTWARE=1` |
-| **Bar / launcher / notifications** | — | — | noctalia-shell (autostarted by niri) |
+| **Bar / launcher / notifications** | — | — | noctalia-shell (autostarted by niri); config via `noctalia.json` (full settings — source of truth, symlinked by HM) |
 | **Clipboard** | — | — | cliphist + wl-clipboard; rofi picker |
 | **Languages** | `nodejs_26` + `pnpm`, `python3`, `rustup`, `just`, `mise` | — | + `uv` |
 | **Local LLM** | — | ollama (Metal, launchd agent) — models pulled manually | ollama (`ollama-vulkan`, systemd user service) — `qwen2.5:7b` pulled manually post-activation |
-| **Nix LSP** | — | `nixd`, `nixfmt` (home packages) | `nixd` (system package) |
+| **LSP / formatters** | `lua-language-server` `bash-language-server` `pyright` `ruff` `clang-tools` `vtsls` `vscode-langservers-extracted` `biome` `tailwindcss-language-server` `nixd` `stylua` `nixfmt-rfc-style` (all in `neovim.nix` — Mason uses these from PATH, no binary downloads); `rust-analyzer` via `rustup component add rust-analyzer` | — | — |
 | **CLI toolkit** | `fzf` `yazi` `eza` `bat` `btop` `ripgrep` `fd` `jq` `curl` `gh` `claude-code` | + `vim` `fastfetch` `tree` `ffmpeg-full` `imagemagick` `_7zz` `yt-dlp` `resvg` `poppler` `odysseus` | + `wget` `openssh` `tldr` `ffmpeg-full` `unzip` `uv` `azure-cli` (+ DevOps ext) |
 | **Git** | LFS, `pull.rebase = true`, `autoSetupRemote = true`, identity from `userMeta` | — | — |
 | **Nix daemon** | — | Determinate Systems installer (`nix.enable = false`) | NixOS-managed |
 | **GC** | — | — | daily, `--delete-older-than 7d` |
 | **Timezone** | — | — | Asia/Tokyo |
-| **Extras** | direnv + nix-direnv, nix-search wrapper | Discord, nix-homebrew, keyboard layouts `us,jp` | xwayland + xwayland-satellite, `nixRebuildStatus`/`nixRebuildKill` aliases |
+| **Extras** | direnv + nix-direnv, nix-search wrapper | Discord, nix-homebrew, keyboard layouts `us,jp` | xwayland, `nixRebuildStatus`/`nixRebuildKill` aliases, `uinput` (input device emulation — `hardware.uinput.enable`, auto-loaded via systemd, `uinput` group) |
 
 ---
 
@@ -334,7 +334,7 @@ multi-nix/
 │           ├── shell.nix             # Catppuccin oh-my-zsh, WSL aliases
 │           ├── weston.nix            # Weston compositor bridge (WSL)
 │           └── wayland/
-│               └── niri/             # Niri KDL, rofi, noctalia
+│               └── niri/             # Niri KDL, rofi, noctalia; noctalia.json = full settings (HM source)
 │
 ├── overlays/
 │   └── zjstatus/                     # darwin-only overlay

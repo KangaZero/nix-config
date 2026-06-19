@@ -53,7 +53,6 @@
     inherit (pkgs)
       git
       neovim
-      nixd
       weston
       ;
   };

@@ -1,4 +1,8 @@
--- INFO: Not sure if mason really is needed if one can self manage them
+-- INFO: On NixOS, LSP servers/formatters are managed by Nix (neovim.nix home.packages).
+-- Mason is kept for its UI but skips ensure_installed — binaries come from PATH.
+-- On other systems, Mason installs everything as normal.
+local is_nixos = vim.uv.fs_stat("/etc/NIXOS") ~= nil
+
 require("mason").setup()
 
 -- NOTE: mason-lspconfig `ensure_installed` accepts LSP server names ONLY.
@@ -6,7 +10,7 @@ require("mason").setup()
 -- mason-registry block below. With mason-lspconfig v2, `automatic_enable`
 -- defaults to true, so every installed server is auto-enabled via
 -- `vim.lsp.enable()`; explicit enables below are redundant but harmless.
-require("mason-lspconfig").setup({
+require("mason-lspconfig").setup(not is_nixos and {
 	ensure_installed = {
 		"lua_ls",
 		"bashls",
@@ -22,21 +26,23 @@ require("mason-lspconfig").setup({
 		"rust_analyzer",
 		"html",
 	},
-})
+} or {})
 
 -- Non-LSP tools (formatters/linters) that mason-lspconfig can't install.
 -- conform.nvim needs stylua on PATH; mason adds its bin dir to PATH.
-local ensure_tools = { "stylua" }
-local ok_registry, registry = pcall(require, "mason-registry")
-if ok_registry then
-	registry.refresh(function()
-		for _, name in ipairs(ensure_tools) do
-			local ok_pkg, pkg = pcall(registry.get_package, name)
-			if ok_pkg and not pkg:is_installed() then
-				pkg:install()
+if not is_nixos then
+	local ensure_tools = { "stylua" }
+	local ok_registry, registry = pcall(require, "mason-registry")
+	if ok_registry then
+		registry.refresh(function()
+			for _, name in ipairs(ensure_tools) do
+				local ok_pkg, pkg = pcall(registry.get_package, name)
+				if ok_pkg and not pkg:is_installed() then
+					pkg:install()
+				end
 			end
-		end
-	end)
+		end)
+	end
 end
 -- lsp configs
 -- vim.lsp.config("lua_ls", {

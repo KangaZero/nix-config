@@ -235,6 +235,11 @@ sudo nixos-rebuild switch --flake .#nixos
 On first run `vim.pack` fetches everything in the lockfile, and mason installs the
 configured LSP servers. Restart once after the initial sync.
 
+> **NixOS:** All LSP servers, formatters, and linters are provided via Nix in
+> `neovim.nix` (`home.packages`). Mason finds them on PATH and skips downloading
+> prebuilt binaries — necessary on baremetal NixOS where foreign ELF binaries won't
+> run. No Mason behaviour changes are needed.
+
 ### Live development (no rebuild)
 
 `~/.config/nvim` is the rebuilt store copy, so edits to the source here are only
