@@ -18,7 +18,10 @@
   # WSL has no login session to keep `systemd --user` (and its dbus socket) alive,
   # so `nixos-rebuild switch` fails to reload user units ("/run/user/1000/bus:
   # Connection refused"). Lingering starts the user manager at boot, persistently.
-  users.users.${username}.linger = true;
+  users.users.${username} = {
+    linger = true;
+    extraGroups = [ "uinput" ];
+  };
 
   nix.gc = {
     automatic = true;

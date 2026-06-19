@@ -56,9 +56,10 @@ function _G.CustomStatusline()
 		"%#StatusLineBranch#",
 		git_section,
 
-		-- "%=", -- everything before is left aligned
+		"%=", -- everything before is left aligned
 		"%=", -- everything after is right aligned
 		"%#DiagnosticWarn#",
+		" ",
 		warnings_count,
 		"%#StatusLineBranch#",
 		" : ",
