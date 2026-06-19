@@ -5,6 +5,7 @@
     noctalia-shell
     cliphist
     wl-clipboard
+    xwayland-satellite
   ];
 
   # Config: ~/.config/noctalia/settings.json
