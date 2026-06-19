@@ -131,6 +131,7 @@ in
                     Alt+Shift+V { spawn "sh" "-c" "${cliphist-picker}"; }
                     Alt+Shift+Slash { spawn "rofi-cheatsheet"; }
                     Alt+Shift+E     { spawn "rofi-powermenu"; }
+                    Alt+N           { spawn "kitty" "--title" "nix-search-tv" "-e" "ns"; }
 
                     // ── Window management ──────────────────────────────────────────────
                     Alt+Shift+Q repeat=false { close-window; }
@@ -196,6 +197,14 @@ in
 
                     // ── Keyboard layout toggle ─────────────────────────────────────────
                     Alt+Ctrl+L { switch-layout "next"; }
+                }
+
+                // ─── Window rules ────────────────────────────────────────────────────────
+                window-rule {
+                    match title="nix-search-tv"
+                    open-floating true
+                    default-column-width { proportion 0.75; }
+                    default-window-height { proportion 0.75; }
                 }
   '';
 }
