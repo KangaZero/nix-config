@@ -136,6 +136,8 @@ in
                     Alt+Shift+Slash { spawn "rofi-cheatsheet"; }
                     Alt+Shift+E     { spawn "rofi-powermenu"; }
                     Alt+N           { spawn "kitty" "--title" "nix-search-tv" "-e" "ns"; }
+                    Shift+Space         { show-hotkey-overlay; }
+                    Alt+Shift+O     { toggle-overview; }
 
                     // ── Screenshots ────────────────────────────────────────────────────
                     Print { screenshot; }
@@ -147,6 +149,7 @@ in
                     Alt+F               { fullscreen-window; }
                     Alt+Shift+F         { maximize-column; }
                     Alt+Space           { toggle-window-floating; }
+                    Alt+Shift+T repeat=false { switch-focus-between-floating-and-tiling; }
                     Alt+Shift+C         { center-column; }
                     Alt+Comma           { consume-or-expel-window-left; }
                     Alt+Period          { consume-or-expel-window-right; }
