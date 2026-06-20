@@ -31,6 +31,6 @@
 
     # Formatters
     stylua
-    nixfmt-rfc-style
+    nixfmt
   ];
 }
