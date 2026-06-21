@@ -166,20 +166,31 @@ local nixd_host = vim.uv.os_gethostname()
 local nixd_user = vim.uv.os_get_passwd().username
 local nixd_opts
 
-if vim.fn.has("wsl") == 1 then
-	-- WSL/NixOS: flake at /etc/nixos, standalone home-manager
-	local ref = string.format('(builtins.getFlake "%s")', "/etc/nixos")
+if is_nixos then
+	-- NixOS (WSL or bare metal)
+	local ref = string.format('(builtins.getFlake "%s")', vim.fn.expand("~/.config/multi-nix"))
+	local options = {
+		nixos = { expr = string.format("%s.nixosConfigurations.%s.options", ref, nixd_host) },
+		home_manager = {
+			expr = string.format(
+				"%s.nixosConfigurations.%s.options.home-manager.users.%s",
+				ref,
+				nixd_host,
+				nixd_user
+			),
+		},
+	}
+	if vim.fn.has("wsl") == 1 then
+		options.nixos_wsl = { expr = string.format("%s.nixosConfigurations.%s.options.wsl", ref, nixd_host) }
+	end
 	nixd_opts = {
 		nixpkgs = { expr = string.format("import %s.inputs.nixpkgs { }", ref) },
 		formatting = { command = { "nixfmt" } },
-		options = {
-			nixos = { expr = string.format("%s.nixosConfigurations.%s.options", ref, nixd_host) },
-			home_manager = { expr = string.format("%s.homeConfigurations.%s.options", ref, nixd_user) },
-		},
+		options = options,
 	}
 elseif vim.fn.has("mac") == 1 then
-	-- macOS: nix-darwin flake at ~/.config/nix, home-manager embedded as darwin module
-	local ref = string.format('(builtins.getFlake "%s")', vim.fn.expand("~/.config/nix"))
+	-- macOS: nix-darwin flake , home-manager embedded as darwin module
+	local ref = string.format('(builtins.getFlake "%s")', vim.fn.expand("~/.config/multi-nix"))
 	nixd_opts = {
 		nixpkgs = { expr = string.format("import %s.inputs.nixpkgs { }", ref) },
 		formatting = { command = { "nixfmt" } },
