@@ -28,13 +28,13 @@
 		"widgets": {
 			"left": [
 				{
-					"colorizeSystemIcon": "tertiary",
+					"colorizeDistroLogo": false,
+					"colorizeSystemIcon": "none",
 					"colorizeSystemText": "none",
 					"customIconPath": "",
 					"enableColorization": false,
-					"icon": "rocket",
-					"iconColor": "none",
-					"id": "Launcher",
+					"icon": "noctalia",
+					"id": "ControlCenter",
 					"useDistroLogo": true
 				},
 				{
@@ -70,6 +70,10 @@
 					"showBadge": true,
 					"showLabelsOnlyWhenOccupied": true,
 					"unfocusedIconsOpacity": 1
+				},
+				{
+					"iconColor": "none",
+					"id": "Settings"
 				},
 				{
 					"displayMode": "forceOpen",
@@ -109,16 +113,6 @@
 					"id": "NotificationHistory",
 					"showUnreadBadge": true,
 					"unreadBadgeColor": "primary"
-				},
-				{
-					"colorizeDistroLogo": false,
-					"colorizeSystemIcon": "none",
-					"colorizeSystemText": "none",
-					"customIconPath": "",
-					"enableColorization": false,
-					"icon": "noctalia",
-					"id": "ControlCenter",
-					"useDistroLogo": false
 				}
 			]
 		},
@@ -165,12 +159,12 @@
 		"allowPanelsOnScreenWithoutBar": true,
 		"showChangelogOnStartup": false,
 		"telemetryEnabled": false,
-		"enableLockScreenCountdown": true,
-		"lockScreenCountdownDuration": 10000,
+		"enableLockScreenCountdown": false,
+		"lockScreenCountdownDuration": 1000,
 		"autoStartAuth": false,
 		"allowPasswordWithFprintd": false,
 		"clockStyle": "custom",
-		"clockFormat": "hh\\nmm",
+		"clockFormat": "yyyy-MM-dd HH:mm ",
 		"passwordChars": true,
 		"lockScreenMonitors": [],
 		"lockScreenBlur": 0.37,
@@ -184,19 +178,19 @@
 			"keyEscape": ["Esc"],
 			"keyRemove": ["Del"]
 		},
-		"reverseScroll": false,
+		"reverseScroll": true,
 		"smoothScrollEnabled": true
 	},
 	"ui": {
-		"fontDefault": "Sans Serif",
-		"fontFixed": "monospace",
+		"fontDefault": "JetBrains Mono",
+		"fontFixed": "JetBrains Mono SemiBold",
 		"fontDefaultScale": 1,
 		"fontFixedScale": 1,
 		"tooltipsEnabled": true,
 		"scrollbarAlwaysVisible": true,
 		"boxBorderEnabled": false,
-		"panelBackgroundOpacity": 0.93,
-		"translucentWidgets": false,
+		"panelBackgroundOpacity": 0.3,
+		"translucentWidgets": true,
 		"panelsAttachedToBar": true,
 		"settingsPanelMode": "attached",
 		"settingsPanelSideBarCardStyle": false
@@ -282,7 +276,7 @@
 		"enableClipboardChips": true,
 		"clipboardWatchTextCommand": "wl-paste --type text --watch cliphist store",
 		"clipboardWatchImageCommand": "wl-paste --type image --watch cliphist store",
-		"position": "center",
+		"position": "bottom_center",
 		"pinnedApps": [],
 		"sortByMostUsed": true,
 		"terminalCommand": "/nix/store/ahbnjqpvc1cfcl50k53diy3s7s1rbvqp-kitty-0.47.1/bin/kitty -e",
@@ -290,14 +284,14 @@
 		"customLaunchPrefix": "",
 		"viewMode": "list",
 		"showCategories": true,
-		"iconMode": "tabler",
+		"iconMode": "native",
 		"showIconBackground": false,
 		"enableSettingsSearch": true,
 		"enableWindowsSearch": true,
 		"enableSessionSearch": true,
 		"ignoreMouseInput": false,
 		"screenshotAnnotationTool": "",
-		"overviewLayer": false,
+		"overviewLayer": true,
 		"density": "default"
 	},
 	"controlCenter": {
@@ -385,7 +379,7 @@
 	},
 	"noctaliaPerformance": {
 		"disableWallpaper": false,
-		"disableDesktopWidgets": true
+		"disableDesktopWidgets": false
 	},
 	"dock": {
 		"enabled": true,
@@ -429,7 +423,7 @@
 		"bluetoothAutoConnect": true
 	},
 	"sessionMenu": {
-		"enableCountdown": true,
+		"enableCountdown": false,
 		"countdownDuration": 10000,
 		"position": "center",
 		"showHeader": true,
@@ -502,7 +496,7 @@
 		"monitors": [],
 		"location": "top_right",
 		"overlayLayer": true,
-		"backgroundOpacity": 1,
+		"backgroundOpacity": 0.30000000000000004,
 		"respectExpireTimeout": false,
 		"lowUrgencyDuration": 5,
 		"normalUrgencyDuration": 8,
@@ -531,8 +525,8 @@
 		"location": "top_right",
 		"autoHideMs": 2000,
 		"overlayLayer": true,
-		"backgroundOpacity": 1,
-		"enabledTypes": [0, 1, 2],
+		"backgroundOpacity": 0.7,
+		"enabledTypes": [0, 1, 2, 3],
 		"monitors": []
 	},
 	"audio": {
@@ -593,7 +587,7 @@
 		"notifyUpdates": true
 	},
 	"idle": {
-		"enabled": false,
+		"enabled": true,
 		"screenOffTimeout": 600,
 		"lockTimeout": 660,
 		"suspendTimeout": 1800,
@@ -607,10 +601,57 @@
 		"customCommands": "[]"
 	},
 	"desktopWidgets": {
-		"enabled": false,
+		"enabled": true,
 		"overviewEnabled": true,
 		"gridSnap": false,
 		"gridSnapScale": false,
-		"monitorWidgets": []
+		"monitorWidgets": [
+			{
+				"name": "winit",
+				"widgets": [
+					{
+						"clockColor": "none",
+						"clockStyle": "digital",
+						"customFont": "",
+						"format": "HH:mm\\nd MMMM yyyy",
+						"id": "Clock",
+						"roundedCorners": true,
+						"showBackground": true,
+						"useCustomFont": false,
+						"x": 217,
+						"y": 101
+					},
+					{
+						"hideMode": "visible",
+						"id": "MediaPlayer",
+						"roundedCorners": true,
+						"showAlbumArt": true,
+						"showBackground": true,
+						"showButtons": true,
+						"showVisualizer": true,
+						"visualizerType": "linear",
+						"x": 347,
+						"y": 1064
+					},
+					{
+						"id": "Weather",
+						"roundedCorners": true,
+						"showBackground": true,
+						"x": 611,
+						"y": 891
+					},
+					{
+						"diskPath": "/",
+						"id": "SystemStat",
+						"layout": "bottom",
+						"roundedCorners": true,
+						"showBackground": true,
+						"statType": "CPU",
+						"x": 1494,
+						"y": 101
+					}
+				]
+			}
+		]
 	}
 }

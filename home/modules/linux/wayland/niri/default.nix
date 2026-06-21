@@ -4,18 +4,9 @@ let
   colorFocusInactive = "#2f354b";
   colorBorderActive = "#c099ff";
   colorBorderInactive = "#c8d3f5";
-
-  cliphist-picker =
-    "cliphist list"
-    + " | rofi -dmenu"
-    + " -theme ~/.config/rofi/applet.rasi"
-    + " -theme-str 'listview { lines: 10; } window { width: 700px; }'"
-    + " | cliphist decode"
-    + " | wl-copy";
 in
 {
   imports = [
-    ./rofi.nix
     ./noctalia.nix
   ];
 
@@ -119,7 +110,7 @@ in
                 // ─── Autostart ───────────────────────────────────────────────────────────
                 // Launched via `weston --fullscreen -- niri` (not niri-session), so
                 // graphical-session.target never fires. Spawn services directly.
-                spawn-at-startup "noctalia-shell"
+                spawn-at-startup "noctalia"
 
                 // ─── Keybinds ────────────────────────────────────────────────────────────
                 // Mod = Alt.  Super is captured by Windows/WSLg window chrome.
@@ -127,17 +118,14 @@ in
                     // ── Launchers ──────────────────────────────────────────────────────
                     Alt+Return { spawn "kitty"; }
                     Alt+Shift+Return { spawn "firefox-devedition"; }
+                    Alt+D           { spawn "noctalia-shell" "ipc" "call" "launcher" "toggle"; }
                     Alt+Shift+Space { spawn "noctalia-shell" "ipc" "call" "launcher" "toggle"; }
-                    Alt+D      { spawn "rofi" "-show" "drun"; }
-                    Alt+Tab    { spawn "rofi" "-show" "window"; }
-                    Alt+Shift+D { spawn "rofi" "-show" "combi"; }
-                    Alt+C      { spawn "rofi" "-show" "calc" "-no-show-match" "-no-sort"; }
-                    Alt+Shift+V { spawn "sh" "-c" "${cliphist-picker}"; }
-                    Alt+Shift+Slash { spawn "rofi-cheatsheet"; }
-                    Alt+Shift+E     { spawn "rofi-powermenu"; }
-                    Alt+N           { spawn "kitty" "--title" "nix-search-tv" "-e" "ns"; }
-                    Shift+Space         { show-hotkey-overlay; }
+                    Alt+Tab         { toggle-overview; }
                     Alt+Shift+O     { toggle-overview; }
+                    Alt+Shift+V     { spawn "noctalia-shell" "ipc" "call" "clipboard" "toggle"; }
+                    Alt+Shift+E     { spawn "noctalia-shell" "ipc" "call" "session" "toggle"; }
+                    Alt+N           { spawn "kitty" "--title" "nix-search-tv" "-e" "ns"; }
+                    Shift+Space     { show-hotkey-overlay; }
 
                     // ── Screenshots ────────────────────────────────────────────────────
                     Print { screenshot; }

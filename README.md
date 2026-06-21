@@ -39,8 +39,8 @@ nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
 | **Nav** | zoxide | — | — |
 | **Browser** | Firefox Developer Edition (declarative — policies + Vimium) | — | — |
 | **Desktop** | — | native macOS | niri (Wayland tiling) → weston (kiosk-shell) → WSLg; `Alt` mod; `LIBGL_ALWAYS_SOFTWARE=1` |
-| **Bar / launcher / notifications** | — | — | noctalia-shell (autostarted by niri); config via `noctalia.json` (full settings — source of truth, symlinked by HM) |
-| **Clipboard** | — | — | cliphist + wl-clipboard; rofi picker |
+| **Bar / launcher / notifications** | — | — | noctalia v5 (autostarted by niri); config managed as Nix attrset in `noctalia.nix` via `programs.noctalia.settings` |
+| **Clipboard** | — | — | noctalia built-in clipboard panel (`Alt+Shift+V` → `noctalia-shell ipc call clipboard toggle`) |
 | **Languages** | `nodejs_26` + `pnpm`, `python3`, `rustup`, `just`, `mise` | — | + `uv` |
 | **Local LLM** | — | ollama (Metal, launchd agent) — models pulled manually | ollama (`ollama-vulkan`, systemd user service) — `qwen2.5:7b` pulled manually post-activation |
 | **LSP / formatters** | `lua-language-server` `bash-language-server` `pyright` `ruff` `clang-tools` `vtsls` `vscode-langservers-extracted` `biome` `tailwindcss-language-server` `nixd` `stylua` `nixfmt-rfc-style` (all in `neovim.nix` — Mason uses these from PATH, no binary downloads); `rust-analyzer` via `rustup component add rust-analyzer` | — | — |
@@ -334,7 +334,7 @@ multi-nix/
 │           ├── shell.nix             # Catppuccin oh-my-zsh, WSL aliases
 │           ├── weston.nix            # Weston compositor bridge (WSL)
 │           └── wayland/
-│               └── niri/             # Niri KDL, rofi, noctalia; noctalia.json = full settings (HM source)
+│               └── niri/             # Niri KDL + noctalia v5; settings as Nix attrset in noctalia.nix
 │
 ├── overlays/
 │   └── zjstatus/                     # darwin-only overlay

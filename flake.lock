@@ -323,6 +323,26 @@
         "url": "https://flakehub.com/f/DeterminateSystems/nixpkgs-weekly/0.1"
       }
     },
+    "noctalia": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1782040888,
+        "narHash": "sha256-CRDCc1HVz5mZ+HQ7MCazyV+yzEvT6RbHoPXTNKy4IFM=",
+        "owner": "noctalia-dev",
+        "repo": "noctalia",
+        "rev": "7584f938dcf309f561309202cbb328c8f0c47c34",
+        "type": "github"
+      },
+      "original": {
+        "owner": "noctalia-dev",
+        "repo": "noctalia",
+        "type": "github"
+      }
+    },
     "odysseus-nix": {
       "inputs": {
         "flake-utils": "flake-utils",
@@ -358,6 +378,7 @@
         "nix-wrapper-modules": "nix-wrapper-modules",
         "nixos-wsl": "nixos-wsl",
         "nixpkgs": "nixpkgs",
+        "noctalia": "noctalia",
         "odysseus-nix": "odysseus-nix",
         "zjstatus": "zjstatus"
       }
