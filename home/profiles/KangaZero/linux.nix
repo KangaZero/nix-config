@@ -28,7 +28,7 @@
 
   programs = {
     kitty.settings = {
-      background_image = "${assetsDir}/stars.png";
+      background_image = "${assetsDir}/moon_dark.png";
       background_image_layout = "scaled";
       background_tint = "0.85";
     };
