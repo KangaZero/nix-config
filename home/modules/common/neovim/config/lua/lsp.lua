@@ -172,12 +172,7 @@ if is_nixos then
 	local options = {
 		nixos = { expr = string.format("%s.nixosConfigurations.%s.options", ref, nixd_host) },
 		home_manager = {
-			expr = string.format(
-				"%s.nixosConfigurations.%s.options.home-manager.users.%s",
-				ref,
-				nixd_host,
-				nixd_user
-			),
+			expr = string.format("%s.nixosConfigurations.%s.options.home-manager.users.%s", ref, nixd_host, nixd_user),
 		},
 	}
 	if vim.fn.has("wsl") == 1 then

@@ -64,7 +64,7 @@ LSP servers are installed/managed by **mason** + **mason-lspconfig** (see
 │   ├── options.lua           # vim.o / vim.opt settings, diagnostic signs
 │   ├── keymaps.lua           # all keymaps (windows, LSP, flash, treesitter textobjects, …)
 │   ├── autocmds.lua          # yank highlight, format-on-save, autosave, close-with-q, …
-│   ├── usercmds.lua          # :GitBlameLine and other user commands
+│   ├── usercmds.lua          # :GitBlameLine — git blame for current line
 │   ├── colorscheme.lua       # nekonight theme + custom highlight overrides
 │   ├── lsp.lua               # mason + native vim.lsp.config per-server setup
 │   │
@@ -175,14 +175,15 @@ Leader is **`<Space>`**.
 
 **Find / search**
 - `<leader><leader>` — smart picker (snacks)
-- `<leader>ff` — find files · `<leader>sg` — live grep · `<leader>fm` — search `:messages`
+- `<leader>ff` — find files · `<leader>sg`/`<leader>fg` — live grep · `<leader>fm` — search `:messages`
+- `<leader>fb` — buffers · `<leader>fG` — git status
 - `<leader>sr` — grug-far search & replace
 - `<leader>E` — yazi at cwd · `<leader>e` — yazi at current buffer · `<leader>fc` — open Neovim config in yazi
 - `<C-Up>` — resume / toggle the last yazi session
 
 **LSP / diagnostics**
-- `<leader>gd/gr/gI` — definitions / references / implementations (snacks picker)
-- `<leader>xx` — diagnostics list · `<leader>td` — toggle inline (virtual_lines) diagnostics
+- `<leader>gd/gr/gI` — definitions / references / implementations (telescope)
+- `<leader>xx` — diagnostics list (telescope) · `<leader>td` — toggle inline (virtual_lines) diagnostics
 - `]e/[e`, `]w/[w` — next/prev error / warning
 - `<leader>fF` — LSP format (nvim-0.12)
 

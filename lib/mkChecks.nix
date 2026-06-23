@@ -13,20 +13,12 @@ inputs.git-hooks.lib.${system}.run {
       enable = true;
       name = "check git author";
       entry = "${pkgs.writeShellScript "check-author" ''
-        while IFS=" " read -r _local_ref local_sha _remote_ref remote_sha; do
-          [ "$local_sha" = "0000000000000000000000000000000000000000" ] && continue
-          if [ "$remote_sha" = "0000000000000000000000000000000000000000" ]; then
-            range="$local_sha"
-          else
-            range="$remote_sha..$local_sha"
-          fi
-          bad=$(git log --format="%H %ae" "$range" | grep -v "samuelyongw@gmail.com")
-          if [ -n "$bad" ]; then
-            echo "Push rejected: commits not authored by KangaZero <samuelyongw@gmail.com>:"
-            echo "$bad"
-            exit 1
-          fi
-        done
+        bad=$(git log --format="%ae" 2>/dev/null | grep -v "samuelyongw@gmail.com")
+        if [ -n "$bad" ]; then
+          echo "Push rejected: commits not authored by KangaZero <samuelyongw@gmail.com>:"
+          echo "$bad" author(s) found
+          exit 1
+        fi
       ''}";
       language = "system";
       pass_filenames = false;
