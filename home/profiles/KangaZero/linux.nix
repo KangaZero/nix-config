@@ -44,6 +44,7 @@
     inherit (userMeta) stateVersion;
     homeDirectory = "/home/${username}";
     keyboard.layout = "us";
+    sessionPath = [ "$HOME/.local/bin" ];
     sessionVariables = {
       EDITOR = "nvim";
       LIBGL_ALWAYS_SOFTWARE = "1";

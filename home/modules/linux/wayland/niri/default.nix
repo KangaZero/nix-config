@@ -120,7 +120,7 @@ in
                                                     // ── Launchers ──────────────────────────────────────────────────────
                                                     Alt+Return { spawn "kitty"; }
                                                     Alt+Shift+Return { spawn "firefox-devedition"; }
-                				    Alt+Space       { spawn "noctalia" "msg" "panel-toggle" "launcher"; }
+                				    Alt+D       { spawn "noctalia" "msg" "panel-toggle" "launcher"; }
                                                     Alt+N           { spawn "kitty" "--title" "nix-search-tv" "-e" "ns"; }
         					    Alt+Shift+Comma { spawn "noctalia" "msg" "settings-toggle"; }
                                                     Alt+Shift+O     { toggle-overview; }
@@ -216,7 +216,7 @@ in
                                 		// For v5 : taken from : https://docs.noctalia.dev/v5/compositor-settings/niri/ 
                                 		window-rule {
                                 			// Rounded corners for a modern look.
-                                			geometry-corner-radius 20
+                                			geometry-corner-radius 6
 
                                 				// Clips window contents to the rounded corner boundaries.
                                 				clip-to-geometry true

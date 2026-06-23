@@ -13,6 +13,24 @@
     recursive = true;
   };
 
+  # Generated so the Neovim runtime path stays correct after every `nixos-rebuild switch`.
+  xdg.configFile."nvim/.luarc.json".text = ''
+    {
+      "$schema": "https://raw.githubusercontent.com/LuaLS/vscode-lua/master/setting/schema.json",
+      "runtime": { "version": "LuaJIT" },
+      "workspace": {
+        "library": [
+          "${pkgs.neovim-unwrapped}/share/nvim/runtime/lua",
+          "''${3rd}/luv/library"
+        ],
+        "checkThirdParty": false
+      },
+      "diagnostics": {
+        "globals": ["vim"]
+      }
+    }
+  '';
+
   # LSP servers, formatters, and linters on PATH so Mason uses these
   # instead of downloading prebuilt binaries (which break on baremetal NixOS).
   home.packages = with pkgs; [

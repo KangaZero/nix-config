@@ -78,21 +78,9 @@ vim.keymap.set("t", "<Esc>", "<C-\\><C-n>", { desc = "Enter normal mode in termi
 
 local ok_snacks, Snacks = pcall(require, "snacks")
 if ok_snacks then
-	vim.keymap.set({ "n", "v" }, "<leader>gd", function()
-		Snacks.picker.lsp_definitions()
-	end, { desc = "Goto Definition" })
-	vim.keymap.set({ "n", "v" }, "<leader>gr", function()
-		Snacks.picker.lsp_references()
-	end, { desc = "Goto References" })
-	vim.keymap.set({ "n", "v" }, "<leader>gI", function()
-		Snacks.picker.lsp_implementations()
-	end, { desc = "Goto Implementations" })
 	vim.keymap.set({ "n", "v" }, "<leader>sk", function()
 		Snacks.picker.keymaps()
 	end, { desc = "Keymaps" })
-	vim.keymap.set("n", "<leader>xx", function()
-		Snacks.picker.diagnostics()
-	end, { desc = "Diagnostics" })
 end
 
 local function diag_goto(next, severity)
@@ -116,24 +104,32 @@ vim.keymap.set("n", "<leader>fc", function()
 end, { desc = "Open Config" })
 
 if pcall(require, "telescope") then
+	local builtin = require("telescope.builtin")
+
+	vim.keymap.set({ "n", "v" }, "<leader>ff", builtin.find_files, { desc = "Find Files" })
+	vim.keymap.set({ "n", "v" }, "<leader>fb", builtin.buffers, { desc = "Buffers" })
+	vim.keymap.set({ "n", "v" }, "<leader>fG", builtin.git_status, { desc = "Git Status" })
+
 	--HACK: unrelated but use vim.fn.system to execute shell cmds
 	if vim.fn.executable("rg") == 1 then
-		vim.keymap.set({ "n", "v" }, "<leader>sg", "<cmd>Telescope live_grep<cr>")
+		vim.keymap.set({ "n", "v" }, "<leader>sg", builtin.live_grep, { desc = "Live Grep" })
+		vim.keymap.set({ "n", "v" }, "<leader>fg", builtin.live_grep, { desc = "Live Grep" })
 	end
-	if vim.fn.executable("fzf") == 1 then
-		vim.keymap.set({ "n", "v" }, "<leader>ff", "<cmd>Telescope find_files<cr>")
-		vim.keymap.set("n", "<leader>fm", function()
-			local messages = vim.split(vim.fn.execute("messages"), "\n")
-			require("telescope.builtin").live_grep({
-				search_dirs = {},
-				default_text = "",
-				finder = require("telescope.finders").new_table({
-					results = messages,
-				}),
-				sorter = require("telescope.config").values.generic_sorter({}),
-			})
-		end, { desc = "Messages" })
-	end
+
+	vim.keymap.set({ "n", "v" }, "<leader>gd", builtin.lsp_definitions, { desc = "Goto Definition" })
+	vim.keymap.set({ "n", "v" }, "<leader>gr", builtin.lsp_references, { desc = "Goto References" })
+	vim.keymap.set({ "n", "v" }, "<leader>gI", builtin.lsp_implementations, { desc = "Goto Implementations" })
+	vim.keymap.set("n", "<leader>xx", builtin.diagnostics, { desc = "Diagnostics" })
+
+	vim.keymap.set("n", "<leader>fm", function()
+		local messages = vim.split(vim.fn.execute("messages"), "\n")
+		builtin.live_grep({
+			search_dirs = {},
+			default_text = "",
+			finder = require("telescope.finders").new_table({ results = messages }),
+			sorter = require("telescope.config").values.generic_sorter({}),
+		})
+	end, { desc = "Messages" })
 end
 
 ---@type Util

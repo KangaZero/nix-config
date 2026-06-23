@@ -33,7 +33,7 @@ nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
 | **Shell** | zsh + oh-my-zsh | — | — |
 | **Prompt** | — | oh-my-posh (external TOML config) | catppuccin oh-my-zsh (mocha, time + hostname) |
 | **Editor** | neovim — `defaultEditor`, config HM-managed via `xdg.configFile` → `~/.config/nvim`; `vi`/`vim` aliases | — | root nvim symlinked to user config via activation script |
-| **Terminal** | kitty — Tokyo Night Moon, JetBrains Mono, 85% opacity | animated pixel-art gif bg | static `stars.png` bg |
+| **Terminal** | kitty — Tokyo Night Moon, JetBrains Mono, 85% opacity | animated pixel-art gif bg | static `moon_dark.png` bg |
 | **Font** | `nerd-fonts.jetbrains-mono` | — | `fonts.fontconfig.enable = true` |
 | **Multiplexer** | zellij | — | — |
 | **Nav** | zoxide | — | — |
@@ -569,15 +569,6 @@ Common subset extracted to `home/modules/common/packages/common.nix`:
 Platform-only packages stay in `home/modules/darwin/packages.nix` and `home/modules/linux/packages.nix`.
 
 ---
-
-## Migration Steps
-
-- [x] **Step 1** — README and repo structure plan
-- [x] **Step 2** — Scaffold: full directory structure, lib helpers, CI, `.envrc`
-- [x] **Step 3** — Migrate darwin: all system + home modules ported; `common/` modules written
-- [x] **Step 4** — Migrate NixOS/WSL: port WSL config; verify `nix build .#nixosConfigurations.nixos.config.system.build.toplevel`
-- [x] **Step 5** — Verify both builds pass end-to-end
-- [ ] **Step 6** — Archive old repos
 
 ## Security
 

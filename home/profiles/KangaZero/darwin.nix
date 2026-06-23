@@ -34,6 +34,7 @@
     inherit username;
     inherit (userMeta) stateVersion;
     homeDirectory = "/Users/${username}";
+    sessionPath = [ "$HOME/.local/bin" ];
     sessionVariables.EDITOR = "nvim";
     file.".hushlogin".text = "";
   };

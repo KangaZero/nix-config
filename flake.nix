@@ -118,6 +118,10 @@
       formatter."${darwinSystem}" = nixpkgs.legacyPackages."${darwinSystem}".nixfmt-tree;
       formatter."${wslSystem}" = nixpkgs.legacyPackages."${wslSystem}".nixfmt-tree;
 
+      # macOS only — Linux kitty is pkgs.kitty from nixpkgs.
+      # Darwin needs a custom .app bundle via nix-wrapper-modules: bakes in theme (Tokyo Night Moon),
+      # font (JetBrains Mono), animated GIF background, and transparency settings at the derivation
+      # level so macOS Spotlight/Finder see a proper .app and the assets are store-pinned.
       packages."${darwinSystem}".kitty = import ./packages/kitty.nix {
         pkgs = nixpkgs.legacyPackages."${darwinSystem}";
         inherit (inputs) nix-wrapper-modules;

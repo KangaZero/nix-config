@@ -3,6 +3,7 @@ vim.pack.add({
 	"https://github.com/neko-night/nvim",
 })
 
+--- NOTE: plugins/telesccope also has its own colorscheme applied on its own file
 ---@class nekonight.Config
 require("nekonight").setup({
 	style = "night",

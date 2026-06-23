@@ -27,7 +27,7 @@ vim.o.termguicolors = true -- true color support
 -- 		}
 -- 	end
 -- end) -- to increase startime a bit
--- vim.o.clipboard = "unnamedplus" -- use system clipboard
+vim.o.clipboard = "unnamedplus" -- use system clipboard
 vim.o.signcolumn = "yes" -- always show the sign column (gitsigns)
 -- NOTE: "debug" writes huge volumes to the LSP log (disk + slowdown). Use
 -- "warn" normally; bump to "debug" only when actively debugging a server.
