@@ -118,6 +118,15 @@
       formatter."${darwinSystem}" = nixpkgs.legacyPackages."${darwinSystem}".nixfmt-tree;
       formatter."${wslSystem}" = nixpkgs.legacyPackages."${wslSystem}".nixfmt-tree;
 
+      # Standalone home-manager — only needed when no sudo access on a bare-metal/server host.
+      # Home config is already applied atomically by nixos-rebuild on hosts where you have sudo.
+      # Uncomment and adjust when adding a host where you are not root:
+      #
+      # homeConfigurations."KangaZero" = lib.mkHome {
+      #   system = "x86_64-linux"; # or "aarch64-linux"
+      #   user   = "KangaZero";
+      # };
+
       # macOS only — Linux kitty is pkgs.kitty from nixpkgs.
       # Darwin needs a custom .app bundle via nix-wrapper-modules: bakes in theme (Tokyo Night Moon),
       # font (JetBrains Mono), animated GIF background, and transparency settings at the derivation

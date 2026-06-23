@@ -19,5 +19,6 @@
     just
     claude-code
     nerd-fonts.jetbrains-mono
+    nh
   ];
 }

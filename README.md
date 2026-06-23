@@ -44,7 +44,7 @@ nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
 | **Languages** | `nodejs_26` + `pnpm`, `python3`, `rustup`, `just`, `mise` | — | + `uv` |
 | **Local LLM** | — | ollama (Metal, launchd agent) — models pulled manually | ollama (`ollama-vulkan`, systemd user service) — `qwen2.5:7b` pulled manually post-activation |
 | **LSP / formatters** | `lua-language-server` `bash-language-server` `pyright` `ruff` `clang-tools` `vtsls` `vscode-langservers-extracted` `biome` `tailwindcss-language-server` `nixd` `stylua` `nixfmt-rfc-style` (all in `neovim.nix` — Mason uses these from PATH, no binary downloads); `rust-analyzer` via `rustup component add rust-analyzer` | — | — |
-| **CLI toolkit** | `fzf` `yazi` `eza` `bat` `btop` `ripgrep` `fd` `jq` `curl` `gh` `claude-code` | + `vim` `fastfetch` `tree` `ffmpeg-full` `imagemagick` `_7zz` `yt-dlp` `resvg` `poppler` `odysseus` | + `wget` `openssh` `tldr` `ffmpeg-full` `unzip` `uv` `azure-cli` (+ DevOps ext) |
+| **CLI toolkit** | `fzf` `yazi` `eza` `bat` `btop` `ripgrep` `fd` `jq` `curl` `gh` `claude-code` `nh` | + `vim` `fastfetch` `tree` `ffmpeg-full` `imagemagick` `_7zz` `yt-dlp` `resvg` `poppler` `odysseus` | + `wget` `openssh` `tldr` `ffmpeg-full` `unzip` `uv` `azure-cli` (+ DevOps ext) |
 | **Git** | LFS, `pull.rebase = true`, `autoSetupRemote = true`, identity from `userMeta` | — | — |
 | **Nix daemon** | — | Determinate Systems installer (`nix.enable = false`) | NixOS-managed |
 | **GC** | — | — | daily, `--delete-older-than 7d` |
@@ -92,9 +92,12 @@ nix run nix-darwin/master -- switch --flake .#KangaZero
 # Shell aliases set by this config (work from anywhere):
 nix-switch   # sudo darwin-rebuild switch --flake ~/.config/multi-nix#KangaZero
 nix-build    # darwin-rebuild build   --flake ~/.config/multi-nix#KangaZero
+nh-switch    # nh os switch ~/.config/multi-nix#KangaZero  (prettier output + nvd diff)
+nh-build     # nh os build  ~/.config/multi-nix#KangaZero
 
 # Directly from the repo:
 darwin-rebuild switch --flake .#KangaZero
+nh os switch .#KangaZero
 ```
 
 **5. Dry-run / build check (no activation)**
@@ -150,6 +153,11 @@ wsl --terminate NixOS && wsl -d NixOS
 sudo nixos-rebuild switch --flake ~/.config/multi-nix#nixos
 # or from inside the repo:
 sudo nixos-rebuild switch --flake .#nixos
+
+# Shell aliases (work from anywhere):
+nix-switch   # sudo nixos-rebuild switch --flake ~/.config/multi-nix#nixos
+nh-switch    # nh os switch ~/.config/multi-nix#nixos  (prettier output + nvd diff)
+nh-build     # nh os build  ~/.config/multi-nix#nixos
 ```
 
 **5. Dry-run / build check (no activation)**
@@ -247,6 +255,24 @@ Rebuild remotely after install:
 nixos-rebuild switch --flake .#server --target-host user@server --use-remote-sudo
 ```
 
+#### No sudo access (shared host)
+
+If you don't own the machine and can't run `nixos-rebuild`, use standalone home-manager instead — it only touches user-space (`~/.config`, `~/.local`, symlinks), no root required.
+
+1. Uncomment the `homeConfigurations` block in `flake.nix` and set the correct system:
+   ```nix
+   homeConfigurations."KangaZero" = lib.mkHome {
+     system = "x86_64-linux";
+     user   = "KangaZero";
+   };
+   ```
+2. Apply:
+   ```sh
+   nh home switch ~/.config/multi-nix#KangaZero
+   # or
+   home-manager switch --flake ~/.config/multi-nix#KangaZero
+   ```
+
 ---
 
 ### Rebuild quick reference
@@ -255,9 +281,12 @@ nixos-rebuild switch --flake .#server --target-host user@server --use-remote-sud
 |---|---|
 | macOS — switch | `darwin-rebuild switch --flake .#KangaZero` |
 | macOS — alias | `nix-switch` |
+| macOS — nh alias | `nh-switch` / `nh-build` |
 | macOS — build only | `darwin-rebuild build --flake .#KangaZero` |
 | macOS — rollback | `sudo darwin-rebuild switch --rollback` |
 | NixOS WSL — switch | `sudo nixos-rebuild switch --flake .#nixos` |
+| NixOS WSL — alias | `nix-switch` |
+| NixOS WSL — nh alias | `nh-switch` / `nh-build` |
 | NixOS WSL — build only | `nixos-rebuild dry-build --flake .#nixos` |
 | NixOS WSL/bare — rollback | `sudo nixos-rebuild switch --rollback` |
 | NixOS server — remote | `nixos-rebuild switch --flake .#server --target-host user@host --use-remote-sudo` |
@@ -274,6 +303,7 @@ multi-nix/
 │   ├── mkDarwin.nix                  # Builds darwinSystem + home-manager
 │   ├── mkNixOS.nix                   # Builds nixosSystem (bare metal / VM / server)
 │   ├── mkWSL.nix                     # Thin wrapper: mkNixOS + nixos-wsl + extras
+│   ├── mkHome.nix                    # Standalone home-manager config (no-sudo hosts)
 │   ├── mkChecks.nix                  # Pre-commit checks per system
 │   └── mkDevShell.nix                # Dev shell per system
 │

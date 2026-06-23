@@ -8,6 +8,8 @@
     "nix-build" = "darwin-rebuild build --flake ~/.config/multi-nix#${hostname}";
     "nix-eval" =
       "nix eval --raw ~/.config/multi-nix#darwinConfigurations.${hostname}.config.system.build.toplevel.outPath";
+    "nh-switch" = "nh os switch ~/.config/multi-nix#${hostname}";
+    "nh-build" = "nh os build ~/.config/multi-nix#${hostname}";
     # Run nvim against the live in-repo config without a rebuild. NVIM_APPNAME is
     # relative to $XDG_CONFIG_HOME (~/.config), so it resolves straight to the
     # working tree. Data/state isolated under ~/.local/share/multi-nix/... so this
