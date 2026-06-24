@@ -1,0 +1,65 @@
+name: Weekly CVE Report
+
+on:
+  schedule:
+    # Runs 12pm JST every Friday
+    - cron: '0 3 * * 5'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  cve-linux:
+    name: CVE Report (x86_64-linux)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/nix-installer-action@main
+        with:
+          determinate: false
+      - uses: DeterminateSystems/magic-nix-cache-action@main
+      - name: Run vulnix
+        run: bash scripts/vulnix-flake.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cve-report-linux
+          path: CVE_REPORT_WSL.md
+
+  cve-darwin:
+    name: CVE Report (aarch64-darwin)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/nix-installer-action@main
+        with:
+          determinate: false
+      - uses: DeterminateSystems/magic-nix-cache-action@main
+      - name: Run vulnix
+        run: bash scripts/vulnix-flake.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cve-report-darwin
+          path: CVE_REPORT_DARWIN.md
+
+  commit:
+    name: Commit reports
+    runs-on: ubuntu-latest
+    needs: [cve-linux, cve-darwin]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: cve-report-linux
+          path: .
+      - uses: actions/download-artifact@v4
+        with:
+          name: cve-report-darwin
+          path: .
+      - name: Commit and push
+        run: |
+          git config user.name "Github bot"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add CVE_REPORT_WSL.md CVE_REPORT_DARWIN.md
+          git diff --staged --quiet || git commit -m "<chore> Retrieved latest CVE Reports"
+          git push

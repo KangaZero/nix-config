@@ -31,7 +31,7 @@ nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
 | Category | Common | macOS (darwin) | NixOS WSL |
 |---|---|---|---|
 | **Shell** | zsh + oh-my-zsh | — | — |
-| **Prompt** | — | oh-my-posh (external TOML config) | catppuccin oh-my-zsh (mocha, time + hostname) |
+| **Prompt** | oh-my-posh (TOML config in `home/modules/common/oh-my-posh.toml`) | — | — |
 | **Editor** | neovim — `defaultEditor`, config HM-managed via `xdg.configFile` → `~/.config/nvim`; `vi`/`vim` aliases | — | root nvim symlinked to user config via activation script |
 | **Terminal** | kitty — Tokyo Night Moon, JetBrains Mono, 85% opacity | animated pixel-art gif bg | static `moon_dark.png` bg |
 | **Font** | `nerd-fonts.jetbrains-mono` | — | `fonts.fontconfig.enable = true` |
@@ -337,6 +337,8 @@ multi-nix/
 │       │   ├── direnv.nix
 │       │   ├── firefox.nix           # Firefox Dev Edition + policies
 │       │   ├── kitty.nix             # Tokyo Night Moon — bg image from assetsDir
+│       │   ├── oh-my-posh.nix        # Shared prompt — both darwin + linux
+│       │   ├── oh-my-posh.toml       # Prompt config (dracula purple, sysinfo, git, path)
 │       │   ├── neovim/
 │       │   │   ├── neovim.nix        # HM module — symlinks config via xdg.configFile
 │       │   │   └── config/           # Standalone nvim config (init.lua, lua/, scripts/…)
@@ -354,14 +356,13 @@ multi-nix/
 │       ├── darwin/                   # macOS home-manager modules
 │       │   ├── packages.nix          # _7zz, imagemagick, odysseus-dev, etc.
 │       │   ├── shell.nix             # brew shellenv, mac aliases
-│       │   ├── oh-my-posh.nix        # Prompt
 │       │   ├── discord.nix
 │       │   └── ollama.nix            # ollama (Metal) — launchd agent (port 11434)
 │       └── linux/                    # Linux home-manager modules
 │           ├── packages.nix          # azure-cli, uv, openssh, wget, etc.
 │           ├── ollama.nix            # ollama-vulkan — systemd user service (port 11434)
 │           ├── bash.nix              # zsh trampoline
-│           ├── shell.nix             # Catppuccin oh-my-zsh, WSL aliases
+│           ├── shell.nix             # zsh aliases + WSL helpers (weston, kill-port, nix-gc)
 │           ├── weston.nix            # Weston compositor bridge (WSL)
 │           └── wayland/
 │               └── niri/             # Niri KDL + noctalia v5; settings as Nix attrset in noctalia.nix
@@ -377,7 +378,8 @@ multi-nix/
 ├── .gitignore
 └── .github/
     └── workflows/
-        └── ci.yml                    # Matrix CI: lint + dry-build per architecture
+        ├── ci.yml                    # Matrix CI: lint + dry-build per architecture
+        └── cron.yml                  # Weekly CVE report — vulnix on both arches, single commit
 ```
 
 ---
@@ -460,13 +462,25 @@ sudo nixos-rebuild switch --profile /nix/var/nix/profiles/system-<N>-link
 
 ## CI Pipeline
 
-GitHub Actions runs a matrix across both architectures on every push and PR:
+### On every push / PR (`ci.yml`)
+
+GitHub Actions runs a matrix across both architectures:
 
 | Job | Runner | Checks |
 |---|---|---|
 | `check-darwin` | `macos-latest` (aarch64) | nixfmt, statix, deadnix |
 | `check-linux` | `ubuntu-latest` (x86_64) | nixfmt, statix, deadnix |
 | `check-nvim-config` | `ubuntu-latest` | Lua syntax (`nvim --clean`), stylua fmt check |
+
+### Weekly CVE report (`cron.yml`)
+
+Runs every Friday at 12pm JST (also triggerable via `workflow_dispatch`):
+
+| Job | Runner | What it does |
+|---|---|---|
+| `cve-linux` | `ubuntu-latest` | Builds `nixosConfigurations.nixos`, runs vulnix, uploads `CVE_REPORT_WSL.md` as artifact |
+| `cve-darwin` | `macos-latest` | Builds `darwinConfigurations.KangaZero.system`, runs vulnix, uploads `CVE_REPORT_DARWIN.md` as artifact |
+| `commit` | `ubuntu-latest` | Downloads both artifacts, commits both reports in a single commit |
 
 Uses `DeterminateSystems/nix-installer-action` with `determinate: false` — the Determinate installer binary, but running standard Nix (avoids FlakeHub authentication requirements).
 
@@ -585,11 +599,12 @@ This repo consolidates two existing configs:
 
 | Module | Platform | Source |
 |---|---|---|
-| `oh-my-posh.nix`, `discord.nix` | darwin | mac config |
-| `shell.nix` (oh-my-posh, brew shellenv) | darwin | mac config |
+| `discord.nix` | darwin | mac config |
+| `shell.nix` (brew shellenv) | darwin | mac config |
+| `oh-my-posh.nix` + `oh-my-posh.toml` | common | moved from darwin — shared prompt |
 | `wayland/niri/` | linux | WSL config |
 | `bash.nix`, `weston.nix` | linux | WSL config |
-| `shell.nix` (catppuccin, WSL aliases) | linux | WSL config |
+| `shell.nix` (WSL aliases, helpers) | linux | WSL config — catppuccin theme dropped (oh-my-posh owns prompt) |
 
 ### packages split
 
@@ -602,20 +617,18 @@ Platform-only packages stay in `home/modules/darwin/packages.nix` and `home/modu
 
 ## Security
 
-CVE scanning is done via [`vulnix`](https://github.com/nix-community/vulnix) against the built store closure.
-
-Run the scanner:
+CVE scanning is done via [`vulnix`](https://github.com/nix-community/vulnix) against the built store closure. Reports are generated automatically every Friday via the `cron.yml` workflow, or run locally:
 
 ```sh
 bash scripts/vulnix-flake.sh
 ```
 
-This builds the current platform's config, then writes a report to:
+Detects the current platform via `uname`, builds the matching config, and writes a report to:
 
-| Platform | Report file |
-|---|---|
-| NixOS WSL | [`CVE_REPORT_WSL.md`](./CVE_REPORT_WSL.md) |
-| macOS (darwin) | [`CVE_REPORT_DARWIN.md`](./CVE_REPORT_DARWIN.md) |
+| Platform | Build target | Report file |
+|---|---|---|
+| Linux / NixOS WSL | `.#nixosConfigurations.nixos.config.system.build.toplevel` | [`CVE_REPORT_WSL.md`](./CVE_REPORT_WSL.md) |
+| macOS (darwin) | `.#darwinConfigurations.KangaZero.system` | [`CVE_REPORT_DARWIN.md`](./CVE_REPORT_DARWIN.md) |
 
 ---
 

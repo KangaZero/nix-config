@@ -8,15 +8,11 @@ cd "$REPO_DIR"
 
 OS="$(uname)"
 
-if [[ -n "${WSL_DISTRO_NAME:-}" ]]; then
+if [[ "$OS" == "Linux" ]]; then
 	nix build .#nixosConfigurations.nixos.config.system.build.toplevel
 	REPORT="$REPO_DIR/CVE_REPORT_WSL.md"
-elif [[ "$OS" == "Linux" ]]; then
-	# TODO: add native Linux build command and REPORT path
-	echo "Native Linux (non-WSL) not yet implemented" >&2
-	exit 1
 elif [[ "$OS" == "Darwin" ]]; then
-	darwin-rebuild build --flake .#KangaZero
+	nix build .#darwinConfigurations.KangaZero.system
 	REPORT="$REPO_DIR/CVE_REPORT_DARWIN.md"
 else
 	echo "Unsupported platform: $OS" >&2
