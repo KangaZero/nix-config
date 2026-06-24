@@ -17,7 +17,7 @@
     ../../modules/common/shell/zsh-core.nix
     ../../modules/darwin/packages.nix
     ../../modules/darwin/shell.nix
-    ../../modules/darwin/oh-my-posh.nix
+    ../../modules/common/oh-my-posh.nix
     ../../modules/darwin/discord.nix
     ../../modules/common/zellij.nix
     ../../modules/common/zoxide.nix

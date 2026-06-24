@@ -15,6 +15,7 @@
     ../../modules/common/packages/common.nix
     ../../modules/common/packages/ns-script.nix
     ../../modules/common/shell/zsh-core.nix
+    ../../modules/common/oh-my-posh.nix
     ../../modules/common/zellij.nix
     ../../modules/common/zoxide.nix
     ../../modules/common/lazygit.nix

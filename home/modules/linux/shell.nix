@@ -1,13 +1,6 @@
-{ pkgs, ... }:
-{
+_: {
   programs.zsh = {
     autosuggestion.highlight = "fg=#ac62de,bg=#134d4d,bold,underline";
-
-    sessionVariables = {
-      CATPPUCCIN_FLAVOR = "mocha";
-      CATPPUCCIN_SHOW_TIME = "true";
-      CATPPUCCIN_SHOW_HOSTNAME = "always";
-    };
 
     initContent = ''
       weston() {
@@ -89,19 +82,12 @@
     };
 
     oh-my-zsh = {
-      theme = "catppuccin";
       plugins = [
         "git"
         "fzf"
         "colorize"
         "z"
       ];
-      custom = "${pkgs.fetchFromGitHub {
-        owner = "JannoTjarks";
-        repo = "catppuccin-zsh";
-        rev = "main";
-        sha256 = "sha256-w6uw8q54kQV2lwVSK3JjQ93slPt0OCvQMeZClyEFdwY=";
-      }}";
     };
   };
 }

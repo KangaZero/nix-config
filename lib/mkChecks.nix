@@ -12,11 +12,18 @@ inputs.git-hooks.lib.${system}.run {
     check-author = {
       enable = true;
       name = "check git author";
-      entry = "${pkgs.writeShellScript "check-author" ''
-        bad=$(git log --format="%ae" 2>/dev/null | grep -v "samuelyongw@gmail.com")
-        if [ -n "$bad" ]; then
+      #%ae is the author's email, %ce is the committer's email
+      entry = "${pkgs.writeShellScriptBin "check-author" ''
+        bad_author=$(git log --format="%ae" 2>/dev/null | grep -v "samuelyongw@gmail.com")
+        bad_comitter=$(git log --format="%ce" 2>/dev/null | grep -v "samuelyongw@gmail.com")
+        if [ -n "$bad_author" ]; then
           echo "Push rejected: commits not authored by KangaZero <samuelyongw@gmail.com>:"
-          echo "$bad" author(s) found
+          echo "$bad_author" author(s) found
+          exit 1
+        fi
+        if [ -n "$bad_comitter" ]; then
+          echo "Push rejected: commits not comitted by KangaZero <samuelyongw@gmail.com>:"
+          echo "$bad_comitter" comitter(s) found
           exit 1
         fi
       ''}";
