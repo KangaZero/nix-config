@@ -21,6 +21,19 @@
   users.users.${username} = {
     linger = true;
     extraGroups = [ "uinput" ];
+    # See https://nixos.wiki/wiki/SSH_public_key_authentication
+    openssh.authorizedKeys.keys = [
+      # paste output of: cat ~/.ssh/id_ed25519.pub
+      "ssh-ed25519 REPLACE_ME KangaZero"
+    ];
+  };
+
+  services.openssh = {
+    enable = true;
+    settings = {
+      PasswordAuthentication = false;
+      KbdInteractiveAuthentication = false;
+    };
   };
 
   nix.gc = {

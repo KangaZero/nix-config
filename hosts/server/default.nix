@@ -1,6 +1,8 @@
 _: {
   services.openssh.enable = true;
 
+  # hardware
+
   nix.gc = {
     automatic = true;
     dates = "weekly";

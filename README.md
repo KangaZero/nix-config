@@ -49,7 +49,8 @@ nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
 | **Nix daemon** | — | Determinate Systems installer (`nix.enable = false`) | NixOS-managed |
 | **GC** | — | — | daily, `--delete-older-than 7d` |
 | **Timezone** | — | — | Asia/Tokyo |
-| **Extras** | direnv + nix-direnv, nix-search wrapper | Discord, nix-homebrew, keyboard layouts `us,jp` | xwayland, `nixRebuildStatus`/`nixRebuildKill` aliases, `uinput` (input device emulation — `hardware.uinput.enable`, auto-loaded via systemd, `uinput` group) |
+| **SSH** | — | — | `sshd` enabled, key-only auth (`PasswordAuthentication=false`, `KbdInteractiveAuthentication=false`); authorized key via `openssh.authorizedKeys.keys` |
+| **Extras** | direnv + nix-direnv, nix-search wrapper | Discord, nix-homebrew, keyboard layouts `us,jp` | xwayland, `nixRebuildStatus`/`nixRebuildKill` aliases, `ff` (fastfetch with `NixOwO.png` logo via kitty-direct, zellij-aware), `uinput` (input device emulation — `hardware.uinput.enable`, auto-loaded via systemd, `uinput` group) |
 
 ---
 
@@ -362,7 +363,7 @@ multi-nix/
 │           ├── packages.nix          # azure-cli, uv, openssh, wget, etc.
 │           ├── ollama.nix            # ollama-vulkan — systemd user service (port 11434)
 │           ├── bash.nix              # zsh trampoline
-│           ├── shell.nix             # zsh aliases + WSL helpers (weston, kill-port, nix-gc)
+│           ├── shell.nix             # zsh aliases + WSL helpers (weston, kill-port, nix-gc, ff)
 │           ├── weston.nix            # Weston compositor bridge (WSL)
 │           └── wayland/
 │               └── niri/             # Niri KDL + noctalia v5; settings as Nix attrset in noctalia.nix
@@ -373,7 +374,7 @@ multi-nix/
 │   └── kitty.nix                     # nix-wrapper-modules standalone kitty
 ├── assets/
 │   ├── mac/                          # macOS assets (background gif, etc.)
-│   └── linux/                        # Linux assets (wallpapers, etc.)
+│   └── linux/                        # Linux assets (NixOwO.png fastfetch logo, wallpapers)
 ├── .envrc                            # direnv: use flake .
 ├── .gitignore
 └── .github/

@@ -30,6 +30,18 @@ _: {
         echo "kill-port: killing $(echo $targets | tr '\n' ' ')on :$port" >&2
         echo "$targets" | xargs -r kill -9
       }
+      ff() {
+        local nix_png="$HOME/.config/multi-nix/assets/linux/NixOwO.png"
+        if [[ ! -e "$nix_png" ]]; then
+          echo "ff: missing png file: $nix_png"
+          return 1
+        fi
+        if [[ -n "$ZELLIJ_SESSION_NAME" ]]; then
+          echo "ff: exit zellij before running"
+          return 1
+        fi
+        nix run nixpkgs#fastfetch -- --logo "$nix_png" --logo-type kitty-direct
+      }
     '';
 
     shellAliases = {
