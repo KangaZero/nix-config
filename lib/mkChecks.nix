@@ -12,20 +12,34 @@ inputs.git-hooks.lib.${system}.run {
     check-author = {
       enable = true;
       name = "check git author";
-      #%ae is the author's email, %ce is the committer's email
       entry = "${pkgs.writeShellScriptBin "check-author" ''
-        bad_author=$(git log --format="%ae" 2>/dev/null | grep -v "samuelyongw@gmail.com")
-        bad_comitter=$(git log --format="%ce" 2>/dev/null | grep -v "samuelyongw@gmail.com")
-        if [ -n "$bad_author" ]; then
-          echo "Push rejected: commits not authored by KangaZero <samuelyongw@gmail.com>:"
-          echo "$bad_author" author(s) found
-          exit 1
-        fi
-        if [ -n "$bad_comitter" ]; then
-          echo "Push rejected: commits not comitted by KangaZero <samuelyongw@gmail.com>:"
-          echo "$bad_comitter" comitter(s) found
-          exit 1
-        fi
+        while IFS=' ' read -r local_ref local_sha remote_ref remote_sha; do
+          [ "$local_sha" = "0000000000000000000000000000000000000000" ] && continue
+
+          if [ "$remote_sha" = "0000000000000000000000000000000000000000" ]; then
+            commits=$(git rev-list "$local_sha" --not --remotes 2>/dev/null)
+          else
+            commits=$(git rev-list "$remote_sha..$local_sha" 2>/dev/null)
+          fi
+
+          [ -z "$commits" ] && continue
+
+          while IFS= read -r commit; do
+            while IFS= read -r author; do
+              if [ "$author" != "samuelyongw@gmail.com" ]; then
+                echo "Push rejected: $commit not authored by KangaZero <samuelyongw@gmail.com> (got: $author)"
+                exit 1
+              fi
+            done <<< "$(git log -10 --format="%ae" "$commit")"
+
+            while IFS= read -r committer; do
+              if [ "$committer" != "samuelyongw@gmail.com" ]; then
+                echo "Push rejected: $commit not committed by KangaZero <samuelyongw@gmail.com> (got: $committer)"
+                exit 1
+              fi
+            done <<< "$(git log -10 --format="%ce" "$commit")"
+          done <<< "$commits"
+        done
       ''}";
       language = "system";
       pass_filenames = false;
