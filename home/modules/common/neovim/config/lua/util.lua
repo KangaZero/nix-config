@@ -197,4 +197,67 @@ function M.get_lsp_symbol()
 	return ""
 end
 
+--- Mutates text on the current line or visual selection using a string transformer
+--- @param transform_fn fun(str: string): string
+function M.modify_text(transform_fn)
+	local mode = vim.api.nvim_get_mode().mode
+	if mode:match("[vV]") then
+		-- Visual mode processing
+		vim.cmd("normal! \27") -- Exit visual mode to grab marks
+		local start_line, start_col = unpack(vim.api.nvim_buf_get_mark(0, "<"))
+		local end_line, end_col = unpack(vim.api.nvim_buf_get_mark(0, ">"))
+		local lines = vim.api.nvim_buf_get_lines(0, start_line - 1, end_line, false)
+		if #lines == 0 then
+			return
+		end
+
+		for i, line in ipairs(lines) do
+			local s_col = (i == 1) and start_col + 1 or 1
+			local e_col = (i == #lines) and end_col + 1 or #line
+			local prefix = line:sub(1, s_col - 1)
+			local target = line:sub(s_col, e_col)
+			local target_indent, target_content = target:match("^(%s*)(.*)")
+			local suffix = line:sub(e_col + 1)
+			lines[i] = prefix .. target_indent .. transform_fn(target_content) .. suffix
+		end
+		vim.api.nvim_buf_set_lines(0, start_line - 1, end_line, false, lines)
+	else
+		-- Normal mode processing (current line)
+		local line = vim.api.nvim_get_current_line()
+		local indent, content = line:match("^(%s*)(.*)")
+		local transformed_content = transform_fn(content)
+		local transformed_line = indent .. transformed_content
+		vim.api.nvim_set_current_line(transformed_line)
+	end
+end
+
+--- @param str string
+function M.to_kebab(str)
+	local res = str:gsub("^(%s?+)([a-z0-9])([A-Z])", "%1%2-%3")
+	res = res:gsub("([A-Z])([A-Z][a-z])", "%1-%2")
+	return res:gsub("[_%s]+", "-"):lower()
+end
+
+--- @param str string
+function M.to_pascal(str)
+	local res = str:gsub("^%l", string.upper)
+	res = res:gsub("[-_%s]+(%l)", function(c)
+		return c:upper()
+	end)
+	return res:gsub("[-_%s]", "")
+end
+
+--- @param str string
+function M.to_camel(str)
+	local res = M.to_pascal(str)
+	res = str:gsub("^%u", string.lower)
+	return res
+end
+
+--- @param str string
+function M.to_snake(str)
+	local res = M.to_kebab(str)
+	return res:gsub("-", "_")
+end
+
 return M

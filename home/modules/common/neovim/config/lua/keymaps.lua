@@ -29,6 +29,8 @@ vim.keymap.set("v", "K", ":<C-u>execute \"'<,'>move '<-\" . (v:count1 + 1)<cr>gv
 vim.keymap.set("n", "<leader>aa", ":.lua<CR>", { desc = "Execute lua" })
 vim.keymap.set("v", "<leader>aa", ":lua<CR>", { desc = "Execute lua" })
 
+-- Case switching
+
 if pcall(require, "snacks") then
 	vim.keymap.set({ "n", "v" }, "<leader><leader>", function()
 		require("snacks").picker.smart()
@@ -134,6 +136,22 @@ end
 
 ---@type Util
 local util = require("util")
+
+vim.keymap.set({ "n", "x" }, "<leader>ck", function()
+	util.modify_text(util.to_kebab)
+end, { desc = "Case: kebab-case" })
+
+vim.keymap.set({ "n", "x" }, "<leader>cP", function()
+	util.modify_text(util.to_pascal)
+end, { desc = "Case: PascalCase" })
+
+vim.keymap.set({ "n", "x" }, "<leader>cc", function()
+	util.modify_text(util.to_camel)
+end, { desc = "Case: camelCase" })
+
+vim.keymap.set({ "n", "x" }, "<leader>cs", function()
+	util.modify_text(util.to_snake)
+end, { desc = "Case: snake_case" })
 
 if pcall(require, "undotree") then
 	vim.keymap.set("n", "<leader>uu", function()

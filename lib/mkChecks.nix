@@ -13,33 +13,40 @@ inputs.git-hooks.lib.${system}.run {
       enable = true;
       name = "check git author";
       entry = "${pkgs.writeShellScriptBin "check-author" ''
-        while IFS=' ' read -r local_ref local_sha remote_ref remote_sha; do
-          [ "$local_sha" = "0000000000000000000000000000000000000000" ] && continue
+               while IFS=' ' read -r local_ref local_sha remote_ref remote_sha; do
+        	  # Skip branch deletions
+        	  [ "$local_sha" = "0000000000000000000000000000000000000000" ] && continue
 
-          if [ "$remote_sha" = "0000000000000000000000000000000000000000" ]; then
-            commits=$(git rev-list "$local_sha" --not --remotes 2>/dev/null)
-          else
-            commits=$(git rev-list "$remote_sha..$local_sha" 2>/dev/null)
-          fi
+        	  # Isolate only the new incoming commits
+        	  if [ "$remote_sha" = "0000000000000000000000000000000000000000" ]; then
+        	    commits=$(git rev-list "$local_sha" --not --remotes 2>/dev/null)
+        	  else
+        	    commits=$(git rev-list "$remote_sha..$local_sha" 2>/dev/null)
+        	  fi
 
-          [ -z "$commits" ] && continue
+        	  [ -z "$commits" ] && continue
 
-          while IFS= read -r commit; do
-            while IFS= read -r author; do
-              if [ "$author" != "samuelyongw@gmail.com" ]; then
-                echo "Push rejected: $commit not authored by KangaZero <samuelyongw@gmail.com> (got: $author)"
-                exit 1
-              fi
-            done <<< "$(git log -10 --format="%ae" "$commit")"
+        	  # Loop through each incoming commit
+        	  while IFS= read -r commit; do
+        	    
+        	    # FIX: Fetch both emails separated by '|', restricted to exactly 1 commit (-1)
+        	    # Use read with IFS='|' to extract them cleanly into variables 
+        	    IFS='|' read -r author_email committer_email <<< "$(git log -1 --format="%ae|%ce" "$commit" 2>/dev/null)"
 
-            while IFS= read -r committer; do
-              if [ "$committer" != "samuelyongw@gmail.com" ]; then
-                echo "Push rejected: $commit not committed by KangaZero <samuelyongw@gmail.com> (got: $committer)"
-                exit 1
-              fi
-            done <<< "$(git log -10 --format="%ce" "$commit")"
-          done <<< "$commits"
-        done
+        	    # Validate Author
+        	    if [ "$author_email" != "samuelyongw@gmail.com" ]; then
+        	      echo "Push rejected: $commit not authored by KangaZero <samuelyongw@gmail.com> (got: $author_email)"
+        	      exit 1
+        	    fi
+
+        	    # Validate Committer
+        	    if [ "$committer_email" != "samuelyongw@gmail.com" ]; then
+        	      echo "Push rejected: $commit not committed by KangaZero <samuelyongw@gmail.com> (got: $committer_email)"
+        	      exit 1
+        	    fi
+
+        	  done <<< "$commits"
+        	done 
       ''}";
       language = "system";
       pass_filenames = false;
