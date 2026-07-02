@@ -12,6 +12,8 @@ inputs.git-hooks.lib.${system}.run {
     check-author = {
       enable = true;
       name = "check git author";
+      # writeShellScriptBin puts the binary at $out/bin/<name>, so ${drv} alone
+      # resolves to $out (a directory). Must suffix /bin/check-author.
       entry = "${pkgs.writeShellScriptBin "check-author" ''
                while IFS=' ' read -r local_ref local_sha remote_ref remote_sha; do
         	  # Skip branch deletions
@@ -47,7 +49,7 @@ inputs.git-hooks.lib.${system}.run {
 
         	  done <<< "$commits"
         	done 
-      ''}";
+      ''}/bin/check-author";
       language = "system";
       pass_filenames = false;
       always_run = true;
