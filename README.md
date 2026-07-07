@@ -10,7 +10,7 @@ A unified Nix flake monorepo consolidating macOS (nix-darwin) and NixOS configur
 |---|---|---|---|
 | `KangaZero` | macOS (nix-darwin) | aarch64-darwin | Active |
 | `nixos` | NixOS WSL2 | x86_64-linux | Active |
-| `server` | NixOS headless | x86_64/aarch64-linux | Planned |
+| `server` | NixOS bare-metal (niri desktop) | x86_64-linux | Active |
 
 ## Nixpkgs Source
 
@@ -40,7 +40,7 @@ nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
 | **Browser** | Firefox Developer Edition (declarative — policies + Vimium) | — | — |
 | **Desktop** | — | native macOS | niri (Wayland tiling) → weston (kiosk-shell) → WSLg; `Alt` mod; `LIBGL_ALWAYS_SOFTWARE=1` |
 | **Bar / launcher / notifications** | — | — | noctalia v5 (autostarted by niri); config managed as Nix attrset in `noctalia.nix` via `programs.noctalia.settings` |
-| **Clipboard** | — | — | noctalia built-in clipboard panel (`Alt+Shift+V` → `noctalia-shell ipc call clipboard toggle`) |
+| **Clipboard** | — | — | noctalia built-in clipboard panel (`Alt+Shift+V` → `noctalia msg panel-toggle clipboard`) |
 | **Languages** | `nodejs_26` + `pnpm`, `python3`, `rustup`, `just`, `mise` | — | + `uv` |
 | **Local LLM** | — | ollama (Metal, launchd agent) — models pulled manually | ollama (`ollama-vulkan`, systemd user service) — `qwen2.5:7b` pulled manually post-activation |
 | **LSP / formatters** | `lua-language-server` `bash-language-server` `pyright` `ruff` `clang-tools` `vtsls` `vscode-langservers-extracted` `biome` `tailwindcss-language-server` `nixd` `stylua` `nixfmt-rfc-style` (all in `neovim.nix` — Mason uses these from PATH, no binary downloads); `rust-analyzer` via `rustup component add rust-analyzer` | — | — |
@@ -51,6 +51,35 @@ nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
 | **Timezone** | — | — | Asia/Tokyo |
 | **SSH** | — | — | `sshd` enabled, key-only auth (`PasswordAuthentication=false`, `KbdInteractiveAuthentication=false`); authorized key via `openssh.authorizedKeys.keys` |
 | **Extras** | direnv + nix-direnv, nix-search wrapper | Discord, nix-homebrew, keyboard layouts `us,jp` | xwayland, `nixRebuildStatus`/`nixRebuildKill` aliases, `ff` (fastfetch with `NixOwO.png` logo via kitty-direct, zellij-aware), `uinput` (input device emulation — `hardware.uinput.enable`, auto-loaded via systemd, `uinput` group) |
+
+### NixOS server (bare-metal desktop)
+
+The `server` host reuses the entire WSL home profile and shares the `KangaZero` identity
+(`home/profiles/server/default.nix` re-exports `home/profiles/KangaZero/default.nix`), but is a
+real Wayland desktop rather than a WSLg bridge. It is built via `lib.mkNixOS` directly (not
+`mkWSL`), pulling the non-WSL subset of extra modules: `nix-ld`, `graphics`, `wayland/niri`.
+
+| Category | `server` |
+|---|---|
+| **Same as WSL** | zsh + oh-my-posh, neovim, kitty, zellij, zoxide, firefox, git (work identity), niri KDL + **noctalia v5** config (bar/dock/theme/keybinds — shared base, server adds an `idle` override), ollama, `nh`, common + linux packages, Asia/Tokyo, key-only sshd |
+| **Desktop** | niri (Wayland tiling) launched **natively** via greetd — no weston bridge, no `LIBGL_ALWAYS_SOFTWARE`; `Alt` mod |
+| **Login** | greetd + **noctalia-greeter** (`programs.noctalia-greeter`, themed session picker); input `noctalia-greeter` flake |
+| **Idle / lock** | noctalia built-in Idle service — lock at 5 min, screen-off at 10 min (`programs.noctalia.settings.idle`); no swayidle |
+| **Audio** | PipeWire (`alsa` + `pulse`, `rtkit`), PulseAudio disabled |
+| **Graphics** | Intel — `hardware.graphics.enable` + `intel-media-driver` (`enable32Bit` from shared `graphics.nix`) |
+| **Power** | `power-profiles-daemon` (noctalia-integrated — **not** TLP), `brightnessctl` |
+| **Bluetooth** | `hardware.bluetooth` (powerOnBoot) — noctalia Control Center is the UI |
+| **Printing** | CUPS (`services.printing`) |
+| **Secrets / polkit** | gnome-keyring (unlocked via greetd PAM), `security.polkit`, polkit-gnome user agent bound to `graphical-session.target` |
+| **Fonts** | `nerd-fonts.jetbrains-mono` + Noto (`noto-fonts`, `-cjk-sans`, `-cjk-serif`, `-color-emoji`), fontconfig `defaultFonts` (mono JetBrainsMono NF, CJK Noto) |
+| **Portals** | `xdg-desktop-portal-gtk` + `-gnome` |
+| **GC** | weekly, `--delete-older-than 30d` (WSL is daily / 7d) |
+| **Dropped vs old box** | fcitx5/ja input, Steam |
+| **Aliases** | server-local `nix-switch`/`nh-switch`/`nh-build`/`home-switch`/`edit-nix`/`nvim-dev` (in `home/profiles/server/linux.nix`) |
+
+Because home-manager is wired through `nixos-rebuild`, home-only tweaks can also be applied fast
+without sudo/reboot via the standalone `homeConfigurations."KangaZero"` output — see
+[No sudo access](#no-sudo-access-shared-host--fast-home-only-iteration).
 
 ---
 
@@ -238,41 +267,83 @@ sudo nixos-rebuild switch --rollback
 
 ---
 
-### NixOS server / headless (x86_64-linux)
+### NixOS bare-metal desktop — `server` (x86_64-linux)
 
-Same flow as bare metal above but reference `hosts/server/default.nix` (sshd enabled, no GUI). Register in `flake.nix`:
+The `server` host is a full niri + noctalia Wayland desktop (greetd login, PipeWire, CUPS,
+Bluetooth, Intel graphics). It is already registered in `flake.nix` via `lib.mkNixOS` with the
+non-WSL extra modules:
 
 ```nix
 nixosConfigurations."server" = lib.mkNixOS {
-  hostname = "server";
-  system   = "x86_64-linux";
-  user     = "KangaZero";
+  hostname     = "server";
+  system       = "x86_64-linux";
+  user         = "server";                       # profile dir; username resolves to "KangaZero"
+  extraModules = [
+    ./modules/nixos/nix-ld.nix
+    ./modules/nixos/graphics.nix
+    ./modules/nixos/wayland/niri.nix
+  ];
 };
 ```
 
-Rebuild remotely after install:
+**1. Install** (from the NixOS installer — follow the *bare metal* partition/mount steps above,
+then generate hardware config into `hosts/server/hardware.nix`):
 
 ```sh
-nixos-rebuild switch --flake .#server --target-host user@server --use-remote-sudo
+sudo nixos-install --flake /mnt/home/KangaZero/.config/multi-nix#server --root /mnt
+reboot
 ```
 
-#### No sudo access (shared host)
+> Before the first switch: paste your real SSH pubkey into `hosts/server/default.nix`
+> (`openssh.authorizedKeys.keys`) and confirm the `hosts/server/hardware.nix` UUIDs match the
+> target disk (`lsblk -f`).
 
-If you don't own the machine and can't run `nixos-rebuild`, use standalone home-manager instead — it only touches user-space (`~/.config`, `~/.local`, symlinks), no root required.
+**2. Day-to-day system rebuilds** (bootloader/greetd/daemons):
 
-1. Uncomment the `homeConfigurations` block in `flake.nix` and set the correct system:
-   ```nix
-   homeConfigurations."KangaZero" = lib.mkHome {
-     system = "x86_64-linux";
-     user   = "KangaZero";
-   };
-   ```
-2. Apply:
-   ```sh
-   nh home switch ~/.config/multi-nix#KangaZero
-   # or
-   home-manager switch --flake ~/.config/multi-nix#KangaZero
-   ```
+```sh
+sudo nixos-rebuild switch --flake ~/.config/multi-nix#server
+# server-local aliases (after first switch):
+nix-switch   # sudo nixos-rebuild switch --flake ~/.config/multi-nix#server
+nh-switch    # nh os switch ~/.config/multi-nix#server
+nh-build     # nh os build  ~/.config/multi-nix#server
+```
+
+Reboot once after the first switch (bootloader + greetd), then pick the **niri** session in
+noctalia-greeter. Subsequent tweaks apply live — no more reboots.
+
+<a id="no-sudo-access-shared-host--fast-home-only-iteration"></a>
+#### No sudo access (shared host) / fast home-only iteration
+
+Home-manager is wired through `nixos-rebuild`, but the standalone
+`homeConfigurations."${serverHomeManagerUser}"` output (`serverHomeManagerUser = "KangaZero"`) lets
+you apply **home-only** changes (niri/noctalia/kitty/zsh/nvim/packages) without sudo or a reboot —
+useful both on a machine you don't own and for fast local iteration. It only touches user-space
+(`~/.config`, `~/.local`, symlinks).
+
+The block is already active in `flake.nix`:
+
+```nix
+serverHomeManagerUser = "KangaZero";              # output key / activation target
+# ...
+homeConfigurations."${serverHomeManagerUser}" = lib.mkHome {
+  system = serverSystem;                          # "x86_64-linux"
+  user   = serverUser;                            # "server" (loads home/profiles/server/linux.nix)
+};
+```
+
+Apply:
+
+```sh
+home-switch   # home-manager switch --flake ~/.config/multi-nix#KangaZero  (server-local alias)
+# or
+home-manager switch --flake ~/.config/multi-nix#KangaZero
+nh home switch ~/.config/multi-nix#KangaZero
+```
+
+> System-level pieces (greetd, PipeWire, CUPS, fonts, kernel) still require `nixos-rebuild switch`.
+> Both paths read the same `home/profiles/server/linux.nix`, so they don't fight — but don't hand-
+> edit noctalia via its UI expecting it to persist; the declared `noctalia.nix` settings win on the
+> next switch.
 
 ---
 
@@ -290,6 +361,9 @@ If you don't own the machine and can't run `nixos-rebuild`, use standalone home-
 | NixOS WSL — nh alias | `nh-switch` / `nh-build` |
 | NixOS WSL — build only | `nixos-rebuild dry-build --flake .#nixos` |
 | NixOS WSL/bare — rollback | `sudo nixos-rebuild switch --rollback` |
+| NixOS server — switch | `sudo nixos-rebuild switch --flake .#server` (alias `nix-switch`) |
+| NixOS server — nh alias | `nh-switch` / `nh-build` |
+| NixOS server — home-only (no sudo) | `home-manager switch --flake .#KangaZero` (alias `home-switch`) |
 | NixOS server — remote | `nixos-rebuild switch --flake .#server --target-host user@host --use-remote-sudo` |
 | kitty wrapper | `nix run .#kitty` |
 | nvim live config (no rebuild) | `nvim-dev` (alias for `NVIM_APPNAME=multi-nix/home/modules/common/neovim/config nvim`) |
@@ -310,8 +384,12 @@ multi-nix/
 │
 ├── hosts/
 │   ├── KangaZero/default.nix         # macOS M4 — hostname, spotlight, shell aliases
-│   ├── nixos/default.nix             # NixOS WSL2 — wsl opts, nix-ld, root nvim symlink
-│   └── server/default.nix            # Headless — sshd, no GUI (future)
+│   ├── nixos/                        # NixOS WSL2 — wsl opts, nix-ld, root nvim symlink
+│   │   ├── default.nix
+│   │   └── hardware.nix              # WSL: uinput module load
+│   └── server/                       # NixOS bare-metal desktop
+│       ├── default.nix               # greetd+noctalia-greeter, pipewire, cups, bluetooth, PPD, intel gfx, fonts
+│       └── hardware.nix              # from nixos-generate-config (real UUIDs, kvm-intel)
 │
 ├── modules/
 │   ├── darwin/                       # nix-darwin system modules
@@ -328,10 +406,13 @@ multi-nix/
 │
 ├── home/
 │   ├── profiles/
-│   │   └── KangaZero/
-│   │       ├── default.nix           # User metadata: usernames, git identities, stateVersion
-│   │       ├── darwin.nix            # Darwin home-manager entry point
-│   │       └── linux.nix             # Linux home-manager entry point
+│   │   ├── KangaZero/
+│   │   │   ├── default.nix           # User metadata: usernames, git identities, stateVersion
+│   │   │   ├── darwin.nix            # Darwin home-manager entry point
+│   │   │   └── linux.nix             # Linux (WSL) home-manager entry point — imports weston, LIBGL sw
+│   │   └── server/
+│   │       ├── default.nix           # Re-exports KangaZero/default.nix (shared identity)
+│   │       └── linux.nix             # Bare-metal profile — KangaZero minus weston/LIBGL, + noctalia idle + polkit agent
 │   └── modules/
 │       ├── common/                   # Platform-agnostic (compiles on darwin + linux)
 │       │   ├── git.nix               # Reads identities from userMeta
@@ -363,13 +444,13 @@ multi-nix/
 │           ├── packages.nix          # azure-cli, uv, openssh, wget, etc.
 │           ├── ollama.nix            # ollama-vulkan — systemd user service (port 11434)
 │           ├── bash.nix              # zsh trampoline
-│           ├── shell.nix             # zsh aliases + WSL helpers (weston, kill-port, nix-gc, ff)
-│           ├── weston.nix            # Weston compositor bridge (WSL)
+│           ├── shell.nix             # zsh aliases + shared helpers (weston fn, kill-port, nix-gc, ff)
+│           ├── weston.nix            # Weston compositor bridge (WSL only — not imported by server)
 │           └── wayland/
-│               └── niri/             # Niri KDL + noctalia v5; settings as Nix attrset in noctalia.nix
+│               └── niri/             # Niri KDL + noctalia v5 (shared by WSL + server); settings as Nix attrset in noctalia.nix
 │
 ├── overlays/
-│   └── zjstatus/                     # darwin-only overlay
+│   └── zjstatus/                     # zellij status-bar overlay — applied in mkNixOS + mkHome (and mkDarwin)
 ├── packages/
 │   └── kitty.nix                     # nix-wrapper-modules standalone kitty
 ├── assets/
@@ -395,8 +476,8 @@ This repo is set up to catch problems as early as possible — before a commit, 
 |---|---|---|
 | On `cd` | `direnv` + `nix develop` | Activates dev shell automatically via `.envrc` |
 | On every commit | `deadnix`, `nixfmt`, `statix` | Dead code, formatting drift, anti-patterns |
-| On every push | `nix build` for the current platform | Broken builds before they reach the remote |
-| On every PR / push to remote | Full CI matrix (both arches) | Cross-platform regressions |
+| On every push | `nix build` for the current platform (`.#nixos` / darwin) | Broken builds before they reach the remote |
+| On every PR / push to remote | CI matrix — **lint only** (`nixfmt`/`statix`/`deadnix` + nvim); config-build steps are commented out in `ci.yml` | Formatting drift, anti-patterns, dead code |
 | Any time manually | `nix flake check` | Full evaluation + checks for all outputs |
 
 ### Dev shell & pre-commit hooks
@@ -424,6 +505,10 @@ Pre-push hooks (block the push if the build fails):
 |---|---|
 | darwin | `nix build .#darwinConfigurations.KangaZero.system` |
 | linux | `nixos-rebuild dry-build --flake .#nixos` |
+
+> **Note:** the pre-push build (and CI) covers only `.#nixos` (WSL) and darwin — the bare-metal
+> **`server`** config has **no automated build check** (no `checks` entry, `ci.yml` build steps
+> commented). Verify it manually before relying on it: `nixos-rebuild build --flake .#server`.
 
 ### Manual checks
 

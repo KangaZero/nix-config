@@ -13,6 +13,8 @@ let
       builtins.elem (inputs.nixpkgs.lib.getName pkg) [
         "claude-code"
       ];
+    # Same overlay mkNixOS applies — home/modules/common/zellij.nix references pkgs.zjstatus.
+    overlays = [ (import ../overlays/zjstatus { inherit inputs; }) ];
   };
 in
 inputs.home-manager.lib.homeManagerConfiguration {

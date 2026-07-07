@@ -88,6 +88,10 @@
       serverHostname = "server";
       serverUser = "server";
       serverSystem = "x86_64-linux";
+      # Standalone home-manager output key / activation target for the server host.
+      # Distinct from serverUser ("server", the profile dir): the resolved Linux username
+      # is "KangaZero" (userMeta.usernames.linux), so `home-manager switch --flake .#KangaZero`.
+      serverHomeManagerUser = "KangaZero";
     in
     {
       darwinConfigurations."${darwinHostname}" = lib.mkDarwin {
@@ -142,14 +146,17 @@
       formatter."${darwinSystem}" = nixpkgs.legacyPackages."${darwinSystem}".nixfmt-tree;
       formatter."${wslSystem}" = nixpkgs.legacyPackages."${wslSystem}".nixfmt-tree;
 
-      # Standalone home-manager — only needed when no sudo access on a bare-metal/server host.
-      # Home config is already applied atomically by nixos-rebuild on hosts where you have sudo.
-      # Uncomment and adjust when adding a host where you are not root:
+      # Standalone home-manager for the bare-metal `server` host. Lets `home-manager switch`
+      # apply home-only changes fast, without sudo/nixos-rebuild. Loads home/profiles/server/linux.nix
+      # (user = serverUser = "server"); username resolves to "KangaZero" from userMeta, so the
+      # output key + activation target is `KangaZero`. System daemons (greetd/pipewire/cups/fonts)
+      # still require `nixos-rebuild switch`.
       #
-      # homeConfigurations."KangaZero" = lib.mkHome {
-      #   system = "x86_64-linux"; # or "aarch64-linux"
-      #   user   = "KangaZero";
-      # };
+      #   home-manager switch --flake .#${serverHomeManagerUser}
+      homeConfigurations."${serverHomeManagerUser}" = lib.mkHome {
+        system = serverSystem;
+        user = serverUser;
+      };
 
       # macOS only — Linux kitty is pkgs.kitty from nixpkgs.
       # Darwin needs a custom .app bundle via nix-wrapper-modules: bakes in theme (Tokyo Night Moon),

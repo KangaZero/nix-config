@@ -110,6 +110,7 @@
       pkgs.nerd-fonts.jetbrains-mono
       pkgs.noto-fonts
       pkgs.noto-fonts-cjk-sans
+      pkgs.noto-fonts-cjk-serif # provides "Noto Serif CJK JP" referenced in defaultFonts.serif
       pkgs.noto-fonts-color-emoji
     ];
     fontconfig.defaultFonts = {
