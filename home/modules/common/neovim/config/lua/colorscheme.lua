@@ -1,6 +1,8 @@
 ---@diagnostic disable: unused-local
 vim.pack.add({
-	"https://github.com/neko-night/nvim",
+	-- Mirror of the removed upstream neko-night/nvim (nekonight colorscheme by
+	-- BrunoCiccarino, MIT), snapshot-preserved at commit df1c6af.
+	"https://github.com/KangaZero/nekonight.nvim",
 })
 
 --- NOTE: plugins/telesccope also has its own colorscheme applied on its own file
