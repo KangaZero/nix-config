@@ -43,6 +43,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    noctalia-greeter = {
+      url = "github:noctalia-dev/noctalia-greeter";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     odysseus-nix = {
       url = "github:KangaZero/odysseus-nix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -80,6 +85,9 @@
       wslHostname = "nixos";
       wslUser = "KangaZero";
       wslSystem = "x86_64-linux";
+      serverHostname = "server";
+      serverUser = "server";
+      serverSystem = "x86_64-linux";
     in
     {
       darwinConfigurations."${darwinHostname}" = lib.mkDarwin {
@@ -93,6 +101,22 @@
         hostname = wslHostname;
         system = wslSystem;
         user = wslUser;
+      };
+
+      # Bare-metal NixOS laptop. mkWSL is just mkNixOS + WSL extraModules, so the
+      # server calls mkNixOS directly with the non-WSL subset (nix-ld + graphics +
+      # niri), skipping nixos-wsl and passwordless sudo.
+      nixosConfigurations."${serverHostname}" = lib.mkNixOS {
+        hostname = serverHostname;
+        system = serverSystem;
+        user = serverUser;
+        # NOTE: path literals resolve relative to *this* file (repo root), so `./modules`.
+        # mkWSL.nix uses `../modules` only because that literal lives in lib/.
+        extraModules = [
+          ./modules/nixos/nix-ld.nix
+          ./modules/nixos/graphics.nix
+          ./modules/nixos/wayland/niri.nix
+        ];
       };
 
       checks."${darwinSystem}".pre-commit-check = lib.mkChecks {
