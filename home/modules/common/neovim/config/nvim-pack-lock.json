@@ -41,10 +41,6 @@
       "rev": "00274623b76a66356e31e1861360b269987a7f64",
       "src": "https://github.com/amansingh-afk/milli.nvim"
     },
-    "nvim": {
-      "rev": "df1c6af5e1df601232a2c0fc7198ea1342e95f29",
-      "src": "https://github.com/neko-night/nvim"
-    },
     "nvim-highlight-colors": {
       "rev": "e4c7af0211866162d999ce0bdd6a029302e19139",
       "src": "https://github.com/brenoprata10/nvim-highlight-colors"

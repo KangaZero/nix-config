@@ -16,5 +16,6 @@
     # (macOS gets `cc` from Xcode CLT, so this stays Linux-only per profile dispatch.)
     gcc
     gnumake
+    wl-clipboard
   ];
 }

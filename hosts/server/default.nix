@@ -94,6 +94,9 @@
       pulse.enable = true;
     };
 
+    # Battery: Allows Noctalia to render Battery widget
+    upower.enable = true;
+
     # Power/brightness: power-profiles-daemon (noctalia-integrated), NOT TLP — they conflict.
     power-profiles-daemon.enable = true;
 

@@ -32,7 +32,7 @@ nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
 |---|---|---|---|
 | **Shell** | zsh + oh-my-zsh | — | — |
 | **Prompt** | oh-my-posh (TOML config in `home/modules/common/oh-my-posh.toml`) | — | — |
-| **Editor** | neovim — `defaultEditor`, config HM-managed via `xdg.configFile` → `~/.config/nvim`; `vi`/`vim` aliases | — | root nvim symlinked to user config via activation script |
+| **Editor** | neovim — `defaultEditor`, `sideloadInitLua = true`; config HM-managed via `xdg.configFile` → `~/.config/nvim` (recursive copy); `vi`/`vim` aliases; `nvimPackLock` activation replaces `nvim-pack-lock.json` symlink with writable copy after each switch (nvim 0.12 `vim.pack` writes it at startup — read-only store symlink caused EROFS crash) | — | root nvim symlinked to user config via activation script |
 | **Terminal** | kitty — Tokyo Night Moon, JetBrains Mono, 85% opacity | animated pixel-art gif bg | static `moon_dark.png` bg |
 | **Font** | `nerd-fonts.jetbrains-mono` | — | `fonts.fontconfig.enable = true` |
 | **Multiplexer** | zellij | — | — |
@@ -44,7 +44,7 @@ nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
 | **Languages** | `nodejs_26` + `pnpm`, `python3`, `rustup`, `just`, `mise` | — | + `uv` |
 | **Local LLM** | — | ollama (Metal, launchd agent) — models pulled manually | ollama (`ollama-vulkan`, systemd user service) — `qwen2.5:7b` pulled manually post-activation |
 | **LSP / formatters** | `lua-language-server` `bash-language-server` `pyright` `ruff` `clang-tools` `vtsls` `vscode-langservers-extracted` `biome` `tailwindcss-language-server` `nixd` `stylua` `nixfmt-rfc-style` (all in `neovim.nix` — Mason uses these from PATH, no binary downloads); `rust-analyzer` via `rustup component add rust-analyzer` | — | — |
-| **CLI toolkit** | `fzf` `yazi` `eza` `bat` `btop` `ripgrep` `fd` `jq` `curl` `gh` `claude-code` `nh` | + `vim` `fastfetch` `tree` `ffmpeg-full` `imagemagick` `_7zz` `yt-dlp` `resvg` `poppler` `odysseus` | + `wget` `openssh` `tldr` `ffmpeg-full` `unzip` `uv` `azure-cli` (+ DevOps ext) |
+| **CLI toolkit** | `fzf` `yazi` `eza` `bat` `btop` `ripgrep` `fd` `jq` `curl` `gh` `claude-code` `nh` | + `vim` `fastfetch` `tree` `ffmpeg-full` `imagemagick` `_7zz` `yt-dlp` `resvg` `poppler` `odysseus` | + `wget` `openssh` `tldr` `ffmpeg-full` `unzip` `uv` `azure-cli` (+ DevOps ext) `gcc` `gnumake` (treesitter parser compilation) `wl-clipboard` |
 | **Git** | LFS, `pull.rebase = true`, `autoSetupRemote = true`, identity from `userMeta` | — | — |
 | **Nix daemon** | — | Determinate Systems installer (`nix.enable = false`) | NixOS-managed |
 | **GC** | — | — | daily, `--delete-older-than 7d` |
@@ -61,16 +61,16 @@ real Wayland desktop rather than a WSLg bridge. It is built via `lib.mkNixOS` di
 
 | Category | `server` |
 |---|---|
-| **Same as WSL** | zsh + oh-my-posh, neovim, kitty, zellij, zoxide, firefox, git (work identity), niri KDL + **noctalia v5** config (bar/dock/theme/keybinds — shared base, server adds an `idle` override), ollama, `nh`, common + linux packages, Asia/Tokyo, key-only sshd |
+| **Same as WSL** | zsh + oh-my-posh, neovim (incl. `nvimPackLock` activation), kitty, zellij, zoxide, firefox, git (work identity), niri KDL + **noctalia v5** config (bar/widgets/theme/idle/nightlight/session — shared base), ollama, `nh`, common + linux packages (`gcc` `gnumake` `wl-clipboard`), Asia/Tokyo, key-only sshd |
 | **Desktop** | niri (Wayland tiling) launched **natively** via greetd — no weston bridge, no `LIBGL_ALWAYS_SOFTWARE`; `Alt` mod |
 | **Login** | greetd + **noctalia-greeter** (`programs.noctalia-greeter`, themed session picker); input `noctalia-greeter` flake |
-| **Idle / lock** | noctalia built-in Idle service — lock at 5 min, screen-off at 10 min (`programs.noctalia.settings.idle`); no swayidle |
+| **Idle / lock** | noctalia built-in Idle service — lock at 10 min, screen-off at 11 min (`programs.noctalia.settings.idle`); no swayidle |
 | **Audio** | PipeWire (`alsa` + `pulse`, `rtkit`), PulseAudio disabled |
 | **Graphics** | Intel — `hardware.graphics.enable` + `intel-media-driver` (`enable32Bit` from shared `graphics.nix`) |
-| **Power** | `power-profiles-daemon` (noctalia-integrated — **not** TLP), `brightnessctl` |
+| **Power** | `power-profiles-daemon` (noctalia-integrated — **not** TLP), `brightnessctl`; `upower.enable = true` (Battery widget) |
 | **Bluetooth** | `hardware.bluetooth` (powerOnBoot) — noctalia Control Center is the UI |
 | **Printing** | CUPS (`services.printing`) |
-| **Secrets / polkit** | gnome-keyring (unlocked via greetd PAM), `security.polkit`, polkit-gnome user agent bound to `graphical-session.target` |
+| **Secrets / polkit** | gnome-keyring (unlocked via greetd PAM), `security.polkit`, polkit-gnome user agent bound to `graphical-session.target`; GnuPG agent (`gnupg.agent`, SSH support enabled) |
 | **Fonts** | `nerd-fonts.jetbrains-mono` + Noto (`noto-fonts`, `-cjk-sans`, `-cjk-serif`, `-color-emoji`), fontconfig `defaultFonts` (mono JetBrainsMono NF, CJK Noto) |
 | **Portals** | `xdg-desktop-portal-gtk` + `-gnome` |
 | **GC** | weekly, `--delete-older-than 30d` (WSL is daily / 7d) |

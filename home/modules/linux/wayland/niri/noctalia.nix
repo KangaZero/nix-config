@@ -17,6 +17,7 @@
     settings = {
       backdrop = {
         blur_intensity = 0.1;
+        tint_intensity = 0.3;
         enabled = true;
       };
 
@@ -34,6 +35,7 @@
             "clock"
             "cat"
             "keyboard_layout"
+            "audio_visualizer"
           ];
           contact_shadow = true;
           end = [
@@ -53,20 +55,102 @@
           shadow = false;
           start = [
             "launcher"
+            "battery"
             "workspaces"
+            "brightness"
           ];
         };
       };
 
       desktop_widgets = {
         schema_version = 2;
-        widget_order = [ ];
+        widget_order = [
+          "desktop-widget-0000000000000001"
+          "desktop-widget-0000000000000002"
+          "desktop-widget-0000000000000003"
+          "desktop-widget-0000000000000004"
+          "desktop-widget-0000000000000005"
+        ];
         grid = {
           cell_size = 16;
           major_interval = 4;
           visible = true;
         };
-        widget = { };
+        widget = {
+          "desktop-widget-0000000000000001" = {
+            box_height = 0.0;
+            box_width = 0.0;
+            cx = 274.0;
+            cy = 687.0;
+            output = "eDP-1";
+            rotation = 0.0;
+            type = "clock";
+          };
+          "desktop-widget-0000000000000002" = {
+            box_height = 0.0;
+            box_width = 0.0;
+            cx = 284.0;
+            cy = 162.0;
+            output = "eDP-1";
+            rotation = 0.0;
+            type = "weather";
+          };
+          "desktop-widget-0000000000000003" = {
+            box_height = 0.0;
+            box_width = 0.0;
+            cx = 1284.0;
+            cy = 367.5;
+            output = "eDP-1";
+            rotation = 0.0;
+            type = "sysmon";
+            settings = {
+              stat = "cpu_usage";
+              stat2 = "cpu_temp";
+            };
+          };
+          "desktop-widget-0000000000000004" = {
+            box_height = 128.0;
+            box_width = 272.0;
+            cx = 616.0;
+            cy = 672.0;
+            output = "eDP-1";
+            rotation = 0.0;
+            type = "media_player";
+          };
+          "desktop-widget-0000000000000005" = {
+            box_height = 0.0;
+            box_width = 0.0;
+            cx = 826.0;
+            cy = 678.0;
+            output = "eDP-1";
+            rotation = 0.0;
+            type = "fancy_audio_visualizer";
+            settings = {
+              background = false;
+            };
+          };
+        };
+      };
+
+      idle = {
+        behavior_order = [ "lock" "screen-off" "lock-and-suspend" ];
+        behavior = {
+          lock = {
+            action = "lock";
+            enabled = true;
+            timeout = 600.0;
+          };
+          "lock-and-suspend" = {
+            action = "lock_and_suspend";
+            enabled = false;
+            timeout = 900.0;
+          };
+          "screen-off" = {
+            action = "screen_off";
+            enabled = true;
+            timeout = 660.0;
+          };
+        };
       };
 
       dock = {
@@ -92,17 +176,38 @@
       };
 
       lockscreen = {
+        blurred_desktop = true;
         wallpaper = "/home/KangaZero/.config/multi-nix/assets/linux/cat-vibin.png";
       };
 
       lockscreen_widgets = {
         enabled = false;
         schema_version = 2;
-        widget_order = [ "lockscreen-login-box@winit" ];
+        widget_order = [ "lockscreen-login-box@eDP-1" "lockscreen-login-box@winit" ];
         grid = {
           cell_size = 16;
           major_interval = 4;
           visible = true;
+        };
+        widget."lockscreen-login-box@eDP-1" = {
+          box_height = 70.0;
+          box_width = 400.0;
+          cx = 768.0;
+          cy = 745.0;
+          output = "eDP-1";
+          rotation = 0.0;
+          type = "login_box";
+          settings = {
+            background_color = "surface_variant";
+            background_opacity = 0.88;
+            background_radius = 12.0;
+            input_opacity = 1.0;
+            input_radius = 6.0;
+            show_caps_lock = true;
+            show_keyboard_layout = true;
+            show_login_button = true;
+            show_password_hint = true;
+          };
         };
         widget."lockscreen-login-box@winit" = {
           box_height = 70.0;
@@ -118,9 +223,16 @@
             background_radius = 12.0;
             input_opacity = 1.0;
             input_radius = 6.0;
+            show_caps_lock = true;
+            show_keyboard_layout = true;
             show_login_button = true;
+            show_password_hint = true;
           };
         };
+      };
+
+      nightlight = {
+        enabled = true;
       };
 
       plugins = {
@@ -131,6 +243,8 @@
       };
 
       shell = {
+        app_icon_colorize = true;
+        password_style = "random";
         font_family = "JetBrains Mono";
         niri_overview_type_to_launch_enabled = true;
         screen_time_enabled = true;
@@ -144,6 +258,52 @@
         };
         screen_corners = {
           enabled = true;
+        };
+        session = {
+          actions = [
+            {
+              action = "lock";
+              countdown_seconds = 0.0;
+              enabled = true;
+              shortcut = "1";
+              variant = "default";
+            }
+            {
+              action = "logout";
+              countdown_seconds = 0.0;
+              enabled = true;
+              shortcut = "2";
+              variant = "default";
+            }
+            {
+              action = "lock_and_suspend";
+              countdown_seconds = 0.0;
+              enabled = true;
+              shortcut = "3";
+              variant = "default";
+            }
+            {
+              action = "reboot";
+              countdown_seconds = 0.0;
+              enabled = true;
+              shortcut = "4";
+              variant = "default";
+            }
+            {
+              action = "shutdown";
+              countdown_seconds = 0.0;
+              enabled = true;
+              shortcut = "5";
+              variant = "destructive";
+            }
+            {
+              action = "command";
+              command = "notify-send 'Noctalia' 'Custom session entry'";
+              countdown_seconds = 0.0;
+              enabled = false;
+              variant = "default";
+            }
+          ];
         };
       };
 
@@ -186,6 +346,9 @@
       };
 
       widget = {
+        battery = {
+          capsule = true;
+        };
         cat = {
           type = "noctalia/bongocat:cat";
         };

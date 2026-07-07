@@ -1,4 +1,4 @@
-{ pkgs, ... }: {
+{ pkgs, lib, ... }: {
   programs.neovim = {
     enable = true;
     defaultEditor = true;
@@ -29,6 +29,18 @@
         "globals": ["vim"]
       }
     }
+  '';
+
+  # vim.pack (nvim 0.12) writes nvim-pack-lock.json on every startup. The recursive
+  # xdg.configFile copy symlinks it into the read-only Nix store, causing an EROFS
+  # crash before keymaps.lua ever loads. Replace the symlink with a writable copy
+  # after each home-manager switch so vim.pack can update it freely.
+  home.activation.nvimPackLock = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    lockFile="$HOME/.config/nvim/nvim-pack-lock.json"
+    if [ -L "$lockFile" ]; then
+      $DRY_RUN_CMD cp --remove-destination "$(readlink -f "$lockFile")" "$lockFile"
+      $DRY_RUN_CMD chmod u+w "$lockFile"
+    fi
   '';
 
   # LSP servers, formatters, and linters on PATH so Mason uses these
