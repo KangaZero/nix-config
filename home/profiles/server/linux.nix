@@ -6,6 +6,20 @@
 #
 # Everything else mirrors KangaZero/linux.nix. Identity (username/git/state) comes from
 # ../KangaZero/default.nix via ./default.nix, so this stays a thin desktop-only override.
+#
+# WHICH profile loads, and the "KangaZero" naming trap:
+# This file is loaded two ways, both selecting the profile by the *directory name* `server`
+# (the `user` arg), NOT by any hostname:
+#   1. Server nixosConfiguration — `lib.mkNixOS { user = "server"; ... }` wires HM via
+#      `home/profiles/server/linux.nix`.
+#   2. Standalone home output — `lib.mkHome { user = "server"; ... }` (mkHome takes no
+#      hostname, only { system, user }) → same file.
+# The standalone output is *keyed* `homeConfigurations."KangaZero"` (flake.nix's
+# `serverHomeManagerUser`) purely because that is the OS username you activate as
+# (`home.username` below resolves to "KangaZero" from userMeta, home dir /home/KangaZero).
+# So `home-manager switch --flake .#KangaZero` = the activation TARGET name (KangaZero),
+# while the CONTENT is this `server` profile. Two different axes that happen to share names —
+# do not "fix" the .#KangaZero key to .#server; it must match the Linux username.
 {
   username,
   userMeta,

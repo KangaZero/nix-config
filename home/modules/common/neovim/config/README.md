@@ -203,7 +203,10 @@ Leader is **`<Space>`**.
 - **Statusline** (`ui/statusline.lua`) is hand-written — mode, file, git branch,
   diagnostic counts, pending keys, clock, and position. No statusline plugin.
 - **Colorscheme** is `nekonight-deep-ocean` (transparent) with custom highlight
-  overrides in `colorscheme.lua`.
+  overrides in `colorscheme.lua`. Upstream `neko-night/nvim` was removed from GitHub,
+  so `colorscheme.lua` now pulls a snapshot mirror at
+  [`KangaZero/nekonight.nvim`](https://github.com/KangaZero/nekonight.nvim)
+  (nekonight by BrunoCiccarino, MIT, pinned at upstream commit `df1c6af`).
 - **Message UI** uses the experimental `vim._core.ui2` to route messages between the
   cmdline, a message window, and a pager (configured in `init.lua`).
 
