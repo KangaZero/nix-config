@@ -123,15 +123,48 @@
         ];
       };
 
-      checks."${darwinSystem}".pre-commit-check = lib.mkChecks {
-        system = darwinSystem;
-        buildTarget = ".#darwinConfigurations.${darwinHostname}.system";
-      };
+      checks =
+        nixpkgs.lib.recursiveUpdate
+          {
+            "${darwinSystem}".pre-commit-check = lib.mkChecks {
+              system = darwinSystem;
+              buildTarget = ".#darwinConfigurations.${darwinHostname}.system";
+            };
 
-      checks."${wslSystem}".pre-commit-check = lib.mkChecks {
-        system = wslSystem;
-        buildTarget = ".#nixosConfigurations.${wslHostname}.config.system.build.toplevel";
-      };
+            # WSL host. The `server` host is bare-metal NixOS but shares the same
+            # system (x86_64-linux), so both can't expose a `pre-commit-check`
+            # under one system key. If the server shares WSL's arch, add its check
+            # here under a distinct name; if it ever moves to a different arch it
+            # gets its own system entry below instead.
+            "${wslSystem}" = {
+              pre-commit-check = lib.mkChecks {
+                system = wslSystem;
+                buildTarget = ".#nixosConfigurations.${wslHostname}.config.system.build.toplevel";
+              };
+            }
+            // (
+              if serverSystem == wslSystem then
+                {
+                  server-pre-commit-check = lib.mkChecks {
+                    system = serverSystem;
+                    buildTarget = ".#nixosConfigurations.${serverHostname}.config.system.build.toplevel";
+                  };
+                }
+              else
+                { }
+            );
+          }
+          (
+            if serverSystem != wslSystem then
+              {
+                "${serverSystem}".pre-commit-check = lib.mkChecks {
+                  system = serverSystem;
+                  buildTarget = ".#nixosConfigurations.${serverHostname}.config.system.build.toplevel";
+                };
+              }
+            else
+              { }
+          );
 
       devShells."${darwinSystem}".default = lib.mkDevShell {
         system = darwinSystem;
