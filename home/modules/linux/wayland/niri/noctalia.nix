@@ -133,7 +133,11 @@
       };
 
       idle = {
-        behavior_order = [ "lock" "screen-off" "lock-and-suspend" ];
+        behavior_order = [
+          "lock"
+          "screen-off"
+          "lock-and-suspend"
+        ];
         behavior = {
           lock = {
             action = "lock";
@@ -183,7 +187,10 @@
       lockscreen_widgets = {
         enabled = false;
         schema_version = 2;
-        widget_order = [ "lockscreen-login-box@eDP-1" "lockscreen-login-box@winit" ];
+        widget_order = [
+          "lockscreen-login-box@eDP-1"
+          "lockscreen-login-box@winit"
+        ];
         grid = {
           cell_size = 16;
           major_interval = 4;
