@@ -1,5 +1,7 @@
 { pkgs, ... }:
 {
+  imports = [ ./nixpkgs.nix ];
+
   home.packages = [ pkgs.zsh-vi-mode ];
 
   programs.zsh = {
