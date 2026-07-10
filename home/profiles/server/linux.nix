@@ -46,6 +46,7 @@
     ../../modules/linux/packages.nix
     ../../modules/linux/bash.nix
     ../../modules/linux/shell.nix
+    ../../modules/linux/zsh-aliases.nix
     ../../modules/linux/wayland/niri/default.nix
   ];
 
@@ -72,17 +73,6 @@
       respect_inhibitors = true;
     };
 
-    # Server-only switch/build aliases (WSL's live in hosts/nixos/default.nix; server
-    # has no host-level block). home-switch targets the standalone homeConfigurations
-    # ".KangaZero" output; nix/nh target the `server` nixosConfiguration.
-    zsh.shellAliases = {
-      edit-nix = "cd /home/${username}/.config/multi-nix && nvim flake.nix";
-      home-switch = "home-manager switch --flake /home/${username}/.config/multi-nix#${username}";
-      nix-switch = "sudo nixos-rebuild switch --flake /home/${username}/.config/multi-nix#server";
-      nh-switch = "nh os switch /home/${username}/.config/multi-nix#server";
-      nh-build = "nh os build /home/${username}/.config/multi-nix#server";
-      nvim-dev = "NVIM_APPNAME=multi-nix/home/modules/common/neovim/config nvim";
-    };
   };
 
   home = {

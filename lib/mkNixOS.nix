@@ -41,7 +41,12 @@ inputs.nixpkgs.lib.nixosSystem {
         useGlobalPkgs = true;
         useUserPackages = true;
         extraSpecialArgs = {
-          inherit inputs username userMeta;
+          inherit
+            inputs
+            username
+            userMeta
+            hostname
+            ;
           assetsDir = ../assets/linux;
           isDarwin = false;
           isLinux = true;

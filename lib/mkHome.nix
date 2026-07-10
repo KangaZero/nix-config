@@ -2,6 +2,7 @@
 {
   system,
   user,
+  hostname ? "",
 }:
 let
   userMeta = import ../home/profiles/${user}/default.nix;
@@ -24,6 +25,7 @@ inputs.home-manager.lib.homeManagerConfiguration {
       inputs
       username
       userMeta
+      hostname
       ;
     assetsDir = ../assets/linux;
     isDarwin = false;

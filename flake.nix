@@ -189,6 +189,7 @@
       homeConfigurations."${serverHomeManagerUser}" = lib.mkHome {
         system = serverSystem;
         user = serverUser;
+        hostname = serverHostname;
       };
 
       # macOS only — Linux kitty is pkgs.kitty from nixpkgs.

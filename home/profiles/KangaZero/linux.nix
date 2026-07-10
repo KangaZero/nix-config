@@ -23,6 +23,7 @@
     ../../modules/linux/packages.nix
     ../../modules/linux/bash.nix
     ../../modules/linux/shell.nix
+    ../../modules/linux/zsh-aliases.nix
     ../../modules/linux/weston.nix
     ../../modules/linux/wayland/niri/default.nix
   ];

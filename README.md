@@ -75,7 +75,7 @@ real Wayland desktop rather than a WSLg bridge. It is built via `lib.mkNixOS` di
 | **Portals** | `xdg-desktop-portal-gtk` + `-gnome` |
 | **GC** | weekly, `--delete-older-than 30d` (WSL is daily / 7d) |
 | **Dropped vs old box** | fcitx5/ja input, Steam |
-| **Aliases** | server-local `nix-switch`/`nh-switch`/`nh-build`/`home-switch`/`edit-nix`/`nvim-dev` (in `home/profiles/server/linux.nix`) |
+| **Aliases** | `nix-switch`/`nh-switch`/`nh-build`/`home-switch`/`edit-nix`/`nvim-dev` — shared with WSL via `home/modules/linux/zsh-aliases.nix`; `${hostname}` injected at eval time so WSL targets `#nixos`, server targets `#server` |
 
 Because home-manager is wired through `nixos-rebuild`, home-only tweaks can also be applied fast
 without sudo/reboot via the standalone `homeConfigurations."KangaZero"` output — see
@@ -326,8 +326,9 @@ The block is already active in `flake.nix`:
 serverHomeManagerUser = "KangaZero";              # output key / activation target
 # ...
 homeConfigurations."${serverHomeManagerUser}" = lib.mkHome {
-  system = serverSystem;                          # "x86_64-linux"
-  user   = serverUser;                            # "server" (loads home/profiles/server/linux.nix)
+  system   = serverSystem;                        # "x86_64-linux"
+  user     = serverUser;                          # "server" (loads home/profiles/server/linux.nix)
+  hostname = serverHostname;                      # "server" — used by zsh-aliases.nix for nh/nix-switch targets
 };
 ```
 
@@ -384,7 +385,7 @@ multi-nix/
 │
 ├── hosts/
 │   ├── KangaZero/default.nix         # macOS M4 — hostname, spotlight, shell aliases
-│   ├── nixos/                        # NixOS WSL2 — wsl opts, nix-ld, root nvim symlink
+│   ├── nixos/                        # NixOS WSL2 — wsl opts, sshd, gc, linger, uinput
 │   │   ├── default.nix
 │   │   └── hardware.nix              # WSL: uinput module load
 │   └── server/                       # NixOS bare-metal desktop
@@ -444,7 +445,8 @@ multi-nix/
 │           ├── packages.nix          # azure-cli, uv, openssh, wget, etc.
 │           ├── ollama.nix            # ollama-vulkan — systemd user service (port 11434)
 │           ├── bash.nix              # zsh trampoline
-│           ├── shell.nix             # zsh aliases + shared helpers (weston fn, kill-port, nix-gc, ff)
+│           ├── shell.nix             # linux-specific aliases (ez, nixRebuildStatus/Kill, cheatsheet-az) + shell helpers (weston fn, kill-port, nix-gc, ff)
+│           ├── zsh-aliases.nix       # rebuild/switch aliases (nix-switch, nh-switch, nh-build, home-switch, edit-nix, nvim-dev) — single source, hostname-aware
 │           ├── weston.nix            # Weston compositor bridge (WSL only — not imported by server)
 │           └── wayland/
 │               └── niri/             # Niri KDL + noctalia v5 (shared by WSL + server); settings as Nix attrset in noctalia.nix
@@ -628,6 +630,7 @@ Every home-manager module receives via `extraSpecialArgs`:
 | `inputs` | All flake inputs |
 | `username` | OS-level username for this platform |
 | `userMeta` | Full profile attrset from `home/profiles/<user>/default.nix` |
+| `hostname` | NixOS hostname (e.g. `"nixos"`, `"server"`) — used by `zsh-aliases.nix` to target the correct flake output |
 | `assetsDir` | Path to `assets/mac` or `assets/linux` |
 | `isDarwin` / `isLinux` | Boolean flags for edge cases only |
 
