@@ -19,6 +19,7 @@ vim.keymap.set({ "n", "v" }, "<leader>ww", "<cmd>wincmd w<cr>", { desc = "Go to 
 vim.keymap.set({ "n", "v" }, "<leader>wd", "<cmd>wincmd c<cr>", { desc = "Close Current Window" })
 vim.keymap.set({ "n", "v" }, "<leader>wx", "<cmd>wincmd x<cr>", { desc = "Swap Windows" })
 vim.keymap.set({ "n", "v" }, "<leader>wv", "<cmd>wincmd v<cr>", { desc = "Split Window Vertically" })
+vim.keymap.set({ "n", "v" }, "<leader>ws", "<cmd>wincmd s<cr>", { desc = "Split Window Horizontally" })
 
 -- vim.keymap.set("n", "J", "<cmd>execute 'move .+' . v:count1<cr>==", { desc = "Move line down" })
 -- vim.keymap.set("n", "K", "<cmd>execute 'move .-' . (v:count1 + 1)<cr>==", { desc = "Move line up" })

@@ -37,6 +37,8 @@ nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
 | **Font** | `nerd-fonts.jetbrains-mono` | — | `fonts.fontconfig.enable = true` |
 | **Multiplexer** | zellij | — | — |
 | **Nav** | zoxide | — | — |
+| **File manager** | yazi — `programs.yazi`, Tokyo Night flavor (matches kitty), `y` shell wrapper (cd-on-quit), `show_hidden = true`, `[mgr]`/`[preview]` tuned, custom `prepend_keymap` (`gh`/`gc`/`gd` jumps, `.` toggle hidden, `!` shell) | — | — |
+| **Claude Code** | `programs.claude-code` — `settings` from `slop/settings.json` → `~/.claude/settings.json` (opus model, Learning output style, vim editor, hooks, enabled LSP plugins) | — | — |
 | **Browser** | Firefox Developer Edition (declarative — policies + Vimium) | — | — |
 | **Desktop** | — | native macOS | niri (Wayland tiling) → weston (kiosk-shell) → WSLg; `Alt` mod; `LIBGL_ALWAYS_SOFTWARE=1` |
 | **Bar / launcher / notifications** | — | — | noctalia v5 (autostarted by niri); config managed as Nix attrset in `noctalia.nix` via `programs.noctalia.settings` |
@@ -44,7 +46,7 @@ nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
 | **Languages** | `nodejs_26` + `pnpm`, `python3`, `rustup`, `just`, `mise` | — | + `uv` |
 | **Local LLM** | — | ollama (Metal, launchd agent) — models pulled manually | ollama (`ollama-vulkan`, systemd user service) — `qwen2.5:7b` pulled manually post-activation |
 | **LSP / formatters** | `lua-language-server` `bash-language-server` `pyright` `ruff` `clang-tools` `vtsls` `vscode-langservers-extracted` `biome` `tailwindcss-language-server` `nixd` `stylua` `nixfmt-rfc-style` (all in `neovim.nix` — Mason uses these from PATH, no binary downloads); `rust-analyzer` via `rustup component add rust-analyzer` | — | — |
-| **CLI toolkit** | `fzf` `yazi` `eza` `bat` `btop` `ripgrep` `fd` `jq` `curl` `gh` `claude-code` `nh` | + `vim` `fastfetch` `tree` `ffmpeg-full` `imagemagick` `_7zz` `yt-dlp` `resvg` `poppler` `odysseus` | + `wget` `openssh` `tldr` `ffmpeg-full` `unzip` `uv` `azure-cli` (+ DevOps ext) `gcc` `gnumake` (treesitter parser compilation) `wl-clipboard` |
+| **CLI toolkit** | `fzf` `eza` `bat` `btop` `ripgrep` `fd` `jq` `curl` `gh` `nh` (yazi + claude-code now via `programs.*`) | + `vim` `fastfetch` `tree` `ffmpeg-full` `imagemagick` `_7zz` `yt-dlp` `resvg` `poppler` `odysseus` | + `wget` `openssh` `tldr` `ffmpeg-full` `unzip` `uv` `azure-cli` (+ DevOps ext) `gcc` `gnumake` (treesitter parser compilation) `wl-clipboard` |
 | **Git** | LFS, `pull.rebase = true`, `autoSetupRemote = true`, identity from `userMeta` | — | — |
 | **Nix daemon** | — | Determinate Systems installer (`nix.enable = false`) | NixOS-managed |
 | **GC** | — | — | daily, `--delete-older-than 7d` |
@@ -420,6 +422,7 @@ multi-nix/
 │       │   ├── direnv.nix
 │       │   ├── firefox.nix           # Firefox Dev Edition + policies
 │       │   ├── kitty.nix             # Tokyo Night Moon — bg image from assetsDir
+│       │   ├── yazi.nix              # File manager — Tokyo Night flavor, keymap, settings
 │       │   ├── oh-my-posh.nix        # Shared prompt — both darwin + linux
 │       │   ├── oh-my-posh.toml       # Prompt config (dracula purple, sysinfo, git, path)
 │       │   ├── neovim/
@@ -430,9 +433,12 @@ multi-nix/
 │       │   ├── lazygit.nix
 │       │   ├── packages/
 │       │   │   ├── common.nix        # Shared: fzf, ripgrep, bat, eza, jq, btop,
-│       │   │   │                     #   yazi, nodejs_26, rustup, python3, mise, just,
-│       │   │   │                     #   claude-code, nerd-fonts, gh
+│       │   │   │                     #   nodejs_26, rustup, python3, mise, just,
+│       │   │   │                     #   nerd-fonts, gh, nh
 │       │   │   └── ns-script.nix     # nix-search-tv shell wrapper
+│       │   ├── slop/
+│       │   │   ├── claude-code.nix    # programs.claude-code — settings → ~/.claude/settings.json
+│       │   │   └── settings.json      # Claude Code settings (model, hooks, plugins, output style)
 │       │   └── shell/
 │       │       └── zsh-core.nix      # Shared zsh: completion, autosuggestion,
 │       │                             #   syntaxHighlighting, history
@@ -698,7 +704,9 @@ This repo consolidates two existing configs:
 ### packages split
 
 Common subset extracted to `home/modules/common/packages/common.nix`:
-`fzf`, `ripgrep`, `bat`, `eza`, `curl`, `jq`, `btop`, `yazi`, `fd`, `nodejs_26`, `pnpm`, `rustup`, `python3`, `mise`, `just`, `claude-code`, `nerd-fonts.jetbrains-mono`, `gh`
+`fzf`, `ripgrep`, `bat`, `eza`, `curl`, `jq`, `btop`, `fd`, `nodejs_26`, `pnpm`, `rustup`, `python3`, `mise`, `just`, `nerd-fonts.jetbrains-mono`, `gh`, `nh`
+
+`yazi` and `claude-code` moved out of the package list — now installed + configured declaratively via `programs.yazi` (`yazi.nix`) and `programs.claude-code` (`slop/claude-code.nix`).
 
 Platform-only packages stay in `home/modules/darwin/packages.nix` and `home/modules/linux/packages.nix`.
 

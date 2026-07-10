@@ -10,11 +10,13 @@
     ../../modules/common/direnv.nix
     ../../modules/common/firefox.nix
     ../../modules/common/kitty.nix
+    ../../modules/common/yazi.nix
     ../../modules/common/neovim/neovim.nix
     ../../modules/darwin/ollama.nix
     ../../modules/common/packages/common.nix
     ../../modules/common/packages/ns-script.nix
     ../../modules/common/shell/zsh-core.nix
+    ../../modules/common/slop/claude-code.nix
     ../../modules/darwin/packages.nix
     ../../modules/darwin/shell.nix
     ../../modules/common/oh-my-posh.nix

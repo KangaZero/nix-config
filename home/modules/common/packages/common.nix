@@ -2,7 +2,6 @@
 {
   home.packages = with pkgs; [
     fzf
-    yazi
     eza
     bat
     btop
@@ -17,7 +16,6 @@
     python3
     mise
     just
-    claude-code
     nerd-fonts.jetbrains-mono
     nh
   ];
