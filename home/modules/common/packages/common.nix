@@ -14,7 +14,6 @@
     pnpm
     rustup
     python3
-    mise
     just
     nerd-fonts.jetbrains-mono
     nh

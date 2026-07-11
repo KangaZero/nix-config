@@ -43,7 +43,7 @@ nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
 | **Desktop** | — | native macOS | niri (Wayland tiling) → weston (kiosk-shell) → WSLg; `Alt` mod; `LIBGL_ALWAYS_SOFTWARE=1` |
 | **Bar / launcher / notifications** | — | — | noctalia v5 (autostarted by niri); config managed as Nix attrset in `noctalia.nix` via `programs.noctalia.settings` |
 | **Clipboard** | — | — | noctalia built-in clipboard panel (`Alt+Shift+V` → `noctalia msg panel-toggle clipboard`) |
-| **Languages** | `nodejs_26` + `pnpm`, `python3`, `rustup`, `just`, `mise` | — | + `uv` |
+| **Languages** | `nodejs_26` + `pnpm`, `python3`, `rustup`, `just` | — | + `uv` |
 | **Local LLM** | — | ollama (Metal, launchd agent) — models pulled manually | ollama (`ollama-vulkan`, systemd user service) — `qwen2.5:7b` pulled manually post-activation |
 | **LSP / formatters** | `lua-language-server` `bash-language-server` `pyright` `ruff` `clang-tools` `vtsls` `vscode-langservers-extracted` `biome` `tailwindcss-language-server` `nixd` `stylua` `nixfmt-rfc-style` (all in `neovim.nix` — Mason uses these from PATH, no binary downloads); `rust-analyzer` via `rustup component add rust-analyzer` | — | — |
 | **CLI toolkit** | `fzf` `eza` `bat` `btop` `ripgrep` `fd` `jq` `curl` `gh` `nh` (yazi + claude-code now via `programs.*`) | + `vim` `fastfetch` `tree` `ffmpeg-full` `imagemagick` `_7zz` `yt-dlp` `resvg` `poppler` `odysseus` | + `wget` `openssh` `tldr` `ffmpeg-full` `unzip` `uv` `azure-cli` (+ DevOps ext) `gcc` `gnumake` (treesitter parser compilation) `wl-clipboard` |
@@ -433,7 +433,7 @@ multi-nix/
 │       │   ├── lazygit.nix
 │       │   ├── packages/
 │       │   │   ├── common.nix        # Shared: fzf, ripgrep, bat, eza, jq, btop,
-│       │   │   │                     #   nodejs_26, rustup, python3, mise, just,
+│       │   │   │                     #   nodejs_26, rustup, python3, just,
 │       │   │   │                     #   nerd-fonts, gh, nh
 │       │   │   └── ns-script.nix     # nix-search-tv shell wrapper
 │       │   ├── slop/
@@ -704,7 +704,7 @@ This repo consolidates two existing configs:
 ### packages split
 
 Common subset extracted to `home/modules/common/packages/common.nix`:
-`fzf`, `ripgrep`, `bat`, `eza`, `curl`, `jq`, `btop`, `fd`, `nodejs_26`, `pnpm`, `rustup`, `python3`, `mise`, `just`, `nerd-fonts.jetbrains-mono`, `gh`, `nh`
+`fzf`, `ripgrep`, `bat`, `eza`, `curl`, `jq`, `btop`, `fd`, `nodejs_26`, `pnpm`, `rustup`, `python3`, `just`, `nerd-fonts.jetbrains-mono`, `gh`, `nh`
 
 `yazi` and `claude-code` moved out of the package list — now installed + configured declaratively via `programs.yazi` (`yazi.nix`) and `programs.claude-code` (`slop/claude-code.nix`).
 

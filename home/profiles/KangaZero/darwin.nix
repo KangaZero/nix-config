@@ -13,6 +13,7 @@
     ../../modules/common/yazi.nix
     ../../modules/common/neovim/neovim.nix
     ../../modules/darwin/ollama.nix
+    ../../modules/darwin/man.nix
     ../../modules/common/packages/common.nix
     ../../modules/common/packages/ns-script.nix
     ../../modules/common/shell/zsh-core.nix
