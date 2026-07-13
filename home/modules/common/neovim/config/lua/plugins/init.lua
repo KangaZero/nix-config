@@ -4,6 +4,7 @@ require("plugins/telescope")
 require("plugins/completion")
 require("plugins/conform") -- code formatter, could use LSP formatting instead if you prefer
 require("plugins/ai")
+require("plugins/markview")
 require("plugins/dashboard")
 require("plugins/flash")
 require("plugins/snacks")
