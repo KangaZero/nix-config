@@ -163,10 +163,13 @@
   environment.systemPackages = [ pkgs.brightnessctl ];
 
   # ─── Nix GC ──────────────────────────────────────────────────────────────────────
-  nix.gc = {
-    automatic = true;
-    dates = "weekly";
-    options = "--delete-older-than 30d";
+  nix = {
+    gc = {
+      automatic = true;
+      dates = "daily";
+      options = "--delete-older-than 30d";
+    };
+    settings.auto-optimise-store = true;
   };
 
   system.stateVersion = "26.11";
