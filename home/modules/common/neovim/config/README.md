@@ -22,6 +22,7 @@ shim. Requires **Neovim ≥ 0.12** (stable as of 0.12.2).
 | **fzf** | Telescope find files |
 | **yazi** | file manager integration (`<leader><leader>`, `<leader>E`) |
 | **lazygit** | floating git UI (`<leader>gg`) |
+| **Ollama** (macOS only) | local LLM for AI ghost-text completion (`avante.nvim`) |
 | **node / cargo / etc.** | runtimes for the LSP servers you enable |
 
 All optional external tools are guarded with `vim.fn.executable(...)`, so missing
@@ -79,7 +80,8 @@ LSP servers are installed/managed by **mason** + **mason-lspconfig** (see
 │   │
 │   ├── plugins/
 │   │   ├── init.lua          # requires every plugin module below
-│   │   ├── ai.lua            # copilot.lua (the only AI plugin — easy to disable)
+│   │   ├── ai.lua            # legacy copilot config (entirely commented out, not loaded)
+│   │   ├── avante.lua        # avante.nvim + Ollama AI completion (macOS only)
 │   │   ├── completion.lua    # blink.cmp (lazy-loaded on InsertEnter)
 │   │   ├── conform.lua       # conform.nvim formatters by filetype
 │   │   ├── dashboard.lua     # dashboard-nvim + milli.nvim splash ("purgatory" theme)
@@ -129,8 +131,10 @@ them; they are intended to play **no role** in the active config right now:
 | [mason.nvim](https://github.com/mason-org/mason.nvim) + [mason-lspconfig.nvim](https://github.com/mason-org/mason-lspconfig.nvim) | install/manage LSP servers & tools |
 | [nvim-lspconfig](https://github.com/neovim/nvim-lspconfig) | LSP server definitions |
 | [blink.cmp](https://github.com/saghen/blink.cmp) | completion engine (lazy on `InsertEnter`) |
-| [copilot.lua](https://github.com/zbirenbaum/copilot.lua) | AI suggestions (only AI plugin) |
 | [conform.nvim](https://github.com/stevearc/conform.nvim) | format-on-save by filetype |
+| [avante.nvim](https://github.com/yetone/avante.nvim) | AI ghost-text completion via local Ollama (macOS only, Copilot-style) |
+| [nui.nvim](https://github.com/MunifTanjim/nui.nvim) | UI components (avante.nvim dep) |
+| [opencode.nvim](https://github.com/nickjvandyke/opencode.nvim) | OpenCode integration (`<leader>oa`, `<leader>os`) |
 | [telescope.nvim](https://github.com/nvim-telescope/telescope.nvim) | fuzzy finder |
 | [snacks.nvim](https://github.com/folke/snacks.nvim) | picker, indent guides, scroll, notifier, dashboard, … |
 | [flash.nvim](https://github.com/folke/flash.nvim) | jump motions / treesitter selection |

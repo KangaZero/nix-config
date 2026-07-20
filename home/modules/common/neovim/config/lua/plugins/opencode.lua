@@ -35,19 +35,19 @@ vim.keymap.set("n", "<S-C-d>", function()
 end, { desc = "Scroll OpenCode down" })
 
 -- Handle OpenCode events
-vim.api.nvim_create_autocmd("User", {
-	pattern = "OpencodeEvent:*", -- Optionally filter event types
-	callback = function(args)
-		---@type opencode.server.Event
-		local event = args.data.event
-		---@type string
-		local url = args.data.url
-
-		-- See the available event types and their properties
-		vim.notify(vim.inspect(event))
-		-- Do something useful
-		if event.type == "session.status" then
-			vim.notify("OpenCode status updated: " .. event.properties.status.type .. url)
-		end
-	end,
-})
+-- vim.api.nvim_create_autocmd("User", {
+-- 	pattern = "OpencodeEvent:*", -- Optionally filter event types
+-- 	callback = function(args)
+-- 		---@type opencode.server.Event
+-- 		local event = args.data.event
+-- 		---@type string
+-- 		local url = args.data.url
+--
+-- 		-- See the available event types and their properties
+-- 		vim.notify(vim.inspect(event))
+-- 		-- Do something useful
+-- 		if event.type == "session.status" then
+-- 			vim.notify("OpenCode status updated: " .. event.properties.status.type .. url)
+-- 		end
+-- 	end,
+-- })
