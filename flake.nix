@@ -14,10 +14,10 @@
     };
 
     darwin = {
-      url = "github:nix-darwin/nix-darwin/a1fa429e945becaf60468600daf649be4ba0350c";
+      # url = "github:nix-darwin/nix-darwin/a1fa429e945becaf60468600daf649be4ba0350c";
       # Commit 320cbf5 (July 4, 2026) changed the manual build to use --sidebar-depth instead of the old --toc-depth/--chunk-toc-depth flags, to match a nixpkgs PR (nixos/nixpkgs#537810) that renamed the nixos-render-docs CLI. Your nixpkgs pin doesn't have that nixpkgs PR yet, so its nixos-render-docs still only understands the old flags — hence "unrecognized arguments: --sidebar-depth."
       #TODO add back when matches nixpkgs
-      # url = "github:nix-darwin/nix-darwin/master";
+      url = "github:nix-darwin/nix-darwin/master";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
