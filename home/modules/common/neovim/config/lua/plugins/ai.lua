@@ -1,44 +1,45 @@
 --INFO: The only AI-related plugin, disable if you prefer coding without AI suggestions.
-vim.pack.add({
-	"https://github.com/zbirenbaum/copilot.lua",
-	-- "https://github.com/fang2hou/blink-copilot",
-})
-
-require("copilot").setup({
-	suggestion = {
-		enabled = not vim.g.ai_cmp,
-		auto_trigger = true,
-		-- Hide ghost text while the completion menu is open. copilot's built-in
-		-- detection keys off pumvisible(), which blink.cmp does NOT set (custom
-		-- menu) -> we drive it manually via the autocmds below.
-		hide_during_completion = true,
-		keymap = {
-			accept = "<TAB>",
-			next = "<M-]>",
-			prev = "<M-[>",
-		},
-	},
-	panel = { enabled = false },
-	filetypes = {
-		markdown = true,
-		help = true,
-	},
-})
-
--- Suppress copilot ghost text whenever blink.cmp's menu is open so the two
--- inline previews (and <Tab>) don't fight. See copilot.lua README.
-local copilot_blink_grp = vim.api.nvim_create_augroup("CopilotBlinkSync", { clear = true })
-vim.api.nvim_create_autocmd("User", {
-	group = copilot_blink_grp,
-	pattern = "BlinkCmpMenuOpen",
-	callback = function()
-		vim.b.copilot_suggestion_hidden = true
-	end,
-})
-vim.api.nvim_create_autocmd("User", {
-	group = copilot_blink_grp,
-	pattern = "BlinkCmpMenuClose",
-	callback = function()
-		vim.b.copilot_suggestion_hidden = false
-	end,
-})
+-- vim.pack.add({
+-- 	"https://github.com/zbirenbaum/copilot.lua",
+-- 	-- "https://github.com/fang2hou/blink-copilot",
+-- })
+--
+-- require("copilot").setup({
+-- 	suggestion = {
+-- 		enabled = not vim.g.ai_cmp,
+-- 		auto_trigger = true,
+-- 		-- Hide ghost text while the completion menu is open. copilot's built-in
+-- 		-- detection keys off pumvisible(), which blink.cmp does NOT set (custom
+-- 		-- menu) -> we drive it manually via the autocmds below.
+-- 		hide_during_completion = true,
+-- 		keymap = {
+-- 			accept = "<TAB>",
+-- 			next = "<M-]>",
+-- 			prev = "<M-[>",
+-- 		},
+-- 	},
+-- 	panel = { enabled = false },
+-- 	filetypes = {
+-- 		markdown = true,
+-- 		help = true,
+-- 	},
+-- })
+--
+-- -- Suppress copilot ghost text whenever blink.cmp's menu is open so the two
+-- -- inline previews (and <Tab>) don't fight. See copilot.lua README.
+-- local copilot_blink_grp = vim.api.nvim_create_augroup("CopilotBlinkSync", { clear = true })
+-- vim.api.nvim_create_autocmd("User", {
+-- 	group = copilot_blink_grp,
+-- 	pattern = "BlinkCmpMenuOpen",
+-- 	callback = function()
+-- 		vim.b.copilot_suggestion_hidden = true
+-- 	end,
+-- })
+-- vim.api.nvim_create_autocmd("User", {
+-- 	group = copilot_blink_grp,
+-- 	pattern = "BlinkCmpMenuClose",
+-- 	callback = function()
+-- 		vim.b.copilot_suggestion_hidden = false
+-- 	end,
+-- })
+--

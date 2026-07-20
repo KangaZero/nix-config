@@ -97,7 +97,11 @@ vim.api.nvim_create_autocmd("InsertEnter", {
 					snippets = { score_offset = -100 },
 					path = { score_offset = 97 },
 					buffer = { score_offset = 95 },
+
 					-- copilot = { name = "copilot", module = "copilot", score_offset = 90, async = true },
+				},
+				per_filetype = {
+					opencode_ask = { "lsp", "buffer" },
 				},
 			},
 			fuzzy = { implementation = "prefer_rust_with_warning" },

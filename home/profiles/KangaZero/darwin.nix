@@ -17,7 +17,7 @@
     ../../modules/common/packages/common.nix
     ../../modules/common/packages/ns-script.nix
     ../../modules/common/shell/zsh-core.nix
-    ../../modules/common/slop/claude-code.nix
+    # ../../modules/common/slop/claude-code.nix
     ../../modules/darwin/packages.nix
     ../../modules/darwin/shell.nix
     ../../modules/common/oh-my-posh.nix
