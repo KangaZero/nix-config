@@ -9,7 +9,13 @@
   };
 
   xdg.configFile."nvim" = {
-    source = ./config;
+    # Exclude nvim-pack-lock.json: it is runtime-owned by vim.pack (see
+    # nvimPackLock below). Managing it here makes home-manager's checkLinkTargets
+    # abort the whole activation once a prior switch leaves a writable copy in place.
+    source = lib.cleanSourceWith {
+      src = ./config;
+      filter = path: _type: baseNameOf path != "nvim-pack-lock.json";
+    };
     recursive = true;
   };
 
@@ -31,17 +37,15 @@
     }
   '';
 
-  # vim.pack (nvim 0.12) owns nvim-pack-lock.json at runtime — do not manage it via
-  # xdg.configFile or home-manager will reset it to a stale committed version on every
-  # switch. Bootstrap an empty lock if the file is missing; convert a stale symlink
-  # (leftover from before this approach) to a writable copy; leave plain files alone.
+  # nvim-pack-lock.json is owned by vim.pack at runtime (nvim 0.12 rewrites it on
+  # startup), so home-manager must NOT manage it — a read-only store symlink causes
+  # EROFS, and re-linking it aborts activation via checkLinkTargets. It is filtered
+  # out of the source above; seed it from the committed (pinned) lock only when
+  # absent, writable, then leave it entirely to nvim.
   home.activation.nvimPackLock = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     lockFile="$HOME/.config/nvim/nvim-pack-lock.json"
-    if [ -L "$lockFile" ]; then
-      $DRY_RUN_CMD cp --remove-destination "$(readlink -f "$lockFile")" "$lockFile"
-      $DRY_RUN_CMD chmod u+w "$lockFile"
-    elif [ ! -e "$lockFile" ]; then
-      $DRY_RUN_CMD echo '{}' > "$lockFile"
+    if [ ! -e "$lockFile" ]; then
+      $DRY_RUN_CMD install -m 0644 -D ${./config/nvim-pack-lock.json} "$lockFile"
     fi
   '';
 
