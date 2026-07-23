@@ -6,7 +6,6 @@
     tldr
     ffmpeg-full
     unzip
-    uv
     (azure-cli.withExtensions [ azure-cli-extensions.azure-devops ])
 
     # Toolchain for nvim-treesitter (main): parsers are compiled from C source at

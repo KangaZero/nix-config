@@ -45,8 +45,12 @@
     fi
   '';
 
-  # LSP servers, formatters, and linters on PATH so Mason uses these
-  # instead of downloading prebuilt binaries (which break on baremetal NixOS).
+  # LSP servers, formatters, and linters on PATH for nvim to spawn directly.
+  # On NixOS (`/etc/NIXOS` present) lsp.lua skips Mason's `ensure_installed`, so
+  # Mason downloads nothing — these packages ARE the toolchain. The node-based
+  # servers (vtsls, vscode-langservers-extracted, tailwindcss, pyright, bashls)
+  # are wrapped by nixpkgs with a store-pinned node, so no global `nodejs` is
+  # needed. Off NixOS, Mason installs everything itself (and would need node).
   home.packages = with pkgs; [
     # LSP servers
     lua-language-server
@@ -55,9 +59,11 @@
     ruff
     clang-tools # provides clangd
     vtsls
+    typescript-go # `tsgo` — native Go TS (TS 7) LSP, run alongside vtsls for A/B
     vscode-langservers-extracted # cssls, jsonls, eslint, html
     biome
     tailwindcss-language-server
+    # If rust is needed add `rustup`
     # rust-analyzer omitted — rustup provides it via `rustup component add rust-analyzer`
     nixd
 

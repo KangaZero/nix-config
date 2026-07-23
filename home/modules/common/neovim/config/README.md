@@ -153,7 +153,12 @@ Exact pinned commits live in `nvim-pack-lock.json`.
 Servers in `ensure_installed` (`lua/lsp.lua`), so the config is aimed at:
 
 - **Lua** — `lua_ls` (+ `stylua` fmt)
-- **TypeScript / JavaScript** — `vtsls`, `eslint`, `biome`
+- **TypeScript / JavaScript** — `tsgo` (typescript-go, native TS 7 port) **primary**,
+  `vtsls` **fallback** — only one attaches per buffer (`lsp.lua` enables `tsgo` when it is
+  on `PATH`, else `vtsls`), so no duplicate diagnostics. Plus `eslint`, `biome` (lint/format).
+  On NixOS `tsgo` comes from the `typescript-go` package; off Nix, install it with
+  `npm i -g @typescript/native-preview` (Mason has no `tsgo` package — `vtsls` is the
+  Mason-managed fallback)
 - **Web** — `html`, `cssls`, `tailwindcss`, `jsonls`
 - **Python** — `pyright` (+ `ruff` lint/fmt)
 - **Rust** — `rust_analyzer` (+ `rustfmt`)

@@ -1,3 +1,6 @@
 result
 result-*
 .direnv/
+
+# Claude Code local, per-machine settings (session permission grants etc.)
+/.claude/settings.local.json

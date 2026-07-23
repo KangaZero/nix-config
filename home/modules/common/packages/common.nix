@@ -10,11 +10,13 @@
     jq
     curl
     gh
-    nodejs_26
-    pnpm
-    rustup
-    python3
-    just
+    # NOTE: These can just be loaded from from said project's flake (shell)
+    # nodejs_26
+    # pnpm
+    # rustup
+    # python3
+    # just
+    # uv
     nerd-fonts.jetbrains-mono
     nh
   ];

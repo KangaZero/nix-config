@@ -39,20 +39,53 @@ nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
 | **Nav** | zoxide | — | — |
 | **File manager** | yazi — `programs.yazi`, Tokyo Night flavor (matches kitty), `y` shell wrapper (cd-on-quit), `show_hidden = true`, `[mgr]`/`[preview]` tuned, custom `prepend_keymap` (`gh`/`gc`/`gd` jumps, `.` toggle hidden, `!` shell) | — | — |
 | **Claude Code** | `programs.claude-code` — `settings` from `slop/settings.json` → `~/.claude/settings.json` (opus model, Learning output style, vim editor, hooks, enabled LSP plugins) | — | — |
-| **Browser** | Firefox Developer Edition (declarative — policies + Vimium) | — | — |
-| **Desktop** | — | native macOS | niri (Wayland tiling) → weston (kiosk-shell) → WSLg; `Alt` mod; `LIBGL_ALWAYS_SOFTWARE=1` |
-| **Bar / launcher / notifications** | — | — | noctalia v5 (autostarted by niri); config managed as Nix attrset in `noctalia.nix` via `programs.noctalia.settings` |
-| **Clipboard** | — | — | noctalia built-in clipboard panel (`Alt+Shift+V` → `noctalia msg panel-toggle clipboard`) |
-| **Languages** | `nodejs_26` + `pnpm`, `python3`, `rustup`, `just` | — | + `uv` |
+| **Browser** | Firefox Developer Edition (declarative — policies + Vimium) — darwin + `server` only; **commented out on WSL** (CLI-only host) | — | — |
+| **Desktop** | — | native macOS | **CLI-only** — niri/weston/noctalia imports commented out in `KangaZero/linux.nix` (used as a terminal via Windows Terminal / WSLg, not a Wayland desktop). Formerly niri → weston (kiosk-shell) → WSLg; the `LIBGL_ALWAYS_SOFTWARE=1` env var is now vestigial |
+| **Bar / launcher / notifications** | — | — | — (disabled with niri — see `server` below) |
+| **Clipboard** | — | — | — (disabled with niri — see `server` below) |
+| **Languages** | none in global profile — per-project `nix develop` + direnv (see note below) | — | — |
 | **Local LLM** | — | ollama (Metal, launchd agent) — models pulled manually | ollama (`ollama-vulkan`, systemd user service) — `qwen2.5:7b` pulled manually post-activation |
-| **LSP / formatters** | `lua-language-server` `bash-language-server` `pyright` `ruff` `clang-tools` `vtsls` `vscode-langservers-extracted` `biome` `tailwindcss-language-server` `nixd` `stylua` `nixfmt-rfc-style` (all in `neovim.nix` — Mason uses these from PATH, no binary downloads); `rust-analyzer` via `rustup component add rust-analyzer` | — | — |
-| **CLI toolkit** | `fzf` `eza` `bat` `btop` `ripgrep` `fd` `jq` `curl` `gh` `nh` (yazi + claude-code now via `programs.*`) | + `vim` `fastfetch` `tree` `ffmpeg-full` `imagemagick` `_7zz` `yt-dlp` `resvg` `poppler` `odysseus` | + `wget` `openssh` `tldr` `ffmpeg-full` `unzip` `uv` `azure-cli` (+ DevOps ext) `gcc` `gnumake` (treesitter parser compilation) `wl-clipboard` |
+| **LSP / formatters** | `lua-language-server` `bash-language-server` `pyright` `ruff` `clang-tools` `vtsls` `typescript-go` (tsgo) `vscode-langservers-extracted` `biome` `tailwindcss-language-server` `nixd` `stylua` `nixfmt-rfc-style` (all in `neovim.nix` — self-contained nix packages, bundle their own runtime; unaffected by dropping global `nodejs`); `rust-analyzer` via `rustup component add rust-analyzer` — but `rustup` is now per-project (`neovim.nix` notes this), so add it via a project devShell first. **TS/JS: `tsgo` (typescript-go, the native TS 7 port) is the primary server, `vtsls` the fallback — only one attaches per buffer (`lsp.lua` prefers `tsgo` when it's on `PATH`), so no duplicate diagnostics** | — | — |
+| **CLI toolkit** | `fzf` `eza` `bat` `btop` `ripgrep` `fd` `jq` `curl` `gh` `nh` (yazi + claude-code now via `programs.*`) | + `vim` `fastfetch` `tree` `ffmpeg-full` `imagemagick` `_7zz` `yt-dlp` `resvg` `poppler` `odysseus` | + `wget` `openssh` `tldr` `ffmpeg-full` `unzip` `azure-cli` (+ DevOps ext) `gcc` `gnumake` (treesitter parser compilation) `wl-clipboard` (`uv` removed — now per-project, see note below) |
 | **Git** | LFS, `pull.rebase = true`, `autoSetupRemote = true`, identity from `userMeta` | — | — |
 | **Nix daemon** | — | Determinate Systems installer (`nix.enable = false`) | NixOS-managed |
 | **GC** | — | — | daily, `--delete-older-than 7d` |
 | **Timezone** | — | — | Asia/Tokyo |
 | **SSH** | — | — | `sshd` enabled, key-only auth (`PasswordAuthentication=false`, `KbdInteractiveAuthentication=false`); authorized key via `openssh.authorizedKeys.keys` |
-| **Extras** | direnv + nix-direnv, nix-search wrapper | Discord, nix-homebrew, keyboard layouts `us,jp` | xwayland, `nixRebuildStatus`/`nixRebuildKill` aliases, `ff` (fastfetch with `NixOwO.png` logo via kitty-direct, zellij-aware), `uinput` (input device emulation — `hardware.uinput.enable`, auto-loaded via systemd, `uinput` group) |
+| **Extras** | direnv + nix-direnv, nix-search wrapper, `nix-shell-init` (scaffolds a project `flake.nix` + `.envrc` — see below) | Discord, nix-homebrew, keyboard layouts `us,jp` | xwayland, `nixRebuildStatus`/`nixRebuildKill` aliases, `ff` (fastfetch with `NixOwO.png` logo via kitty-direct, zellij-aware), `uinput` (input device emulation — `hardware.uinput.enable`, auto-loaded via systemd, `uinput` group) |
+
+> **Why language toolchains left the global profile.** `nodejs_26`, `pnpm`, `python3`,
+> `rustup`, `just` (in `home/modules/common/packages/common.nix`) and `uv` (in
+> `home/modules/linux/packages.nix`) are **commented out**, not deleted. They now come from
+> each project's own `nix develop` shell, auto-loaded by direnv (`.envrc` → `use flake`).
+> Rationale:
+> - **Smaller global closure / faster rebuilds** — the user profile no longer carries
+>   multiple language runtimes.
+> - **No version drift** — a project pins its own toolchain in its `flake.lock`; the global
+>   profile can't silently shadow it with a different version.
+> - **Because `common.nix` is shared by all three hosts, this applies to macOS and `server`
+>   too — not just WSL.** `uv` lived in the Linux-only list, so it drops from WSL + `server`.
+>
+> Trade-offs to know: these tools are only on `PATH` **inside** a project directory, so launch
+> Neovim from a direnv-activated shell — otherwise a **Mason**-installed node LSP won't find
+> `node`/`npm` at runtime. LSPs declared as nixpkgs packages in `neovim.nix` bundle their own
+> runtime (via `wrapProgram`) and are unaffected. For Rust, `rustup component add rust-analyzer`
+> now requires `rustup` from a project devShell first.
+>
+> **Bootstrapping a project shell:** run `nix-shell-init` in a project dir — a universal
+> shell function (in `home/modules/common/shell/shell-functions.sh`, loaded on all hosts)
+> that writes a starter `flake.nix` (nixpkgs-unstable + git-hooks, a personal-identity
+> pre-push guard, and a `devShells.default` with suggested toolchains commented out) plus a
+> `use flake` `.envrc`, stages both so the flake can see them, and runs `direnv allow`. The
+> template is derived from `~/Documents/KangaFlow/flake.nix`.
+
+> **The WSL host is now CLI-only.** `firefox`, `kitty`, `weston`, and the `niri`/`noctalia`
+> imports are commented out in `home/profiles/KangaZero/linux.nix` purely to cut WSL build
+> time — WSL is driven as a terminal (Windows Terminal / WSLg), not a Wayland desktop. This is
+> **WSL-scoped**: the `server` host has its own profile and keeps the full niri + noctalia
+> desktop, Firefox, and kitty. (Leftovers on WSL that are now inert: the `programs.kitty.settings`
+> block, `LIBGL_ALWAYS_SOFTWARE=1`, and the `weston()` shell function in `linux/shell.nix` —
+> none break evaluation, but they reference things WSL no longer installs.)
 
 ### NixOS server (bare-metal desktop)
 
@@ -704,7 +737,9 @@ This repo consolidates two existing configs:
 ### packages split
 
 Common subset extracted to `home/modules/common/packages/common.nix`:
-`fzf`, `ripgrep`, `bat`, `eza`, `curl`, `jq`, `btop`, `fd`, `nodejs_26`, `pnpm`, `rustup`, `python3`, `just`, `nerd-fonts.jetbrains-mono`, `gh`, `nh`
+`fzf`, `ripgrep`, `bat`, `eza`, `curl`, `jq`, `btop`, `fd`, `nerd-fonts.jetbrains-mono`, `gh`, `nh`.
+The language toolchains (`nodejs_26`, `pnpm`, `rustup`, `python3`, `just`) are **commented out** —
+now sourced from per-project `nix develop` shells (see the note under [Defaults](#defaults)).
 
 `yazi` and `claude-code` moved out of the package list — now installed + configured declaratively via `programs.yazi` (`yazi.nix`) and `programs.claude-code` (`slop/claude-code.nix`).
 

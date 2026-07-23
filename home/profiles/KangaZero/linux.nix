@@ -1,3 +1,4 @@
+# NOTE: This is the wsl imports called in mkNixOS
 {
   username,
   userMeta,
@@ -9,8 +10,9 @@
   imports = [
     ../../modules/common/git.nix
     ../../modules/common/direnv.nix
-    ../../modules/common/firefox.nix
-    ../../modules/common/kitty.nix
+    # Commented out as not in use and to reduce bulid time
+    # ../../modules/common/firefox.nix
+    # ../../modules/common/kitty.nix
     ../../modules/common/yazi.nix
     ../../modules/common/neovim/neovim.nix
     ../../modules/common/packages/common.nix
@@ -26,8 +28,9 @@
     ../../modules/linux/bash.nix
     ../../modules/linux/shell.nix
     ../../modules/linux/zsh-aliases.nix
-    ../../modules/linux/weston.nix
-    ../../modules/linux/wayland/niri/default.nix
+    # Commented out as not in use and to reduce bulid time
+    # ../../modules/linux/weston.nix
+    # ../../modules/linux/wayland/niri/default.nix
   ];
 
   programs = {

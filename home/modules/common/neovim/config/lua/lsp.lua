@@ -10,8 +10,11 @@ require("mason").setup()
 -- mason-registry block below. With mason-lspconfig v2, `automatic_enable`
 -- defaults to true, so every installed server is auto-enabled via
 -- `vim.lsp.enable()`; explicit enables below are redundant but harmless.
-require("mason-lspconfig").setup(not is_nixos and {
-	ensure_installed = {
+require("mason-lspconfig").setup({
+	-- On NixOS every binary is on PATH from Nix, so Mason installs nothing.
+	-- Off NixOS, Mason installs this set (vtsls included as the TS fallback;
+	-- tsgo is NOT here — get it via `npm i -g @typescript/native-preview`).
+	ensure_installed = is_nixos and {} or {
 		"lua_ls",
 		"bashls",
 		"pyright",
@@ -26,7 +29,10 @@ require("mason-lspconfig").setup(not is_nixos and {
 		"rust_analyzer",
 		"html",
 	},
-} or {})
+	-- vtsls + tsgo are enabled by hand below (tsgo primary, vtsls fallback), so
+	-- stop automatic_enable from attaching either and duplicating diagnostics.
+	automatic_enable = { exclude = { "vtsls", "tsgo" } },
+})
 
 -- Non-LSP tools (formatters/linters) that mason-lspconfig can't install.
 -- conform.nvim needs stylua on PATH; mason adds its bin dir to PATH.
@@ -133,6 +139,18 @@ vim.lsp.config("vtsls", {
 	end,
 })
 
+-- TypeScript/JavaScript: tsgo (typescript-go, the native TS 7 port) is the PRIMARY
+-- server; vtsls above is the fallback (see the enable logic at the bottom — only one
+-- attaches per buffer). Uses nvim-lspconfig's shipped `tsgo` defaults
+-- (cmd = { "tsgo", "--lsp", "--stdio" }, prefers node_modules/.bin/tsgo then global
+-- `tsgo`). Formatting handed to conform (biome/prettier), so disable the server's.
+vim.lsp.config("tsgo", {
+	on_init = function(client)
+		client.server_capabilities.documentFormattingProvider = false
+		client.server_capabilities.documentRangeFormattingProvider = false
+	end,
+})
+
 -- Python: pyright for types, ruff for lint/format. Disable ruff hover so
 -- pyright owns hover; let pyright do type-checking only (ruff handles imports).
 vim.lsp.config("pyright", {
@@ -214,3 +232,13 @@ vim.lsp.enable("nixd")
 vim.lsp.enable("lua_ls")
 vim.lsp.enable("pyright")
 vim.lsp.enable("sourcekit")
+
+-- TS/JS server priority: prefer tsgo (native TS 7), fall back to vtsls when the
+-- tsgo binary isn't on PATH. Exactly one attaches, so no duplicate diagnostics,
+-- hover, or completion. (node_modules-local tsgo isn't seen by this global check;
+-- it falls back to vtsls in that case.)
+if vim.fn.executable("tsgo") == 1 then
+	vim.lsp.enable("tsgo")
+else
+	vim.lsp.enable("vtsls")
+end
