@@ -6,8 +6,10 @@
     # INFO: Due to the increase attacks on registries (eg. npm, AUR), I use Determinate Systems' nixpkgs-weekly — mirrors nixpkgs-unstable with a 7-day cooldown
     # See: https://determinate.systems/posts/nixpkgs-cooldown/
     # You may replace with the actual registry above if you want to live dangerously
-    nixpkgs.url = "https://flakehub.com/f/DeterminateSystems/nixpkgs-weekly/0.1";
+    # Hmm for some reason this is may cause dependency failure
+    # nixpkgs.url = "https://flakehub.com/f/DeterminateSystems/nixpkgs-weekly/0.1";
 
+    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     home-manager = {
       url = "github:nix-community/home-manager/master";
       inputs.nixpkgs.follows = "nixpkgs";

@@ -19,6 +19,7 @@
     ../../modules/common/shell/zsh-core.nix
     # ../../modules/common/slop/claude-code.nix
     ../../modules/darwin/packages.nix
+    ../../modules/darwin/opencode.nix
     ../../modules/darwin/shell.nix
     ../../modules/common/oh-my-posh.nix
     ../../modules/darwin/discord.nix

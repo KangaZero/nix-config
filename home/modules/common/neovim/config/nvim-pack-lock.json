@@ -1,5 +1,9 @@
 {
   "plugins": {
+    "avante.nvim": {
+      "rev": "8a5a5c16a3c693bf7d9a8da1ee78269e8728879b",
+      "src": "https://github.com/yetone/avante.nvim"
+    },
     "blink-copilot": {
       "rev": "7ad8209b2f880a2840c94cdcd80ab4dc511d4f39",
       "src": "https://github.com/fang2hou/blink-copilot"
@@ -29,13 +33,10 @@
       "rev": "c995bbacf8229dc096ec1c3d60f8531059c86c1b",
       "src": "https://github.com/MagicDuck/grug-far.nvim"
     },
-<<<<<<< HEAD
     "markview.nvim": {
-      "rev": "41ecde17c96941fb5b7c97995a10712738e85efe",
+      "rev": "2471f4097f8561a6880a0fe05ee0f21cbc82b374",
       "src": "https://github.com/OXY2DEV/markview.nvim"
     },
-=======
->>>>>>> 48b7814 (<feat> Moving away from claude on mac in favor of opencode and local LLM)
     "mason-lspconfig.nvim": {
       "rev": "21c5b3ebeaa0412e28096bb0701434c51c1fbf76",
       "src": "https://github.com/mason-org/mason-lspconfig.nvim"
@@ -51,6 +52,10 @@
     "nekonight.nvim": {
       "rev": "37b542b26eaf10524379bae75c590018f47a3613",
       "src": "https://github.com/KangaZero/nekonight.nvim"
+    },
+    "nui.nvim": {
+      "rev": "de740991c12411b663994b2860f1a4fd0937c130",
+      "src": "https://github.com/MunifTanjim/nui.nvim"
     },
     "nvim": {
       "rev": "df1c6af5e1df601232a2c0fc7198ea1342e95f29",
@@ -72,14 +77,11 @@
       "rev": "851e865342e5a4cb1ae23d31caf6e991e1c99f1e",
       "src": "https://github.com/nvim-treesitter/nvim-treesitter-textobjects"
     },
-<<<<<<< HEAD
-=======
     "opencode.nvim": {
       "rev": "427dd9c64c90dfa05479c52e5d6c9febdf31f83c",
       "src": "https://github.com/nickjvandyke/opencode.nvim",
       "version": ">=0.0.0"
     },
->>>>>>> 48b7814 (<feat> Moving away from claude on mac in favor of opencode and local LLM)
     "plenary.nvim": {
       "rev": "74b06c6c75e4eeb3108ec01852001636d85a932b",
       "src": "https://github.com/nvim-lua/plenary.nvim"

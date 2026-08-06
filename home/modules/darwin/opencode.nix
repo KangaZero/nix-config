@@ -1,4 +1,4 @@
-{ pkgs }: {
+{ pkgs, ... }: {
   # ollama for local LLMs. On macOS home-manager runs this as a launchd agent
   # (`ollama serve` on login). The default `pkgs.ollama` builds with Metal
   # acceleration on darwin. Pull models manually post-activation
@@ -13,7 +13,7 @@
     themes = { };
     tools = { };
     tui = { };
-    enableMcpIntegration = false;
+    enableMcpIntegration = true;
     extraPackages = [ ];
     package = pkgs.opencode;
     web = {
