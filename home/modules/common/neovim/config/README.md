@@ -1,13 +1,38 @@
-# nvim-min
+<div align="center">
 
-A minimal-ish, fast Neovim configuration built on **Neovim's native tooling** — the
-built-in `vim.pack` plugin manager, the native `vim.lsp` config API, and the new
-experimental message UI (`vim._core.ui2`). No `lazy.nvim`, no `packer`, no bootstrap
-shim. Requires **Neovim ≥ 0.12** (stable as of 0.12.2).
+# 🐱 nvim-min
 
-> Heads up: this config uses APIs introduced in 0.12 (`vim.pack`,
+**A minimal-ish, fast Neovim config built entirely on Neovim's native tooling — no `lazy.nvim`, no `packer`, no bootstrap shim.**
+
+[Requirements](#requirements) • [Packages](#package-management) • [Layout](#layout) • [Plugins](#plugins) • [LSP](#languages--lsp) • [Keymaps](#notable-features--keymaps) • [Install](#install) • [Testing](#testing--ci)
+
+![Neovim](https://img.shields.io/badge/Neovim-%E2%89%A5%200.12-57A143?style=flat-square&logo=neovim&logoColor=white)
+![Plugin manager](https://img.shields.io/badge/plugins-vim.pack%20(native)-blueviolet?style=flat-square)
+![LSP](https://img.shields.io/badge/LSP-vim.lsp%20(native)-teal?style=flat-square)
+![No lazy.nvim](https://img.shields.io/badge/no-lazy.nvim%20%7C%20packer-critical?style=flat-square)
+
+</div>
+
+Built on the built-in `vim.pack` plugin manager, the native `vim.lsp` config API, and the
+new experimental message UI (`vim._core.ui2`). Requires **Neovim ≥ 0.12** (stable as of
+0.12.2).
+
+> [!WARNING]
+> This config uses APIs introduced in 0.12 (`vim.pack`,
 > `vim.lsp.config`/`vim.lsp.enable`, `vim.diagnostic.jump`, `vim._core.ui2`).
 > On 0.11 or older it will throw on startup.
+
+## Table of Contents
+
+- [Requirements](#requirements)
+- [Package management](#package-management)
+- [Layout](#layout)
+- [🚧 Work in progress (not load-bearing)](#-work-in-progress-not-load-bearing)
+- [Plugins](#plugins)
+- [Languages / LSP](#languages--lsp)
+- [Notable features & keymaps](#notable-features--keymaps)
+- [Install](#install)
+- [Testing & CI](#testing--ci)
 
 ---
 
@@ -84,9 +109,11 @@ LSP servers are installed/managed by **mason** + **mason-lspconfig** (see
 │   │   ├── avante.lua        # avante.nvim + Ollama AI completion (macOS only)
 │   │   ├── completion.lua    # blink.cmp (lazy-loaded on InsertEnter)
 │   │   ├── conform.lua       # conform.nvim formatters by filetype
-│   │   ├── dashboard.lua     # dashboard-nvim + milli.nvim splash ("purgatory" theme)
+│   │   ├── dashboard.lua     # dashboard-nvim start screen ("hyper" theme; milli.nvim splash commented out — perf)
 │   │   ├── flash.lua         # flash.nvim motions / treesitter jumps
 │   │   ├── grug-far.lua      # project-wide search & replace
+│   │   ├── markview.lua      # markview.nvim — in-buffer markdown rendering
+│   │   ├── opencode.lua      # opencode.nvim — OpenCode integration (<leader>o…, go/goo, <S-C-u/d>)
 │   │   ├── snacks.lua        # folke/snacks.nvim (picker, indent, scroll, notifier, …)
 │   │   ├── telescope.lua     # telescope.nvim
 │   │   ├── which-key.lua     # which-key.nvim
@@ -134,14 +161,15 @@ them; they are intended to play **no role** in the active config right now:
 | [conform.nvim](https://github.com/stevearc/conform.nvim) | format-on-save by filetype |
 | [avante.nvim](https://github.com/yetone/avante.nvim) | AI ghost-text completion via local Ollama (macOS only, Copilot-style) |
 | [nui.nvim](https://github.com/MunifTanjim/nui.nvim) | UI components (avante.nvim dep) |
-| [opencode.nvim](https://github.com/nickjvandyke/opencode.nvim) | OpenCode integration (`<leader>oa`, `<leader>os`) |
+| [opencode.nvim](https://github.com/nickjvandyke/opencode.nvim) | OpenCode integration (`<leader>oa` ask, `<leader>os` select, `go`/`goo` append operators, `<S-C-u>`/`<S-C-d>` scroll) |
+| [markview.nvim](https://github.com/OXY2DEV/markview.nvim) | in-buffer markdown rendering |
 | [telescope.nvim](https://github.com/nvim-telescope/telescope.nvim) | fuzzy finder |
 | [snacks.nvim](https://github.com/folke/snacks.nvim) | picker, indent guides, scroll, notifier, dashboard, … |
 | [flash.nvim](https://github.com/folke/flash.nvim) | jump motions / treesitter selection |
 | [grug-far.nvim](https://github.com/MagicDuck/grug-far.nvim) | search & replace across project |
 | [yazi.nvim](https://github.com/mikavilpas/yazi.nvim) | yazi file-manager integration |
 | [which-key.nvim](https://github.com/folke/which-key.nvim) | keymap hints |
-| [dashboard-nvim](https://github.com/nvimdev/dashboard-nvim) + [milli.nvim](https://github.com/amansingh-afk/milli.nvim) | start screen + animated splash |
+| [dashboard-nvim](https://github.com/nvimdev/dashboard-nvim) | start screen (`hyper` theme; [milli.nvim](https://github.com/amansingh-afk/milli.nvim) animated splash is present but commented out for performance) |
 | [plenary.nvim](https://github.com/nvim-lua/plenary.nvim) | lua utility dep (yazi) |
 
 Exact pinned commits live in `nvim-pack-lock.json`.
@@ -150,7 +178,11 @@ Exact pinned commits live in `nvim-pack-lock.json`.
 
 ## Languages / LSP
 
-Servers in `ensure_installed` (`lua/lsp.lua`), so the config is aimed at:
+Servers configured in `lua/lsp.lua` — most via mason's `ensure_installed`; `nixd` and
+`sourcekit` are **not** in `ensure_installed` (they are enabled directly via
+`vim.lsp.enable(...)` against a system/Nix install). On NixOS `ensure_installed` is empty —
+every server comes from Nix (see the NixOS note under [Install](#install)). The config is
+aimed at:
 
 - **Lua** — `lua_ls` (+ `stylua` fmt)
 - **TypeScript / JavaScript** — `tsgo` (typescript-go, native TS 7 port) **primary**,
@@ -208,6 +240,12 @@ Leader is **`<Space>`**.
 - `<leader>p` — update plugins (`vim.pack.update()`)
 - `<leader>aa` — execute current line / selection as Lua
 
+**AI — OpenCode** (`plugins/opencode.lua`)
+- `<leader>oa` — ask OpenCode about the current line/selection (`@this`)
+- `<leader>os` — select an OpenCode prompt/session
+- `go` / `goo` — operator to append a motion range / the current line to OpenCode
+- `<S-C-u>` / `<S-C-d>` — scroll the OpenCode session half-page up / down
+
 ### Custom UI
 - **Statusline** (`ui/statusline.lua`) is hand-written — mode, file, git branch,
   diagnostic counts, pending keys, clock, and position. No statusline plugin.
@@ -248,6 +286,7 @@ sudo nixos-rebuild switch --flake .#nixos
 On first run `vim.pack` fetches everything in the lockfile, and mason installs the
 configured LSP servers. Restart once after the initial sync.
 
+> [!NOTE]
 > **NixOS:** All LSP servers, formatters, and linters are provided via Nix in
 > `neovim.nix` (`home.packages`). Mason finds them on PATH and skips downloading
 > prebuilt binaries — necessary on baremetal NixOS where foreign ELF binaries won't

@@ -1,8 +1,43 @@
-# nix-config
+<div align="center">
 
-A unified Nix flake monorepo consolidating macOS (nix-darwin) and NixOS configurations into a single, multi-platform, multi-user setup.
+# ❄️ nix-config
 
+**A unified Nix flake monorepo — macOS (nix-darwin) + NixOS, multi-platform, multi-user.**
+
+[Platforms](#supported-platforms) • [Defaults](#defaults) • [Setup](#setup--usage) • [Structure](#repository-structure) • [Safety](#safety--checks) • [CI](#ci-pipeline) • [Security](#security) • [Neovim config →](home/modules/common/neovim/config/README.md)
+
+![Nix Flakes](https://img.shields.io/badge/Nix-flakes-5277C3?style=flat-square&logo=nixos&logoColor=white)
+![Platforms](https://img.shields.io/badge/platforms-aarch64--darwin%20%7C%20x86__64--linux-blueviolet?style=flat-square)
+![nixpkgs](https://img.shields.io/badge/nixpkgs-weekly%20(7--day%20cooldown)-008080?style=flat-square)
+![Neovim](https://img.shields.io/badge/Neovim-%E2%89%A5%200.12-57A143?style=flat-square&logo=neovim&logoColor=white)
+![Hosts](https://img.shields.io/badge/hosts-KangaZero%20%7C%20nixos%20%7C%20server-orange?style=flat-square)
+
+</div>
+
+> [!TIP]
 > **Just want the Neovim config?** → [`home/modules/common/neovim/config/`](home/modules/common/neovim/config/README.md) — standalone, no Nix required.
+
+## Table of Contents
+
+- [Supported Platforms](#supported-platforms)
+- [Nixpkgs Source](#nixpkgs-source)
+- [Defaults](#defaults)
+  - [NixOS server (bare-metal desktop)](#nixos-server-bare-metal-desktop)
+- [Setup & Usage](#setup--usage)
+  - [macOS — nix-darwin](#macos--nix-darwin-aarch64-darwin)
+  - [NixOS WSL2](#nixos-wsl2-x86_64-linux)
+  - [NixOS bare metal / VM](#nixos-bare-metal--vm-x86_64-linux-or-aarch64-linux)
+  - [NixOS bare-metal desktop — `server`](#nixos-bare-metal-desktop--server-x86_64-linux)
+  - [Rebuild quick reference](#rebuild-quick-reference)
+- [Repository Structure](#repository-structure)
+- [Safety & Checks](#safety--checks)
+- [CI Pipeline](#ci-pipeline)
+- [Design Principles](#design-principles)
+- [Adding a New Host](#adding-a-new-host)
+- [Adding a New User](#adding-a-new-user)
+- [Module Migration Plan](#module-migration-plan)
+- [Security](#security)
+- [Verification](#verification)
 
 ## Supported Platforms
 
@@ -39,14 +74,16 @@ nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
 | **Nav** | zoxide | — | — |
 | **File manager** | yazi — `programs.yazi`, Tokyo Night flavor (matches kitty), `y` shell wrapper (cd-on-quit), `show_hidden = true`, `[mgr]`/`[preview]` tuned, custom `prepend_keymap` (`gh`/`gc`/`gd` jumps, `.` toggle hidden, `!` shell) | — | — |
 | **Claude Code** | `programs.claude-code` — `settings` from `slop/settings.json` → `~/.claude/settings.json` (opus model, Learning output style, vim editor, hooks, enabled LSP plugins) | — | — |
+| **OpenCode** (AI coding agent) | — | `programs.opencode` (`opencode.nix`) — two local MCP servers (`shadcn` = `npx -y shadcn@latest mcp`, also serves the `@canvas-ui` registry; `playwright` = `npx -y @playwright/mcp`), `enableMcpIntegration = true`, `web.enable = false`. `extraPackages = [ nodejs pnpm typescript ]` — bundled into **opencode's own wrapper PATH** (`npx` launches the MCP servers), not the global profile, so the "no global toolchains" rule below still holds | — |
 | **Browser** | Firefox Developer Edition (declarative — policies + Vimium) — darwin + `server` only; **commented out on WSL** (CLI-only host) | — | — |
 | **Desktop** | — | native macOS | **CLI-only** — niri/weston/noctalia imports commented out in `KangaZero/linux.nix` (used as a terminal via Windows Terminal / WSLg, not a Wayland desktop). Formerly niri → weston (kiosk-shell) → WSLg; the `LIBGL_ALWAYS_SOFTWARE=1` env var is now vestigial |
 | **Bar / launcher / notifications** | — | — | — (disabled with niri — see `server` below) |
 | **Clipboard** | — | — | — (disabled with niri — see `server` below) |
 | **Languages** | none in global profile — per-project `nix develop` + direnv (see note below) | — | — |
 | **Local LLM** | — | ollama (Metal, launchd agent) — models pulled manually | ollama (`ollama-vulkan`, systemd user service) — `qwen2.5:7b` pulled manually post-activation |
+| **Dev database** | — | — | `services.postgresql` (`postgresql_18`, in `hosts/nixos/default.nix`) — declarative `ccui` role + db (`ensureDBOwnership`), `listen_addresses = "*"` (native + Docker can connect), scram auth from localhost + Docker bridge (`172.16.0.0/12`), TCP `5432` opened. **Role password is set out-of-band** (`sudo -u postgres psql -c "ALTER ROLE ccui PASSWORD '<dev-pw>';"`) — never committed (repo is public) |
 | **LSP / formatters** | `lua-language-server` `bash-language-server` `pyright` `ruff` `clang-tools` `vtsls` `typescript-go` (tsgo) `vscode-langservers-extracted` `biome` `tailwindcss-language-server` `nixd` `stylua` `nixfmt-rfc-style` (all in `neovim.nix` — self-contained nix packages, bundle their own runtime; unaffected by dropping global `nodejs`); `rust-analyzer` via `rustup component add rust-analyzer` — but `rustup` is now per-project (`neovim.nix` notes this), so add it via a project devShell first. **TS/JS: `tsgo` (typescript-go, the native TS 7 port) is the primary server, `vtsls` the fallback — only one attaches per buffer (`lsp.lua` prefers `tsgo` when it's on `PATH`), so no duplicate diagnostics** | — | — |
-| **CLI toolkit** | `fzf` `eza` `bat` `btop` `ripgrep` `fd` `jq` `curl` `gh` `nh` (yazi + claude-code now via `programs.*`) | + `vim` `fastfetch` `tree` `ffmpeg-full` `imagemagick` `_7zz` `yt-dlp` `resvg` `poppler` `odysseus` | + `wget` `openssh` `tldr` `ffmpeg-full` `unzip` `azure-cli` (+ DevOps ext) `gcc` `gnumake` (treesitter parser compilation) `wl-clipboard` (`uv` removed — now per-project, see note below) |
+| **CLI toolkit** | `fzf` `eza` `bat` `btop` `ripgrep` `fd` `jq` `curl` `gh` `nh` (yazi + claude-code now via `programs.*`) | + `ani-cli` `vim` `fastfetch` `tree` `ffmpeg-full` `imagemagick` `_7zz` `yt-dlp` `resvg` `poppler` `odysseus` | + `wget` `openssh` `tldr` `ffmpeg-full` `unzip` `azure-cli` (+ DevOps + `containerapp` exts — `containerapp` needs `pythonRelaxDeps = ["kubernetes"]` to build) `gcc` `gnumake` (treesitter parser compilation) `wl-clipboard` (`uv` removed — now per-project, see note below) |
 | **Git** | LFS, `pull.rebase = true`, `autoSetupRemote = true`, identity from `userMeta` | — | — |
 | **Nix daemon** | — | Determinate Systems installer (`nix.enable = false`) | NixOS-managed |
 | **GC** | — | — | daily, `--delete-older-than 7d` |
@@ -78,6 +115,13 @@ nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
 > pre-push guard, and a `devShells.default` with suggested toolchains commented out) plus a
 > `use flake` `.envrc`, stages both so the flake can see them, and runs `direnv allow`. The
 > template is derived from `~/Documents/KangaFlow/flake.nix`.
+>
+> The same file (loaded on all hosts) also defines two more helpers:
+> - **`nixpkg-review-post <pr>`** — runs `nixpkgs-review` (via `nix-shell -p nixpkgs-review`)
+>   against a `NixOS/nixpkgs` PR and posts the result as a PR comment. Validates that the arg is
+>   numeric and the PR exists, and reuses your `gh auth token` as `GITHUB_TOKEN` (fails fast if
+>   `gh` is missing or unauthenticated). Also aliased as `nixpkg-review-post`.
+> - **`cdroot`** — `cd` to the current git repo's top level (`git rev-parse --show-toplevel`).
 
 > **The WSL host is now CLI-only.** `firefox`, `kitty`, `weston`, and the `niri`/`noctalia`
 > imports are commented out in `home/profiles/KangaZero/linux.nix` purely to cut WSL build
@@ -120,6 +164,7 @@ without sudo/reboot via the standalone `homeConfigurations."KangaZero"` output �
 
 ## Setup & Usage
 
+> [!NOTE]
 > **Repo location expected by shell aliases:** `~/.config/multi-nix`
 
 ---
@@ -134,6 +179,7 @@ without sudo/reboot via the standalone `homeConfigurations."KangaZero"` output �
 curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
 ```
 
+> [!IMPORTANT]
 > This config sets `nix.enable = false` — it works with the Determinate installer instead of a nix-darwin-managed daemon. Do not use the official `sh.nixos.org` installer.
 >
 > macOS system updates can silently remove the `/nix` store. The Determinate installer handles re-mounting and persistence through OS upgrades. See [Nix disappeared from macOS](https://docs.determinate.systems/troubleshooting/nix-disappeared-from-macos/).
@@ -476,12 +522,14 @@ multi-nix/
 │       │       └── zsh-core.nix      # Shared zsh: completion, autosuggestion,
 │       │                             #   syntaxHighlighting, history
 │       ├── darwin/                   # macOS home-manager modules
-│       │   ├── packages.nix          # _7zz, imagemagick, odysseus-dev, etc.
+│       │   ├── packages.nix          # ani-cli, _7zz, imagemagick, odysseus-dev, etc.
 │       │   ├── shell.nix             # brew shellenv, mac aliases
-│       │   ├── discord.nix
+│       │   ├── discord.nix           # programs.discord (devtools flag, skip host update)
+│       │   ├── man.nix               # programs.man
+│       │   ├── opencode.nix          # programs.opencode — shadcn + playwright MCP, nodejs/pnpm/typescript toolchain
 │       │   └── ollama.nix            # ollama (Metal) — launchd agent (port 11434)
 │       └── linux/                    # Linux home-manager modules
-│           ├── packages.nix          # azure-cli, uv, openssh, wget, etc.
+│           ├── packages.nix          # azure-cli (+ devops + containerapp exts), openssh, wget, tldr, gcc, gnumake, wl-clipboard (uv removed — now per-project)
 │           ├── ollama.nix            # ollama-vulkan — systemd user service (port 11434)
 │           ├── bash.nix              # zsh trampoline
 │           ├── shell.nix             # linux-specific aliases (ez, nixRebuildStatus/Kill, cheatsheet-az) + shell helpers (weston fn, kill-port, nix-gc, ff)
@@ -547,7 +595,8 @@ Pre-push hooks (block the push if the build fails):
 | darwin | `nix build .#darwinConfigurations.KangaZero.system` |
 | linux | `nixos-rebuild dry-build --flake .#nixos` |
 
-> **Note:** the pre-push build (and CI) covers only `.#nixos` (WSL) and darwin — the bare-metal
+> [!WARNING]
+> The pre-push build (and CI) covers only `.#nixos` (WSL) and darwin — the bare-metal
 > **`server`** config has **no automated build check** (no `checks` entry, `ci.yml` build steps
 > commented). Verify it manually before relying on it: `nixos-rebuild build --flake .#server`.
 
@@ -729,6 +778,8 @@ This repo consolidates two existing configs:
 |---|---|---|
 | `discord.nix` | darwin | mac config |
 | `shell.nix` (brew shellenv) | darwin | mac config |
+| `opencode.nix` | darwin | new — `programs.opencode` (shadcn + playwright MCP, frontend toolchain) |
+| `man.nix` | darwin | new — `programs.man` |
 | `oh-my-posh.nix` + `oh-my-posh.toml` | common | moved from darwin — shared prompt |
 | `wayland/niri/` | linux | WSL config |
 | `bash.nix`, `weston.nix` | linux | WSL config |
