@@ -6,7 +6,12 @@
     tldr
     ffmpeg-full
     unzip
-    (azure-cli.withExtensions [ azure-cli-extensions.azure-devops ])
+    (azure-cli.withExtensions [
+      azure-cli-extensions.azure-devops
+      (azure-cli-extensions.containerapp.overridePythonAttrs (_: {
+        pythonRelaxDeps = [ "kubernetes" ];
+      }))
+    ])
 
     # Toolchain for nvim-treesitter (main): parsers are compiled from C source at
     # install time via `cc`. Bare-metal NixOS ships no implicit compiler, so nvim
