@@ -9,6 +9,15 @@ inputs.git-hooks.lib.${system}.run {
     nixfmt.enable = true;
     statix.enable = true;
     deadnix.enable = true;
+    check-leaks = {
+      enable = true;
+      name = "check for leaks";
+      language = "system";
+      always_run = true;
+      stages = [ "pre-commit" ];
+      pass_filenames = false;
+      entry = "${pkgs.betterleaks}/bin/betterleaks git --staged --no-banner";
+    };
     check-author = {
       enable = true;
       name = "check git author";
