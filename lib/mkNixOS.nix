@@ -33,6 +33,9 @@ inputs.nixpkgs.lib.nixosSystem {
   };
   modules = [
     ../modules/shared/nix-settings.nix
+    # INFO: nix-ld runs unpatched dynamic binaries on NixOS. Every NixOS host here
+    # (WSL + bare metal) wants it, so it lives in the base module set.
+    ../modules/nixos/nix-ld.nix
     ../hosts/${hostname}/hardware.nix
     ../hosts/${hostname}/default.nix
     inputs.home-manager.nixosModules.home-manager

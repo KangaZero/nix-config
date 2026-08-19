@@ -16,9 +16,9 @@
     };
 
     darwin = {
-      # url = "github:nix-darwin/nix-darwin/a1fa429e945becaf60468600daf649be4ba0350c";
-      # Commit 320cbf5 (July 4, 2026) changed the manual build to use --sidebar-depth instead of the old --toc-depth/--chunk-toc-depth flags, to match a nixpkgs PR (nixos/nixpkgs#537810) that renamed the nixos-render-docs CLI. Your nixpkgs pin doesn't have that nixpkgs PR yet, so its nixos-render-docs still only understands the old flags — hence "unrecognized arguments: --sidebar-depth."
-      #TODO add back when matches nixpkgs
+      # Was briefly pinned to a pre-320cbf5 commit because darwin's manual build moved to
+      # --sidebar-depth before nixpkgs renamed the nixos-render-docs CLI (nixos/nixpkgs#537810).
+      # The current nixpkgs pin has that rename, so master tracks fine again.
       url = "github:nix-darwin/nix-darwin/master";
       inputs.nixpkgs.follows = "nixpkgs";
     };
@@ -113,8 +113,8 @@
       };
 
       # Bare-metal NixOS laptop. mkWSL is just mkNixOS + WSL extraModules, so the
-      # server calls mkNixOS directly with the non-WSL subset (nix-ld + graphics +
-      # niri), skipping nixos-wsl and passwordless sudo.
+      # server calls mkNixOS directly with the non-WSL subset (graphics + niri),
+      # skipping nixos-wsl and passwordless sudo. nix-ld is in mkNixOS itself.
       nixosConfigurations."${serverHostname}" = lib.mkNixOS {
         hostname = serverHostname;
         system = serverSystem;
@@ -122,7 +122,6 @@
         # NOTE: path literals resolve relative to *this* file (repo root), so `./modules`.
         # mkWSL.nix uses `../modules` only because that literal lives in lib/.
         extraModules = [
-          ./modules/nixos/nix-ld.nix
           ./modules/nixos/graphics.nix
           ./modules/nixos/wayland/niri.nix
         ];
