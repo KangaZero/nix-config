@@ -14,6 +14,20 @@
 
 </div>
 
+> [!IMPORTANT]
+> **This repo must live at `$HOME/.config/multi-nix` — that exact path *and* that exact directory
+> name.** Several things hardcode it rather than deriving it:
+> - `programs.nh.flake` / `darwinFlake` — `/home/<user>/.config/multi-nix` (`modules/nixos/nh.nix`),
+>   `/Users/<user>/.config/multi-nix` (`home/modules/darwin/nh.nix`). Wrong path → `nh os switch`
+>   with no argument resolves nothing.
+> - The `nix-switch` / `home-switch` / `edit-nix` shell aliases
+>   (`home/modules/linux/zsh-aliases.nix`, `hosts/KangaZero/default.nix`).
+> - `nvim-dev` — `NVIM_APPNAME=multi-nix/home/modules/common/neovim/config`, resolved relative to
+>   `$XDG_CONFIG_HOME`, so the **directory name** itself is part of the path.
+>
+> Cloning elsewhere still builds (`nixos-rebuild --flake /path#host` works fine), but every alias
+> and the argument-free `nh` commands break. Relocating means editing those files.
+
 > [!TIP]
 > **Just want the Neovim config?** → [`home/modules/common/neovim/config/`](home/modules/common/neovim/config/README.md) — standalone, no Nix required.
 
@@ -23,6 +37,7 @@
 - [Nixpkgs Source](#nixpkgs-source)
 - [Defaults](#defaults)
   - [NixOS server (bare-metal desktop)](#nixos-server-bare-metal-desktop)
+- [Garbage Collection (`nh`)](#garbage-collection-nh)
 - [Setup & Usage](#setup--usage)
   - [macOS — nix-darwin](#macos--nix-darwin-aarch64-darwin)
   - [NixOS WSL2](#nixos-wsl2-x86_64-linux)
@@ -81,7 +96,7 @@ inputs here (`home-manager`/`darwin` track `nixpkgs` via `follows`). Re-enable b
 | **Nav** | zoxide | — | — |
 | **Shell history** | atuin — `programs.atuin`, zsh integration, `search_mode = "fuzzy"`, `keymap_mode = "vim-normal"`, `dialect = "uk"`, sync/update-check off (fully local). Ships a declarative theme `tokyonight-kanga` via `programs.atuin.themes` (→ `~/.config/atuin/themes/tokyonight-kanga.toml`), activated by `settings.theme.name` — Tokyo Night Moon body + Dracula purple accent, matching kitty/yazi/oh-my-posh | — | — |
 | **File manager** | yazi — `programs.yazi`, Tokyo Night flavor (matches kitty), `y` shell wrapper (cd-on-quit), `show_hidden = true`, `[mgr]`/`[preview]` tuned, custom `prepend_keymap` (`gh`/`gc`/`gd` jumps, `.` toggle hidden, `!` shell) | — | — |
-| **Claude Code** | `programs.claude-code` — `settings` from `slop/settings.json` → `~/.claude/settings.json` (opus model, Learning output style, vim editor, hooks, enabled LSP plugins) | — | — |
+| **Claude Code** | **not shared — single-host, WSL only** (see note below) | commented out | `programs.claude-code` — `settings` from `slop/settings.json` → `~/.claude/settings.json` (opus model, Learning output style, vim editor, hooks, enabled LSP plugins) |
 | **OpenCode** (AI coding agent) | — | `programs.opencode` (`opencode.nix`) — two local MCP servers (`shadcn` = `npx -y shadcn@latest mcp`, also serves the `@canvas-ui` registry; `playwright` = `npx -y @playwright/mcp`), `enableMcpIntegration = true`, `web.enable = false`. `extraPackages = [ nodejs pnpm typescript ]` — bundled into **opencode's own wrapper PATH** (`npx` launches the MCP servers), not the global profile, so the "no global toolchains" rule below still holds | — |
 | **Browser** | Firefox Developer Edition (declarative — policies + Vimium) — darwin + `server` only; **commented out on WSL** (CLI-only host) | — | — |
 | **Desktop** | — | native macOS | **CLI-only** — niri/weston/noctalia *home-manager* imports commented out in `KangaZero/linux.nix` (used as a terminal via Windows Terminal / WSLg, not a Wayland desktop). Formerly niri → weston (kiosk-shell) → WSLg; the `LIBGL_ALWAYS_SOFTWARE=1` env var is now vestigial. **Caveat:** `mkWSL` still imports the *system* module `modules/nixos/wayland/niri.nix`, so `programs.niri` + xwayland are installed (~1.1 GB closure) with no KDL config to drive them — and WSL exposes `/dev/dxg`, not `/dev/dri`, so niri cannot start there anyway |
@@ -91,10 +106,10 @@ inputs here (`home-manager`/`darwin` track `nixpkgs` via `follows`). Re-enable b
 | **Local LLM** | — | ollama (Metal, launchd agent) — models pulled manually | ollama (`ollama-vulkan`, systemd user service) — `qwen2.5:7b` pulled manually post-activation |
 | **Dev database** | — | — | `services.postgresql` (`postgresql_18`, in `hosts/nixos/default.nix`) — declarative `ccui` role + db (`ensureDBOwnership`), `listen_addresses = "*"` (native + Docker can connect), scram auth from localhost + Docker bridge (`172.16.0.0/12`), TCP `5432` opened. **Role password is set out-of-band** (`sudo -u postgres psql -c "ALTER ROLE ccui PASSWORD '<dev-pw>';"`) — never committed (repo is public) |
 | **LSP / formatters** | `lua-language-server` `bash-language-server` `pyright` `ruff` `clang-tools` `vtsls` `typescript-go` (tsgo) `vscode-langservers-extracted` `biome` `tailwindcss-language-server` `nixd` `stylua` `nixfmt-rfc-style` (all in `neovim.nix` — self-contained nix packages, bundle their own runtime; unaffected by dropping global `nodejs`); `rust-analyzer` via `rustup component add rust-analyzer` — but `rustup` is now per-project (`neovim.nix` notes this), so add it via a project devShell first. **TS/JS: `tsgo` (typescript-go, the native TS 7 port) is the primary server, `vtsls` the fallback — only one attaches per buffer (`lsp.lua` prefers `tsgo` when it's on `PATH`), so no duplicate diagnostics** | — | — |
-| **CLI toolkit** | `fzf` `eza` `bat` `btop` `ripgrep` `fd` `jq` `curl` `gh` `nh` (yazi + claude-code now via `programs.*`) | + `ani-cli` `vim` `fastfetch` `tree` `ffmpeg-full` `imagemagick` `_7zz` `yt-dlp` `resvg` `poppler` `odysseus` | + `wget` `openssh` `tldr` `ffmpeg-full` `unzip` `azure-cli` (+ DevOps + `containerapp` exts — `containerapp` needs `pythonRelaxDeps = ["kubernetes"]` to build) `gcc` `gnumake` (treesitter parser compilation) `wl-clipboard` (`uv` removed — now per-project, see note below) |
+| **CLI toolkit** | `fzf` `eza` `bat` `btop` `ripgrep` `fd` `jq` `curl` `gh` (yazi via `programs.yazi`; `nh` via `programs.nh` — system-level on NixOS, home-manager on darwin, which also exports `NH_FLAKE`; claude-code is WSL-only) | + `ani-cli` `vim` `fastfetch` `tree` `ffmpeg-full` `imagemagick` `_7zz` `yt-dlp` `resvg` `poppler` `odysseus` | + `wget` `openssh` `tldr` `ffmpeg-full` `unzip` `azure-cli` (+ DevOps + `containerapp` exts — `containerapp` needs `pythonRelaxDeps = ["kubernetes"]` to build) `gcc` `gnumake` (treesitter parser compilation) `wl-clipboard` (`uv` removed — now per-project, see note below) |
 | **Git** | LFS, `pull.rebase = true`, `autoSetupRemote = true`, identity from `userMeta` | — | — |
 | **Nix daemon** | — | Determinate Systems installer (`nix.enable = false`) | NixOS-managed |
-| **GC** | — | — | daily, `--delete-older-than 7d` |
+| **GC** | `nh clean all` — see [Garbage Collection](#garbage-collection-nh) | root `launchd.daemons.nh-clean` (`modules/darwin/nh-clean.nix`) — Sundays 15:00, `--keep 3 --keep-since 7d` | `programs.nh.clean` systemd timer (`modules/nixos/nh.nix`) — weekly, `--keep 3 --keep-since 7d` |
 | **Timezone** | — | — | Asia/Tokyo |
 | **SSH** | — | — | `sshd` enabled, key-only auth (`PasswordAuthentication=false`, `KbdInteractiveAuthentication=false`); authorized key via `openssh.authorizedKeys.keys` |
 | **Extras** | direnv + nix-direnv, nix-search wrapper, `nix-shell-init` (scaffolds a project `flake.nix` + `.envrc` — see below) | Discord, nix-homebrew, keyboard layouts `us,jp` | xwayland, `nixRebuildStatus`/`nixRebuildKill` aliases, `ff` (fastfetch with `NixOwO.png` logo via kitty-direct, zellij-aware), `uinput` (input device emulation — `hardware.uinput.enable`, auto-loaded via systemd, `uinput` group) |
@@ -131,6 +146,11 @@ inputs here (`home-manager`/`darwin` track `nixpkgs` via `follows`). Re-enable b
 >   `gh` is missing or unauthenticated). Also aliased as `nixpkg-review-post`.
 > - **`cdroot`** — `cd` to the current git repo's top level (`git rev-parse --show-toplevel`).
 
+> **Claude Code is WSL-only.** `programs.claude-code` sits in `common/`, but only
+> `home/profiles/KangaZero/linux.nix` imports it — `server` (also `x86_64-linux`) does not. On
+> darwin the import in `darwin.nix` **and** the `"claude-code"` entry in `lib/mkDarwin.nix`'s
+> `allowUnfreePredicate` both need uncommenting; it is unfree, so the import alone fails eval.
+
 > **The WSL host is now CLI-only.** `firefox`, `kitty`, `weston`, and the `niri`/`noctalia`
 > imports are commented out in `home/profiles/KangaZero/linux.nix` purely to cut WSL build
 > time — WSL is driven as a terminal (Windows Terminal / WSLg), not a Wayland desktop. This is
@@ -161,9 +181,9 @@ longer listed per-host — `mkNixOS` imports it for every NixOS host.)
 | **Secrets / polkit** | gnome-keyring (unlocked via greetd PAM), `security.polkit`, polkit-gnome user agent bound to `graphical-session.target`; GnuPG agent (`gnupg.agent`, SSH support enabled) |
 | **Fonts** | `nerd-fonts.jetbrains-mono` + Noto (`noto-fonts`, `-cjk-sans`, `-cjk-serif`, `-color-emoji`), fontconfig `defaultFonts` (mono JetBrainsMono NF, CJK Noto) |
 | **Portals** | `xdg-desktop-portal-gtk` + `-gnome` |
-| **GC** | weekly, `--delete-older-than 30d` (WSL is daily / 7d) |
+| **GC** | `programs.nh.clean`, weekly, `--keep 5 --keep-since 30d` — the only host that overrides the base retention (`programs.nh.clean.extraArgs` in `hosts/server/default.nix`; the base value is `lib.mkDefault`, so a plain assignment wins instead of erroring on a merge conflict). WSL takes the base window |
 | **Dropped vs old box** | fcitx5/ja input, Steam |
-| **Aliases** | `nix-switch`/`nh-switch`/`nh-build`/`home-switch`/`edit-nix`/`nvim-dev` — shared with WSL via `home/modules/linux/zsh-aliases.nix`; `${hostname}` injected at eval time so WSL targets `#nixos`, server targets `#server` |
+| **Aliases** | `nh-switch`/`nh-build`/`nh-test`/`nh-boot`/`nh-rollback`/`nh-info` (primary) + `nix-switch`/`home-switch`/`edit-nix`/`nvim-dev` — shared with WSL via `home/modules/linux/zsh-aliases.nix`. The `nh-*` aliases take **no flake argument**: `programs.nh.flake` exports `NH_FLAKE` and nh resolves the attribute from the running hostname, so nothing host-specific is interpolated. `${hostname}` is still injected into the legacy `nix-switch` alias (WSL → `#nixos`, server → `#server`) |
 
 Because home-manager is wired through `nixos-rebuild`, home-only tweaks can also be applied fast
 without sudo/reboot via the standalone `homeConfigurations."KangaZero"` output — see
@@ -171,10 +191,66 @@ without sudo/reboot via the standalone `homeConfigurations."KangaZero"` output �
 
 ---
 
+## Garbage Collection (`nh`)
+
+Store cleanup runs through **[`nh`](https://github.com/nix-community/nh)** on every host.
+`nh clean all` sweeps every profile (system, home-manager, per-user) plus gcroots and then the
+store in one pass, and its `--keep` is a generation *floor* on top of the `--keep-since` age
+window — whichever keeps more wins, so a rollback target always survives.
+
+| Host | Mechanism | Schedule | Retention |
+|---|---|---|---|
+| `nixos` (WSL) | `programs.nh.clean` → systemd `nh-clean` service + timer | weekly, `Persistent = true` | `--keep 3 --keep-since 7d` |
+| `server` | same | weekly | `--keep 3 --keep-since 30d` (age window only) |
+| `KangaZero` (macOS) | root `launchd.daemons.nh-clean` (hand-rolled) | Sundays 15:00 | `--keep 3 --keep-since 7d` |
+
+Base policy is `lib.mkDefault` in **`modules/nixos/nh.nix`**, so a host overrides it with a plain
+assignment (`programs.nh.clean.extraArgs` in `hosts/server/default.nix`). Without `mkDefault` the
+two definitions sit at equal priority and the merge is a hard eval error, not a silent win.
+
+> [!WARNING]
+> `extraArgs` must be set explicitly. It defaults to `""`, and nh's own defaults are
+> `--keep 1 --keep-since 0h` — enabling `clean` without it prunes a host to a single generation.
+> Also keep `nix.gc.automatic` off: the module only *warns* on the conflict, so both timers would
+> run and contend for the store lock.
+
+### macOS
+
+nix-darwin ships no `programs.nh`, and `nix.enable = false` here (Determinate installer owns the
+daemon) leaves no `nix.gc` either, so it takes two pieces:
+
+- **`modules/darwin/nh-clean.nix`** — root `launchd.daemons.nh-clean` running `nh clean all`. Root
+  is required for `/nix/var/nix/profiles/system`, where `darwin-rebuild` generations live.
+  `environment.PATH` is explicit because a launchd daemon starts with a near-empty environment and
+  nh shells out to the Determinate `nix` in `/nix/var/nix/profiles/default/bin`. `RunAtLoad` is off
+  so a GC can't race an activation for the store lock. Logs to `/var/log/nh-clean.log`.
+- **`home/modules/darwin/nh.nix`** — home-manager `programs.nh`, for `NH_DARWIN_FLAKE` only.
+  `clean.enable = false`: it could schedule only `nh clean user` (unprivileged agent), which the
+  root sweep already covers — both would mean two GCs on one store lock.
+
+### Manual sweep
+
+`nix-gc` is a shell function in `home/modules/common/shell/shell-functions.sh`, loaded on **all**
+hosts (it was previously Linux-only):
+
+```sh
+nix-gc          # nh clean all --keep 3 --keep-since 7d   (default window)
+nix-gc 30d      # nh clean all --keep 3 --keep-since 30d
+nh clean all -n # dry run — print what would be removed, remove nothing
+nh clean all -a # ask for confirmation per profile
+```
+
+> [!NOTE]
+> `nh` comes from `programs.nh` — the **system** config on NixOS, the **darwin** home profile on
+> macOS. The standalone `homeConfigurations."KangaZero"` output does not include it, so `nix-gc`
+> there fails with a hint pointing at `nix run nixpkgs#nh -- clean all ...`.
+
+---
+
 ## Setup & Usage
 
 > [!NOTE]
-> **Repo location expected by shell aliases:** `~/.config/multi-nix`
+> Every command below assumes the repo is at `~/.config/multi-nix` — see the note at the top.
 
 ---
 
@@ -206,31 +282,40 @@ cd ~/.config/multi-nix
 nix run nix-darwin/master -- switch --flake .#KangaZero
 ```
 
-**4. Day-to-day rebuilds**
+**4. Day-to-day rebuilds — `nh` is the primary path**
 
 ```sh
-# Shell aliases set by this config (work from anywhere):
+# nh aliases (work from anywhere; no flake argument — programs.nh.darwinFlake
+# exports NH_DARWIN_FLAKE):
+nh-switch    # nh darwin switch   (prettier output + nvd closure diff)
+nh-build     # nh darwin build
+nh-repl      # nh darwin repl
+
+# Native fallback, kept for the subcommands nh's darwin driver lacks:
 nix-switch   # sudo darwin-rebuild switch --flake ~/.config/multi-nix#KangaZero
 nix-build    # darwin-rebuild build   --flake ~/.config/multi-nix#KangaZero
-nh-switch    # nh os switch ~/.config/multi-nix#KangaZero  (prettier output + nvd diff)
-nh-build     # nh os build  ~/.config/multi-nix#KangaZero
-
-# Directly from the repo:
-darwin-rebuild switch --flake .#KangaZero
-nh os switch .#KangaZero
 ```
+
+> [!NOTE]
+> macOS uses `nh darwin`, not `nh os` — in nh 4.x `os` is NixOS-only.
 
 **5. Dry-run / build check (no activation)**
 
 ```sh
-darwin-rebuild build --flake .#KangaZero
+nh-build                                  # nh darwin build
+darwin-rebuild build --flake .#KangaZero  # equivalent, native
 ```
 
 **6. Roll back** the last activation if something breaks
 
 ```sh
-sudo darwin-rebuild switch --rollback
+nix-rollback   # sudo darwin-rebuild switch --rollback
 ```
+
+> [!NOTE]
+> Rollback stays on `darwin-rebuild`. nh 4.4.2's `darwin` subcommand implements only
+> `switch` / `build` / `repl` — there is no `nh darwin rollback` or `nh darwin info`
+> (the NixOS driver has both). Verify with `nh darwin --help` before assuming parity.
 
 ---
 
@@ -267,30 +352,36 @@ Restart the instance after the first switch so shell and user settings take effe
 wsl --terminate NixOS && wsl -d NixOS
 ```
 
-**4. Day-to-day rebuilds**
+**4. Day-to-day rebuilds — `nh` is the primary path**
 
 ```sh
-sudo nixos-rebuild switch --flake ~/.config/multi-nix#nixos
-# or from inside the repo:
-sudo nixos-rebuild switch --flake .#nixos
+# nh aliases (work from anywhere; no flake argument — programs.nh.flake exports
+# NH_FLAKE, and nh resolves the attribute from the running hostname):
+nh-switch    # nh os switch   (prettier output + nvd closure diff)
+nh-build     # nh os build
+nh-test      # nh os test     — activate without touching the boot default
+nh-boot      # nh os boot     — stage for next boot, don't activate now
+nh-info      # nh os info     — list generations
 
-# Shell aliases (work from anywhere):
+# Native fallback:
 nix-switch   # sudo nixos-rebuild switch --flake ~/.config/multi-nix#nixos
-nh-switch    # nh os switch ~/.config/multi-nix#nixos  (prettier output + nvd diff)
-nh-build     # nh os build  ~/.config/multi-nix#nixos
 ```
 
 **5. Dry-run / build check (no activation)**
 
 ```sh
+nh-build                              # nh os build
 nixos-rebuild dry-build --flake .#nixos
 ```
 
 **6. Roll back** if something breaks
 
 ```sh
+nh-rollback   # nh os rollback
+nh-info       # nh os info — inspect generations first
+
+# Native equivalents / pick a specific generation:
 sudo nixos-rebuild switch --rollback
-# or pick a specific generation:
 sudo nix-env --list-generations --profile /nix/var/nix/profiles/system
 sudo nixos-rebuild switch --profile /nix/var/nix/profiles/system-<N>-link
 ```
@@ -346,12 +437,16 @@ reboot
 **6. Day-to-day rebuilds**
 
 ```sh
+nh os switch                 # NH_FLAKE + hostname are already set by programs.nh
+# native fallback:
 sudo nixos-rebuild switch --flake ~/.config/multi-nix#<hostname>
 ```
 
 **7. Roll back**
 
 ```sh
+nh os rollback
+# native fallback:
 sudo nixos-rebuild switch --rollback
 ```
 
@@ -390,11 +485,15 @@ reboot
 **2. Day-to-day system rebuilds** (bootloader/greetd/daemons):
 
 ```sh
-sudo nixos-rebuild switch --flake ~/.config/multi-nix#server
-# server-local aliases (after first switch):
+# server-local aliases (after first switch) — nh first:
+nh-switch    # nh os switch
+nh-build     # nh os build
+nh-rollback  # nh os rollback
+nh-info      # nh os info
+
+# native fallback:
 nix-switch   # sudo nixos-rebuild switch --flake ~/.config/multi-nix#server
-nh-switch    # nh os switch ~/.config/multi-nix#server
-nh-build     # nh os build  ~/.config/multi-nix#server
+sudo nixos-rebuild switch --flake ~/.config/multi-nix#server
 ```
 
 Reboot once after the first switch (bootloader + greetd), then pick the **niri** session in
@@ -425,10 +524,14 @@ Apply:
 
 ```sh
 home-switch   # home-manager switch --flake ~/.config/multi-nix#KangaZero  (server-local alias)
-# or
+# or, via nh (NH_FLAKE is already exported, so the path is optional):
+nh home switch -c KangaZero
+# native:
 home-manager switch --flake ~/.config/multi-nix#KangaZero
-nh home switch ~/.config/multi-nix#KangaZero
 ```
+
+> `nh home` needs `-c/--configuration` here: the home output is keyed `KangaZero` (the Linux
+> username), which does not match the `server` hostname nh would otherwise guess.
 
 > System-level pieces (greetd, PipeWire, CUPS, fonts, kernel) still require `nixos-rebuild switch`.
 > Both paths read the same `home/profiles/server/linux.nix`, so they don't fight — but don't hand-
@@ -439,24 +542,28 @@ nh home switch ~/.config/multi-nix#KangaZero
 
 ### Rebuild quick reference
 
-| Platform | Command |
-|---|---|
-| macOS — switch | `darwin-rebuild switch --flake .#KangaZero` |
-| macOS — alias | `nix-switch` |
-| macOS — nh alias | `nh-switch` / `nh-build` |
-| macOS — build only | `darwin-rebuild build --flake .#KangaZero` |
-| macOS — rollback | `sudo darwin-rebuild switch --rollback` |
-| NixOS WSL — switch | `sudo nixos-rebuild switch --flake .#nixos` |
-| NixOS WSL — alias | `nix-switch` |
-| NixOS WSL — nh alias | `nh-switch` / `nh-build` |
-| NixOS WSL — build only | `nixos-rebuild dry-build --flake .#nixos` |
-| NixOS WSL/bare — rollback | `sudo nixos-rebuild switch --rollback` |
-| NixOS server — switch | `sudo nixos-rebuild switch --flake .#server` (alias `nix-switch`) |
-| NixOS server — nh alias | `nh-switch` / `nh-build` |
-| NixOS server — home-only (no sudo) | `home-manager switch --flake .#KangaZero` (alias `home-switch`) |
-| NixOS server — remote | `nixos-rebuild switch --flake .#server --target-host user@host --use-remote-sudo` |
-| kitty wrapper | `nix run .#kitty` |
-| nvim live config (no rebuild) | `nvim-dev` (alias for `NVIM_APPNAME=multi-nix/home/modules/common/neovim/config nvim`) |
+`nh` is the primary driver on every host. None of the `nh-*` aliases take a flake argument —
+`programs.nh` exports `NH_FLAKE` (NixOS) / `NH_DARWIN_FLAKE` (darwin), and nh resolves the
+attribute from the hostname.
+
+| Task | nh (primary) | Native fallback |
+|---|---|---|
+| macOS — switch | `nh-switch` → `nh darwin switch` | `sudo darwin-rebuild switch --flake .#KangaZero` (alias `nix-switch`) |
+| macOS — build only | `nh-build` → `nh darwin build` | `darwin-rebuild build --flake .#KangaZero` |
+| macOS — repl | `nh-repl` → `nh darwin repl` | — |
+| macOS — rollback | **n/a** — no `nh darwin rollback` in nh 4.4.2 | `nix-rollback` → `sudo darwin-rebuild switch --rollback` |
+| macOS — list generations | **n/a** — no `nh darwin info` | `nix-env --list-generations --profile /nix/var/nix/profiles/system` |
+| NixOS WSL/server — switch | `nh-switch` → `nh os switch` | `sudo nixos-rebuild switch --flake .#<host>` (alias `nix-switch`) |
+| NixOS WSL/server — build only | `nh-build` → `nh os build` | `nixos-rebuild dry-build --flake .#<host>` |
+| NixOS WSL/server — activate, keep boot default | `nh-test` → `nh os test` | `sudo nixos-rebuild test` |
+| NixOS WSL/server — stage for next boot | `nh-boot` → `nh os boot` | `sudo nixos-rebuild boot` |
+| NixOS WSL/server — rollback | `nh-rollback` → `nh os rollback` | `sudo nixos-rebuild switch --rollback` |
+| NixOS WSL/server — list generations | `nh-info` → `nh os info` | `nix-env --list-generations --profile /nix/var/nix/profiles/system` |
+| Any host — garbage collect now | `nix-gc [age]` → `nh clean all --keep 3 --keep-since <age>` | — |
+| NixOS server — home-only (no sudo) | `nh home switch -c KangaZero` | `home-manager switch --flake .#KangaZero` (alias `home-switch`) |
+| NixOS server — remote | — | `nixos-rebuild switch --flake .#server --target-host user@host --use-remote-sudo` |
+| kitty wrapper | — | `nix run .#kitty` |
+| nvim live config (no rebuild) | — | `nvim-dev` (alias for `NVIM_APPNAME=multi-nix/home/modules/common/neovim/config nvim`) |
 
 ## Repository Structure
 
@@ -474,7 +581,7 @@ multi-nix/
 │
 ├── hosts/
 │   ├── KangaZero/default.nix         # macOS M4 — hostname, spotlight, shell aliases
-│   ├── nixos/                        # NixOS WSL2 — wsl opts, sshd, gc, linger, uinput
+│   ├── nixos/                        # NixOS WSL2 — wsl opts, sshd, linger, uinput (GC via modules/nixos/nh.nix)
 │   │   ├── default.nix
 │   │   └── hardware.nix              # WSL: uinput module load
 │   └── server/                       # NixOS bare-metal desktop
@@ -485,14 +592,16 @@ multi-nix/
 │   ├── darwin/                       # nix-darwin system modules
 │   │   ├── homebrew.nix              # nix-homebrew + taps + trust
 │   │   ├── settings.nix              # macOS system defaults
-│   │   └── applications.nix          # Spotlight alias activation script
+│   │   ├── applications.nix          # Spotlight alias activation script
+│   │   └── nh-clean.nix              # root launchd daemon: `nh clean all` weekly (no programs.nh on darwin)
 │   ├── nixos/                        # NixOS system modules
 │   │   ├── nix-ld.nix                # programs.nix-ld — imported by mkNixOS (all NixOS hosts)
+│   │   ├── nh.nix                    # programs.nh + clean timer — imported by mkNixOS; base retention (mkDefault)
 │   │   ├── graphics.nix              # hardware.graphics.enable32Bit — `server` only
 │   │   └── wayland/
 │   │       └── niri.nix              # programs.niri + xwayland (system level)
 │   └── shared/
-│       └── nix-settings.nix          # experimental-features, registry, gc — both platforms
+│       └── nix-settings.nix          # experimental-features, registry, nixPath — both platforms
 │
 ├── home/
 │   ├── profiles/
@@ -523,27 +632,30 @@ multi-nix/
 │       │   ├── packages/
 │       │   │   ├── common.nix        # Shared: fzf, ripgrep, bat, eza, jq, btop,
 │       │   │   │                     #   nodejs_26, rustup, python3, just,
-│       │   │   │                     #   nerd-fonts, gh, nh
+│       │   │   │                     #   nerd-fonts, gh (nh now via programs.nh)
 │       │   │   └── ns-script.nix     # nix-search-tv shell wrapper
 │       │   ├── slop/
 │       │   │   ├── claude-code.nix    # programs.claude-code — settings → ~/.claude/settings.json
 │       │   │   └── settings.json      # Claude Code settings (model, hooks, plugins, output style)
 │       │   └── shell/
-│       │       └── zsh-core.nix      # Shared zsh: completion, autosuggestion,
-│       │                             #   syntaxHighlighting, history
+│       │       ├── zsh-core.nix      # Shared zsh: completion, autosuggestion,
+│       │       │                     #   syntaxHighlighting, history
+│       │       └── shell-functions.sh # All-host helpers: cdroot, nix-shell-init,
+│       │                             #   nixpkg-review-post, nix-gc (nh clean all)
 │       ├── darwin/                   # macOS home-manager modules
 │       │   ├── packages.nix          # ani-cli, _7zz, imagemagick, odysseus-dev, etc.
 │       │   ├── shell.nix             # brew shellenv, mac aliases
 │       │   ├── discord.nix           # programs.discord (devtools flag, skip host update)
 │       │   ├── man.nix               # programs.man
+│       │   ├── nh.nix                # programs.nh (HM) — NH_DARWIN_FLAKE only; clean off (root daemon owns it)
 │       │   ├── opencode.nix          # programs.opencode — shadcn + playwright MCP, nodejs/pnpm/typescript toolchain
 │       │   └── ollama.nix            # ollama (Metal) — launchd agent (port 11434)
 │       └── linux/                    # Linux home-manager modules
 │           ├── packages.nix          # azure-cli (+ devops + containerapp exts), openssh, wget, tldr, gcc, gnumake, wl-clipboard (uv removed — now per-project)
 │           ├── ollama.nix            # ollama-vulkan — systemd user service (port 11434)
 │           ├── bash.nix              # zsh trampoline
-│           ├── shell.nix             # linux-specific aliases (ez, nixRebuildStatus/Kill, cheatsheet-az) + shell helpers (weston fn, kill-port, nix-gc, ff)
-│           ├── zsh-aliases.nix       # rebuild/switch aliases (nix-switch, nh-switch, nh-build, home-switch, edit-nix, nvim-dev) — single source, hostname-aware
+│           ├── shell.nix             # linux-specific aliases (ez, nixRebuildStatus/Kill, cheatsheet-az) + shell helpers (weston fn, kill-port, ff)
+│           ├── zsh-aliases.nix       # rebuild aliases — nh-switch/build/test/boot/rollback/info (no flake arg) + nix-switch, home-switch, edit-nix, nvim-dev
 │           ├── weston.nix            # Weston compositor bridge (WSL only — not imported by server)
 │           └── wayland/
 │               └── niri/             # Niri KDL + noctalia v5 (shared by WSL + server); settings as Nix attrset in noctalia.nix
@@ -639,16 +751,21 @@ nixfmt --check .
 Every activation creates a new generation. If something breaks, roll back instantly:
 
 ```sh
-# macOS
-sudo darwin-rebuild switch --rollback
+# NixOS (all variants) — nh
+nh os info        # list generations (alias nh-info)
+nh os rollback    # step back one generation (alias nh-rollback)
 
-# NixOS (all variants)
+# macOS — nh 4.4.2 has no `nh darwin rollback`; use darwin-rebuild
+sudo darwin-rebuild switch --rollback     # alias nix-rollback
+
+# NixOS — native / pick a specific generation
 sudo nixos-rebuild switch --rollback
-
-# NixOS — pick a specific generation
 nix-env --list-generations --profile /nix/var/nix/profiles/system
 sudo nixos-rebuild switch --profile /nix/var/nix/profiles/system-<N>-link
 ```
+
+> The `nh clean` timers keep at least 3 generations on every host regardless of the age cutoff, so
+> a rollback target always survives GC — see [Garbage Collection](#garbage-collection-nh).
 
 ---
 
@@ -804,7 +921,9 @@ This repo consolidates two existing configs:
 ### packages split
 
 Common subset extracted to `home/modules/common/packages/common.nix`:
-`fzf`, `ripgrep`, `bat`, `eza`, `curl`, `jq`, `btop`, `fd`, `nerd-fonts.jetbrains-mono`, `gh`, `nh`.
+`fzf`, `ripgrep`, `bat`, `eza`, `curl`, `jq`, `btop`, `fd`, `nerd-fonts.jetbrains-mono`, `gh`.
+`nh` moved to `programs.nh` (`modules/nixos/nh.nix` on NixOS, `home/modules/darwin/nh.nix` on
+darwin), which also exports `NH_FLAKE`/`NH_DARWIN_FLAKE` and owns the GC timer.
 The language toolchains (`nodejs_26`, `pnpm`, `rustup`, `python3`, `just`) are **commented out** —
 now sourced from per-project `nix develop` shells (see the note under [Defaults](#defaults)).
 
@@ -837,8 +956,9 @@ Run these before any significant change to confirm everything evaluates clean:
 
 ```sh
 nix flake check                                                    # all outputs
-darwin-rebuild build --flake .#KangaZero        # macOS dry-run
-nixos-rebuild dry-build --flake .#nixos            # NixOS WSL dry-run
+nh darwin build                                                    # macOS dry-run (or darwin-rebuild build --flake .#KangaZero)
+nh os build                                                        # NixOS dry-run  (or nixos-rebuild dry-build --flake .#nixos)
+nix-gc                                                             # nh clean all --keep 3 --keep-since 7d
 nix run .#kitty                                                    # kitty wrapper
 statix check . && deadnix . && nixfmt --check .                   # lints
 ```

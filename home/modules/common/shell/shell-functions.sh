@@ -174,3 +174,25 @@ NIX_FLAKE_TEMPLATE
     echo "nix-shell-init: created flake.nix + .envrc"
 }
 
+
+# manual store GC — the on-demand twin of the scheduled nh clean timers
+# (programs.nh.clean on NixOS, launchd.daemons.nh-clean on darwin).
+#
+# `nh clean all` replaces `nix-collect-garbage && nix store gc`: it walks every
+# profile (system, home-manager, per-user) plus gcroots, then runs the store GC in
+# one pass. --keep is a generation *floor*, so a long gap between rebuilds can
+# never leave the host with a single rollback target — the failure mode of a
+# bare --delete-older-than.
+#
+# nh comes from programs.nh, which is wired per-platform (modules/nixos/nh.nix,
+# home/modules/darwin/nh.nix). The standalone homeConfigurations output does NOT
+# include it, so on a shared host activated that way nh may be absent — fail with
+# a usable message instead of "command not found".
+function nix-gc() {
+    if ! command -v nh >/dev/null 2>&1; then
+        echo "nix-gc: nh not on PATH (standalone home-manager activation does not install it)" >&2
+        echo "        one-off: nix run nixpkgs#nh -- clean all --keep 3 --keep-since ${1:-7d}" >&2
+        return 1
+    fi
+    nh clean all --keep 3 --keep-since "${1:-7d}"
+}

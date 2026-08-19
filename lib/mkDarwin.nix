@@ -36,6 +36,8 @@ inputs.darwin.lib.darwinSystem {
     ../modules/darwin/homebrew.nix
     ../modules/darwin/settings.nix
     ../modules/darwin/applications.nix
+    # Root-level `nh clean all` timer — nix-darwin has no programs.nh/nix.gc.
+    ../modules/darwin/nh-clean.nix
     ../hosts/${hostname}/default.nix
     inputs.home-manager.darwinModules.home-manager
     inputs.nix-homebrew.darwinModules.nix-homebrew

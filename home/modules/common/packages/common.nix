@@ -18,6 +18,5 @@
     # just
     # uv
     nerd-fonts.jetbrains-mono
-    nh
   ];
 }

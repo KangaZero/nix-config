@@ -11,9 +11,6 @@ _: {
         # preventing the double-cursor artifact in nested compositor mode.
         XCURSOR_THEME=Bibata-Modern-Classic XCURSOR_SIZE=24 command weston --fullscreen -- niri
       }
-      nix-gc() {
-        nix-collect-garbage --delete-older-than "$1" && nix store gc;
-      }
       kill-port() {
         local port="$1"
         [ -z "$port" ] && { echo "usage: kill-port <port>" >&2; return 1; }

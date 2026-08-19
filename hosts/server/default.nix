@@ -163,14 +163,11 @@
   environment.systemPackages = [ pkgs.brightnessctl ];
 
   # ─── Nix GC ──────────────────────────────────────────────────────────────────────
-  nix = {
-    gc = {
-      automatic = true;
-      dates = "daily";
-      options = "--delete-older-than 30d";
-    };
-    settings.auto-optimise-store = true;
-  };
+  # Bare metal has the disk to keep a longer rollback window than the base
+  # module's default; only the age cutoff differs, the generation floor is shared.
+  programs.nh.clean.extraArgs = "--keep 3 --keep-since 30d";
+
+  nix.settings.auto-optimise-store = true;
 
   system.stateVersion = "26.11";
 }

@@ -75,14 +75,9 @@
     };
   };
 
-  nix = {
-    gc = {
-      automatic = true;
-      dates = "daily";
-      options = "--delete-older-than 7d";
-    };
-    settings.auto-optimise-store = true;
-  };
+  # GC is programs.nh.clean, set in modules/nixos/nh.nix. This host takes the
+  # base retention policy unchanged.
+  nix.settings.auto-optimise-store = true;
 
   environment.variables.EDITOR = "nvim";
 

@@ -36,6 +36,8 @@ inputs.nixpkgs.lib.nixosSystem {
     # INFO: nix-ld runs unpatched dynamic binaries on NixOS. Every NixOS host here
     # (WSL + bare metal) wants it, so it lives in the base module set.
     ../modules/nixos/nix-ld.nix
+    # Store GC for every NixOS host. Per-host retention lives in hosts/<h>/default.nix.
+    ../modules/nixos/nh.nix
     ../hosts/${hostname}/hardware.nix
     ../hosts/${hostname}/default.nix
     inputs.home-manager.nixosModules.home-manager
