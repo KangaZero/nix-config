@@ -8,6 +8,7 @@
 }:
 {
   imports = [
+    ../../modules/common/atuin.nix
     ../../modules/common/git.nix
     ../../modules/common/direnv.nix
     # Commented out as not in use and to reduce bulid time

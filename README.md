@@ -72,6 +72,7 @@ nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
 | **Font** | `nerd-fonts.jetbrains-mono` | — | `fonts.fontconfig.enable = true` |
 | **Multiplexer** | zellij | — | — |
 | **Nav** | zoxide | — | — |
+| **Shell history** | atuin — `programs.atuin`, zsh integration, `search_mode = "fuzzy"`, `keymap_mode = "vim-normal"`, `dialect = "uk"`, sync/update-check off (fully local). Ships a declarative theme `tokyonight-kanga` via `programs.atuin.themes` (→ `~/.config/atuin/themes/tokyonight-kanga.toml`), activated by `settings.theme.name` — Tokyo Night Moon body + Dracula purple accent, matching kitty/yazi/oh-my-posh | — | — |
 | **File manager** | yazi — `programs.yazi`, Tokyo Night flavor (matches kitty), `y` shell wrapper (cd-on-quit), `show_hidden = true`, `[mgr]`/`[preview]` tuned, custom `prepend_keymap` (`gh`/`gc`/`gd` jumps, `.` toggle hidden, `!` shell) | — | — |
 | **Claude Code** | `programs.claude-code` — `settings` from `slop/settings.json` → `~/.claude/settings.json` (opus model, Learning output style, vim editor, hooks, enabled LSP plugins) | — | — |
 | **OpenCode** (AI coding agent) | — | `programs.opencode` (`opencode.nix`) — two local MCP servers (`shadcn` = `npx -y shadcn@latest mcp`, also serves the `@canvas-ui` registry; `playwright` = `npx -y @playwright/mcp`), `enableMcpIntegration = true`, `web.enable = false`. `extraPackages = [ nodejs pnpm typescript ]` — bundled into **opencode's own wrapper PATH** (`npx` launches the MCP servers), not the global profile, so the "no global toolchains" rule below still holds | — |
@@ -509,6 +510,8 @@ multi-nix/
 │       │   │   └── config/           # Standalone nvim config (init.lua, lua/, scripts/…)
 │       │   ├── zellij.nix            # zjstatus layout
 │       │   ├── zoxide.nix
+│       │   ├── atuin.nix             # Shell history — local-only, vim-normal keymap,
+│       │   │                         #   declarative `tokyonight-kanga` theme
 │       │   ├── lazygit.nix
 │       │   ├── packages/
 │       │   │   ├── common.nix        # Shared: fzf, ripgrep, bat, eza, jq, btop,
