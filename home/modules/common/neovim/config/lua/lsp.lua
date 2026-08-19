@@ -179,46 +179,50 @@ vim.lsp.config("eslint", {
 	},
 })
 
---INFO: see for official config https://nix-community.github.io/nixd/md_nixd_2docs_2configuration.html
-local nixd_host = vim.uv.os_gethostname()
-local nixd_user = vim.uv.os_get_passwd().username
-local nixd_opts
+--INFO: official config schema
+-- https://github.com/nix-community/nixd/blob/main/nixd/docs/configuration.md
+--
+-- Flake attr names track networking.hostName (hosts/*/default.nix + the nixos-wsl
+-- default), so the live hostname is the config key. Strip any DNS/mDNS suffix
+-- (macOS can hand back "host.local") before using it as an attr path.
+local nixd_host = vim.uv.os_gethostname():gsub("%..*$", "")
+local nixd_ref = string.format('(builtins.getFlake "%s")', vim.fn.expand("~/.config/multi-nix"))
 
-if is_nixos then
-	-- NixOS (WSL or bare metal)
-	local ref = string.format('(builtins.getFlake "%s")', vim.fn.expand("~/.config/multi-nix"))
-	local options = {
-		nixos = { expr = string.format("%s.nixosConfigurations.%s.options", ref, nixd_host) },
-		home_manager = {
-			expr = string.format("%s.nixosConfigurations.%s.options.home-manager.users.%s", ref, nixd_host, nixd_user),
-		},
-	}
-	if vim.fn.has("wsl") == 1 then
-		options.nixos_wsl = { expr = string.format("%s.nixosConfigurations.%s.options.wsl", ref, nixd_host) }
-	end
-	nixd_opts = {
-		nixpkgs = { expr = string.format("import %s.inputs.nixpkgs { }", ref) },
-		formatting = { command = { "nixfmt" } },
-		options = options,
-	}
-elseif vim.fn.has("mac") == 1 then
-	-- macOS: nix-darwin flake , home-manager embedded as darwin module
-	local ref = string.format('(builtins.getFlake "%s")', vim.fn.expand("~/.config/multi-nix"))
-	nixd_opts = {
-		nixpkgs = { expr = string.format("import %s.inputs.nixpkgs { }", ref) },
+-- home-manager is used as a NixOS / nix-darwin *module* here, not standalone — that's
+-- case "B" in nixd's docs. The per-user option tree therefore sits behind the `users`
+-- submodule type: `options.home-manager.users.<username>` does NOT exist (that node only
+-- carries _type/type/value/declarations/...), so it evaluated to
+-- `error: attribute '<username>' missing` and nixd silently served zero HM completions.
+-- `.users.type.getSubOptions []` unwraps the submodule into real option declarations.
+local function nixd_hm_expr(flake_attr)
+	return string.format("%s.%s.%s.options.home-manager.users.type.getSubOptions []", nixd_ref, flake_attr, nixd_host)
+end
+
+-- One `options` entry == one lazy full-config eval (nixpkgs alone is 200~300MB of names
+-- per nixd's docs), so keep the map minimal: a `nixos_wsl` entry pointing at
+-- `options.wsl` is already covered by the `nixos` entry's option tree.
+-- `options` keys are arbitrary labels (nixd merges every entry for completion), but each
+-- entry is one lazy full-config eval — nixpkgs alone is 200~300MB of names per nixd's
+-- docs — so keep the map minimal: the dropped `nixos_wsl` entry pointed at `options.wsl`,
+-- which the `nixos` entry's option tree already contains.
+local function nixd_settings(hostname, flake_attr)
+	return {
+		nixpkgs = { expr = string.format("import %s.inputs.nixpkgs { }", nixd_ref) },
 		formatting = { command = { "nixfmt" } },
 		options = {
-			nixos = { expr = string.format("%s.darwinConfigurations.%s.options", ref, nixd_host) },
-			home_manager = {
-				expr = string.format(
-					"%s.darwinConfigurations.%s.options.home-manager.users.%s",
-					ref,
-					nixd_host,
-					nixd_user
-				),
-			},
+			[hostname] = { expr = string.format("%s.%s.%s.options", nixd_ref, flake_attr, nixd_host) },
+			["home-manager"] = { expr = nixd_hm_expr(flake_attr) },
 		},
 	}
+end
+
+local nixd_opts
+if is_nixos then
+	-- NixOS (WSL or bare metal)
+	nixd_opts = nixd_settings("nixos", "nixosConfigurations")
+elseif vim.fn.has("mac") == 1 then
+	-- macOS: nix-darwin flake, home-manager embedded as a darwin module
+	nixd_opts = nixd_settings("darwin", "darwinConfigurations")
 end
 
 vim.lsp.config("nixd", {
