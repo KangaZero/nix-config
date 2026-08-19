@@ -47,7 +47,7 @@ new experimental message UI (`vim._core.ui2`). Requires **Neovim ≥ 0.12** (sta
 | **fzf** | Telescope find files |
 | **yazi** | file manager integration (`<leader><leader>`, `<leader>E`) |
 | **lazygit** | floating git UI (`<leader>gg`) |
-| **Ollama** (macOS only) | local LLM for AI ghost-text completion (`avante.nvim`) |
+| **Ollama** (macOS only) | local LLM for AI ghost-text completion (`avante.nvim`) — booted on demand via `:AvanteEnable`, never at startup |
 | **node / cargo / etc.** | runtimes for the LSP servers you enable |
 
 All optional external tools are guarded with `vim.fn.executable(...)`, so missing
@@ -72,7 +72,8 @@ manager.
 
 LSP servers are installed/managed by **mason** + **mason-lspconfig** (see
 `ensure_installed` in `lua/lsp.lua`), with server settings applied through the native
-`vim.lsp.config(...)` API.
+`vim.lsp.config(...)` API. On NixOS `ensure_installed` is empty — every server comes from
+Nix (`neovim.nix`) and Mason is kept for its UI only.
 
 ---
 
@@ -159,7 +160,7 @@ them; they are intended to play **no role** in the active config right now:
 | [nvim-lspconfig](https://github.com/neovim/nvim-lspconfig) | LSP server definitions |
 | [blink.cmp](https://github.com/saghen/blink.cmp) | completion engine (lazy on `InsertEnter`) |
 | [conform.nvim](https://github.com/stevearc/conform.nvim) | format-on-save by filetype |
-| [avante.nvim](https://github.com/yetone/avante.nvim) | AI ghost-text completion via local Ollama (macOS only, Copilot-style) |
+| [avante.nvim](https://github.com/yetone/avante.nvim) | AI ghost-text completion via local Ollama (macOS only, Copilot-style). Inert until `:AvanteEnable` — that command checks `ollama` is installed/running and the model is pulled, then flips `auto_suggestions` on, so Ollama never loads at startup |
 | [nui.nvim](https://github.com/MunifTanjim/nui.nvim) | UI components (avante.nvim dep) |
 | [opencode.nvim](https://github.com/nickjvandyke/opencode.nvim) | OpenCode integration (`<leader>oa` ask, `<leader>os` select, `go`/`goo` append operators, `<S-C-u>`/`<S-C-d>` scroll) |
 | [markview.nvim](https://github.com/OXY2DEV/markview.nvim) | in-buffer markdown rendering |
@@ -196,7 +197,14 @@ aimed at:
 - **Rust** — `rust_analyzer` (+ `rustfmt`)
 - **C / C++** — `clangd`
 - **Bash / shell** — `bashls` (`sh`, `bash`, `zsh`)
-- **Nix** — `nixd` (flake-aware: resolves host + user at runtime against `/etc/nixos`)
+- **Nix** — `nixd` (flake-aware). Settings are built at startup from the live hostname
+  (`vim.uv.os_gethostname()`, DNS suffix stripped) against the flake at `~/.config/multi-nix`, so
+  the same file serves `nixos` / `server` / `KangaZero`. Three exprs: `nixpkgs` (`import
+  <flake>.inputs.nixpkgs { }`), `options.nixos` (or `options.darwin` on macOS), and
+  `options.home-manager`. Home Manager runs as a NixOS/nix-darwin **module** here, so its option
+  tree is reached via `options.home-manager.users.type.getSubOptions []` — see
+  [nixd's configuration docs](https://github.com/nix-community/nixd/blob/main/nixd/docs/configuration.md)
+  (case "B")
 - **Swift** — `sourcekit` (enabled, expects a system install)
 
 Formatters (`conform.nvim`): `stylua` (lua), `ruff` (python), `rustfmt` (rust),
@@ -296,7 +304,8 @@ configured LSP servers. Restart once after the initial sync.
 
 `~/.config/nvim` is the rebuilt store copy, so edits to the source here are only
 picked up after a system rebuild. To iterate on the config live, use the `nvim-dev`
-shell alias (defined in `hosts/nixos` and `hosts/KangaZero`):
+shell alias (defined in `home/modules/linux/zsh-aliases.nix` for Linux hosts, and in
+`hosts/KangaZero/default.nix` for macOS):
 
 ```sh
 nvim-dev          # == NVIM_APPNAME=multi-nix/home/modules/common/neovim/config nvim

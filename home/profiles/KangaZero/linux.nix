@@ -29,7 +29,7 @@
     ../../modules/linux/bash.nix
     ../../modules/linux/shell.nix
     ../../modules/linux/zsh-aliases.nix
-    # Commented out as not in use and to reduce bulid time
+    # INFO: Commented out as not in use and to reduce bulid time
     # ../../modules/linux/weston.nix
     # ../../modules/linux/wayland/niri/default.nix
   ];

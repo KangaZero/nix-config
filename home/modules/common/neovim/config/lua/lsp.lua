@@ -198,19 +198,16 @@ local function nixd_hm_expr(flake_attr)
 	return string.format("%s.%s.%s.options.home-manager.users.type.getSubOptions []", nixd_ref, flake_attr, nixd_host)
 end
 
--- One `options` entry == one lazy full-config eval (nixpkgs alone is 200~300MB of names
--- per nixd's docs), so keep the map minimal: a `nixos_wsl` entry pointing at
--- `options.wsl` is already covered by the `nixos` entry's option tree.
 -- `options` keys are arbitrary labels (nixd merges every entry for completion), but each
 -- entry is one lazy full-config eval — nixpkgs alone is 200~300MB of names per nixd's
 -- docs — so keep the map minimal: the dropped `nixos_wsl` entry pointed at `options.wsl`,
 -- which the `nixos` entry's option tree already contains.
-local function nixd_settings(hostname, flake_attr)
+local function nixd_settings(label, flake_attr)
 	return {
 		nixpkgs = { expr = string.format("import %s.inputs.nixpkgs { }", nixd_ref) },
 		formatting = { command = { "nixfmt" } },
 		options = {
-			[hostname] = { expr = string.format("%s.%s.%s.options", nixd_ref, flake_attr, nixd_host) },
+			[label] = { expr = string.format("%s.%s.%s.options", nixd_ref, flake_attr, nixd_host) },
 			["home-manager"] = { expr = nixd_hm_expr(flake_attr) },
 		},
 	}

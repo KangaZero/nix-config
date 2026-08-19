@@ -8,7 +8,7 @@
 
 ![Nix Flakes](https://img.shields.io/badge/Nix-flakes-5277C3?style=flat-square&logo=nixos&logoColor=white)
 ![Platforms](https://img.shields.io/badge/platforms-aarch64--darwin%20%7C%20x86__64--linux-blueviolet?style=flat-square)
-![nixpkgs](https://img.shields.io/badge/nixpkgs-weekly%20(7--day%20cooldown)-008080?style=flat-square)
+![nixpkgs](https://img.shields.io/badge/nixpkgs-unstable-008080?style=flat-square)
 ![Neovim](https://img.shields.io/badge/Neovim-%E2%89%A5%200.12-57A143?style=flat-square&logo=neovim&logoColor=white)
 ![Hosts](https://img.shields.io/badge/hosts-KangaZero%20%7C%20nixos%20%7C%20server-orange?style=flat-square)
 
@@ -49,15 +49,22 @@
 
 ## Nixpkgs Source
 
-This repo uses [`DeterminateSystems/nixpkgs-weekly`](https://flakehub.com/f/DeterminateSystems/nixpkgs-weekly/0.1) — a mirror of `nixpkgs-unstable`, but with packages released needing to be published for at least **7-days**.
-
-This guards against malicious packages reaching users before detection, a growing concern following supply-chain attacks on registries like npm and the AUR. See [the announcement](https://determinate.systems/posts/nixpkgs-cooldown/) for details.
-
-To live dangerously, use raw `nixpkgs-unstable` instead, swap the input in `flake.nix`:
+Currently raw **`nixpkgs-unstable`**:
 
 ```nix
 nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
 ```
+
+A commented-out alternative sits above it in `flake.nix`:
+[`DeterminateSystems/nixpkgs-weekly`](https://flakehub.com/f/DeterminateSystems/nixpkgs-weekly/0.1) — a
+mirror of `nixpkgs-unstable` where packages must have been published for at least **7 days**. That
+cooldown guards against malicious packages reaching users before detection, a growing concern after
+the supply-chain attacks on registries like npm and the AUR
+([announcement](https://determinate.systems/posts/nixpkgs-cooldown/)).
+
+It is **disabled** because the FlakeHub input caused dependency-resolution failures against the other
+inputs here (`home-manager`/`darwin` track `nixpkgs` via `follows`). Re-enable by swapping the two
+`nixpkgs.url` lines and re-running `nix flake update` — expect to re-pin the followers if it breaks.
 
 ---
 
@@ -77,7 +84,7 @@ nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
 | **Claude Code** | `programs.claude-code` — `settings` from `slop/settings.json` → `~/.claude/settings.json` (opus model, Learning output style, vim editor, hooks, enabled LSP plugins) | — | — |
 | **OpenCode** (AI coding agent) | — | `programs.opencode` (`opencode.nix`) — two local MCP servers (`shadcn` = `npx -y shadcn@latest mcp`, also serves the `@canvas-ui` registry; `playwright` = `npx -y @playwright/mcp`), `enableMcpIntegration = true`, `web.enable = false`. `extraPackages = [ nodejs pnpm typescript ]` — bundled into **opencode's own wrapper PATH** (`npx` launches the MCP servers), not the global profile, so the "no global toolchains" rule below still holds | — |
 | **Browser** | Firefox Developer Edition (declarative — policies + Vimium) — darwin + `server` only; **commented out on WSL** (CLI-only host) | — | — |
-| **Desktop** | — | native macOS | **CLI-only** — niri/weston/noctalia imports commented out in `KangaZero/linux.nix` (used as a terminal via Windows Terminal / WSLg, not a Wayland desktop). Formerly niri → weston (kiosk-shell) → WSLg; the `LIBGL_ALWAYS_SOFTWARE=1` env var is now vestigial |
+| **Desktop** | — | native macOS | **CLI-only** — niri/weston/noctalia *home-manager* imports commented out in `KangaZero/linux.nix` (used as a terminal via Windows Terminal / WSLg, not a Wayland desktop). Formerly niri → weston (kiosk-shell) → WSLg; the `LIBGL_ALWAYS_SOFTWARE=1` env var is now vestigial. **Caveat:** `mkWSL` still imports the *system* module `modules/nixos/wayland/niri.nix`, so `programs.niri` + xwayland are installed (~1.1 GB closure) with no KDL config to drive them — and WSL exposes `/dev/dxg`, not `/dev/dri`, so niri cannot start there anyway |
 | **Bar / launcher / notifications** | — | — | — (disabled with niri — see `server` below) |
 | **Clipboard** | — | — | — (disabled with niri — see `server` below) |
 | **Languages** | none in global profile — per-project `nix develop` + direnv (see note below) | — | — |
@@ -137,7 +144,8 @@ nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
 The `server` host reuses the entire WSL home profile and shares the `KangaZero` identity
 (`home/profiles/server/default.nix` re-exports `home/profiles/KangaZero/default.nix`), but is a
 real Wayland desktop rather than a WSLg bridge. It is built via `lib.mkNixOS` directly (not
-`mkWSL`), pulling the non-WSL subset of extra modules: `nix-ld`, `graphics`, `wayland/niri`.
+`mkWSL`), pulling the non-WSL subset of extra modules: `graphics`, `wayland/niri`. (`nix-ld` is no
+longer listed per-host — `mkNixOS` imports it for every NixOS host.)
 
 | Category | `server` |
 |---|---|
@@ -146,7 +154,7 @@ real Wayland desktop rather than a WSLg bridge. It is built via `lib.mkNixOS` di
 | **Login** | greetd + **noctalia-greeter** (`programs.noctalia-greeter`, themed session picker); input `noctalia-greeter` flake |
 | **Idle / lock** | noctalia built-in Idle service — lock at 10 min, screen-off at 11 min (`programs.noctalia.settings.idle`); no swayidle |
 | **Audio** | PipeWire (`alsa` + `pulse`, `rtkit`), PulseAudio disabled |
-| **Graphics** | Intel — `hardware.graphics.enable` + `intel-media-driver` (`enable32Bit` from shared `graphics.nix`) |
+| **Graphics** | Intel — `hardware.graphics.enable` + `intel-media-driver`; `enable32Bit` from `modules/nixos/graphics.nix`, which is now a **`server`-only** extra module (WSL dropped it — `nixos-wsl` already sets `hardware.graphics.enable`, so `enable32Bit` really pulled 32-bit mesa into a CLI-only closure) |
 | **Power** | `power-profiles-daemon` (noctalia-integrated — **not** TLP), `brightnessctl`; `upower.enable = true` (Battery widget) |
 | **Bluetooth** | `hardware.bluetooth` (powerOnBoot) — noctalia Control Center is the UI |
 | **Printing** | CUPS (`services.printing`) |
@@ -360,8 +368,7 @@ nixosConfigurations."server" = lib.mkNixOS {
   hostname     = "server";
   system       = "x86_64-linux";
   user         = "server";                       # profile dir; username resolves to "KangaZero"
-  extraModules = [
-    ./modules/nixos/nix-ld.nix
+  extraModules = [                               # nix-ld comes from mkNixOS itself
     ./modules/nixos/graphics.nix
     ./modules/nixos/wayland/niri.nix
   ];
@@ -459,8 +466,8 @@ multi-nix/
 ├── lib/
 │   ├── default.nix                   # Re-exports all helpers
 │   ├── mkDarwin.nix                  # Builds darwinSystem + home-manager
-│   ├── mkNixOS.nix                   # Builds nixosSystem (bare metal / VM / server)
-│   ├── mkWSL.nix                     # Thin wrapper: mkNixOS + nixos-wsl + extras
+│   ├── mkNixOS.nix                   # Builds nixosSystem (bare metal / VM / server) + nix-ld
+│   ├── mkWSL.nix                     # Thin wrapper: mkNixOS + nixos-wsl + niri + passwordless sudo
 │   ├── mkHome.nix                    # Standalone home-manager config (no-sudo hosts)
 │   ├── mkChecks.nix                  # Pre-commit checks per system
 │   └── mkDevShell.nix                # Dev shell per system
@@ -480,8 +487,8 @@ multi-nix/
 │   │   ├── settings.nix              # macOS system defaults
 │   │   └── applications.nix          # Spotlight alias activation script
 │   ├── nixos/                        # NixOS system modules
-│   │   ├── nix-ld.nix                # programs.nix-ld (run generic linux binaries)
-│   │   ├── graphics.nix              # hardware.graphics.enable32Bit (WSL / VM)
+│   │   ├── nix-ld.nix                # programs.nix-ld — imported by mkNixOS (all NixOS hosts)
+│   │   ├── graphics.nix              # hardware.graphics.enable32Bit — `server` only
 │   │   └── wayland/
 │   │       └── niri.nix              # programs.niri + xwayland (system level)
 │   └── shared/
@@ -567,8 +574,8 @@ This repo is set up to catch problems as early as possible — before a commit, 
 | When | What runs | What it catches |
 |---|---|---|
 | On `cd` | `direnv` + `nix develop` | Activates dev shell automatically via `.envrc` |
-| On every commit | `deadnix`, `nixfmt`, `statix` | Dead code, formatting drift, anti-patterns |
-| On every push | `nix build` for the current platform (`.#nixos` / darwin) | Broken builds before they reach the remote |
+| On every commit | `deadnix`, `nixfmt`, `statix`, `betterleaks`, `nvim-lua-syntax` | Dead code, formatting drift, anti-patterns, committed secrets, broken Lua |
+| On every push | `nix build` for the current platform (`.#nixos` / darwin) + git-author guard | Broken builds, and commits authored/committed under the wrong identity |
 | On every PR / push to remote | CI matrix — **lint only** (`nixfmt`/`statix`/`deadnix` + nvim); config-build steps are commented out in `ci.yml` | Formatting drift, anti-patterns, dead code |
 | Any time manually | `nix flake check` | Full evaluation + checks for all outputs |
 
@@ -590,18 +597,24 @@ Pre-commit hooks (block the commit if they fail):
 | `nixfmt` | Enforces consistent formatting via nixfmt-tree |
 | `statix` | Lints for anti-patterns — enforces `inherit` over explicit assignment |
 | `nvim-lua-syntax` | Parses every staged `.lua` file under `neovim/config/` via `nvim --clean`; fails on syntax errors |
+| `check-leaks` | `betterleaks git --staged` — blocks committed secrets/credentials (`always_run`) |
 
-Pre-push hooks (block the push if the build fails):
+Pre-push hooks (block the push if they fail):
 
-| Platform | Command |
+| Hook | What it does |
 |---|---|
-| darwin | `nix build .#darwinConfigurations.KangaZero.system` |
-| linux | `nixos-rebuild dry-build --flake .#nixos` |
+| `home-build` (darwin) | `nix build --no-link .#darwinConfigurations.KangaZero.system` |
+| `home-build` (linux) | `nix build --no-link .#nixosConfigurations.nixos.config.system.build.toplevel` |
+| `check-author` | Rejects the push unless **every** incoming commit is authored *and* committed by `KangaZero <samuelyongw@gmail.com>` — keeps the work identity out of this public repo |
 
 > [!WARNING]
-> The pre-push build (and CI) covers only `.#nixos` (WSL) and darwin — the bare-metal
-> **`server`** config has **no automated build check** (no `checks` entry, `ci.yml` build steps
-> commented). Verify it manually before relying on it: `nixos-rebuild build --flake .#server`.
+> The pre-push build covers only `.#nixos` (WSL) and darwin. A
+> `checks.x86_64-linux.server-pre-commit-check` output **does** exist (added because `server` shares
+> `x86_64-linux` with WSL and one system key can hold only one `pre-commit-check`), but nothing
+> activates it: `mkDevShell` installs the hooks of `pre-commit-check` only, the `home-build` hook is
+> `stages = [ "pre-push" ]` so `nix flake check` skips it, and `ci.yml`'s build steps are commented
+> out. Net effect: the bare-metal **`server`** config is still never built automatically — verify it
+> by hand: `nixos-rebuild build --flake .#server`.
 
 ### Manual checks
 
