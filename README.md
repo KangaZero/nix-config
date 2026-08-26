@@ -89,7 +89,7 @@ inputs here (`home-manager`/`darwin` track `nixpkgs` via `follows`). Re-enable b
 |---|---|---|---|
 | **Shell** | zsh + oh-my-zsh | — | — |
 | **Prompt** | oh-my-posh (TOML config in `home/modules/common/oh-my-posh.toml`) | — | — |
-| **Editor** | neovim — `defaultEditor`, `sideloadInitLua = true`; config HM-managed via `xdg.configFile` → `~/.config/nvim` (recursive copy); `vi`/`vim` aliases; `nvimPackLock` activation replaces `nvim-pack-lock.json` symlink with writable copy after each switch (nvim 0.12 `vim.pack` writes it at startup — read-only store symlink caused EROFS crash) | — | root nvim symlinked to user config via activation script |
+| **Editor** | neovim — `defaultEditor`, `sideloadInitLua = true`; config HM-managed via `xdg.configFile` → `~/.config/nvim` (recursive copy); `vi`/`vim` aliases; `nvimPackLock` activation replaces `nvim-pack-lock.json` symlink with writable copy after each switch (nvim 0.12 `vim.pack` writes it at startup — read-only store symlink caused EROFS crash); treesitter folding (`foldmethod=expr`, `vim.treesitter.foldexpr()`, `foldlevel=99`) | — | root nvim symlinked to user config via activation script |
 | **Terminal** | kitty — Tokyo Night Moon, JetBrains Mono, 85% opacity | animated pixel-art gif bg | static `moon_dark.png` bg |
 | **Font** | `nerd-fonts.jetbrains-mono` | — | `fonts.fontconfig.enable = true` |
 | **Multiplexer** | zellij | — | — |
@@ -106,8 +106,8 @@ inputs here (`home-manager`/`darwin` track `nixpkgs` via `follows`). Re-enable b
 | **Local LLM** | — | ollama (Metal, launchd agent) — models pulled manually | ollama (`ollama-vulkan`, systemd user service) — `qwen2.5:7b` pulled manually post-activation |
 | **Dev database** | — | — | `services.postgresql` (`postgresql_18`, in `hosts/nixos/default.nix`) — declarative `ccui` role + db (`ensureDBOwnership`), `listen_addresses = "*"` (native + Docker can connect), scram auth from localhost + Docker bridge (`172.16.0.0/12`), TCP `5432` opened. **Role password is set out-of-band** (`sudo -u postgres psql -c "ALTER ROLE ccui PASSWORD '<dev-pw>';"`) — never committed (repo is public) |
 | **LSP / formatters** | `lua-language-server` `bash-language-server` `pyright` `ruff` `clang-tools` `vtsls` `typescript-go` (tsgo) `vscode-langservers-extracted` `biome` `tailwindcss-language-server` `nixd` `stylua` `nixfmt-rfc-style` (all in `neovim.nix` — self-contained nix packages, bundle their own runtime; unaffected by dropping global `nodejs`); `rust-analyzer` via `rustup component add rust-analyzer` — but `rustup` is now per-project (`neovim.nix` notes this), so add it via a project devShell first. **TS/JS: `tsgo` (typescript-go, the native TS 7 port) is the primary server, `vtsls` the fallback — only one attaches per buffer (`lsp.lua` prefers `tsgo` when it's on `PATH`), so no duplicate diagnostics** | — | — |
-| **CLI toolkit** | `fzf` `eza` `bat` `btop` `ripgrep` `fd` `jq` `curl` `gh` (yazi via `programs.yazi`; `nh` via `programs.nh` — system-level on NixOS, home-manager on darwin, which also exports `NH_FLAKE`; claude-code is WSL-only) | + `ani-cli` `vim` `fastfetch` `tree` `ffmpeg-full` `imagemagick` `_7zz` `yt-dlp` `resvg` `poppler` `odysseus` | + `wget` `openssh` `tldr` `ffmpeg-full` `unzip` `azure-cli` (+ DevOps + `containerapp` exts — `containerapp` needs `pythonRelaxDeps = ["kubernetes"]` to build) `gcc` `gnumake` (treesitter parser compilation) `wl-clipboard` (`uv` removed — now per-project, see note below) |
-| **Git** | LFS, `pull.rebase = true`, `autoSetupRemote = true`, identity from `userMeta` | — | — |
+| **CLI toolkit** | `eza` `btop` `ripgrep` `fd` `jq` `curl` `gh` — **`fzf`** via `programs.fzf` (`fzf.nix` — defaultCommand/fileWidget/defaultOptions with tokyonight-kanga colors); **`bat`** via `programs.bat` (`bat.nix` — tokyonight-kanga tmTheme, `batdiff`/`batman`/`batgrep` via `extraPackages`); yazi via `programs.yazi`; `nh` via `programs.nh` — system-level on NixOS, home-manager on darwin, which also exports `NH_FLAKE`; claude-code is WSL-only | + `ani-cli` `vim` `fastfetch` `tree` `ffmpeg-full` `imagemagick` `_7zz` `yt-dlp` `resvg` `poppler` `odysseus` | + `wget` `openssh` `tldr` `ffmpeg-full` `unzip` `azure-cli` (+ DevOps + `containerapp` exts — `containerapp` needs `pythonRelaxDeps = ["kubernetes"]` to build) `gcc` `gnumake` (treesitter parser compilation) `wl-clipboard` (`uv` removed — now per-project, see note below) |
+| **Git** | LFS, `pull.rebase = true`, `autoSetupRemote = true`, identity from `userMeta`; **delta** as pager (`programs.git.delta`) — tokyonight-kanga syntax theme, side-by-side, line numbers, hunk navigation | — | — |
 | **Nix daemon** | — | Determinate Systems installer (`nix.enable = false`) | NixOS-managed |
 | **GC** | `nh clean all` — see [Garbage Collection](#garbage-collection-nh) | root `launchd.daemons.nh-clean` (`modules/darwin/nh-clean.nix`) — Sundays 15:00, `--keep 3 --keep-since 7d` | `programs.nh.clean` systemd timer (`modules/nixos/nh.nix`) — weekly, `--keep 3 --keep-since 7d` |
 | **Timezone** | — | — | Asia/Tokyo |
@@ -627,12 +627,17 @@ multi-nix/
 │       │   ├── zellij.nix            # zjstatus layout
 │       │   ├── zoxide.nix
 │       │   ├── atuin.nix             # Shell history — local-only, vim-normal keymap,
-│       │   │                         #   declarative `tokyonight-kanga` theme
-│       │   ├── lazygit.nix
+│       │   │                         #   declarative `tokyonight-kanga` theme; palette from theme.nix
+│       │   ├── bat.nix               # programs.bat — tokyonight-kanga tmTheme (inline),
+│       │   │                         #   batdiff / batman / batgrep via extraPackages
+│       │   ├── fzf.nix               # programs.fzf — defaultCommand (fd), fileWidget,
+│       │   │                         #   defaultOptions (tokyonight-kanga --color flags)
+│       │   ├── theme.nix             # tokyonight-kanga palette — bare attrset, no module args;
+│       │   │                         #   import ./theme.nix in any let block (atuin/bat/fzf)
+│       │   ├── lazygit.nix           # tokyonight-kanga theme (hex colors from theme.nix), lightTheme off
 │       │   ├── packages/
-│       │   │   ├── common.nix        # Shared: fzf, ripgrep, bat, eza, jq, btop,
-│       │   │   │                     #   nodejs_26, rustup, python3, just,
-│       │   │   │                     #   nerd-fonts, gh (nh now via programs.nh)
+│       │   │   ├── common.nix        # Shared: eza, btop, ripgrep, fd, jq, curl, gh,
+│       │   │   │                     #   nerd-fonts (fzf → fzf.nix; bat → bat.nix)
 │       │   │   └── ns-script.nix     # nix-search-tv shell wrapper
 │       │   ├── slop/
 │       │   │   ├── claude-code.nix    # programs.claude-code — settings → ~/.claude/settings.json
@@ -904,6 +909,9 @@ This repo consolidates two existing configs:
 | `kitty.nix` | Both | Shared Tokyo Night Moon palette; `background_image = "${assetsDir}/kitty-bg"` |
 | `neovim/neovim.nix` | Both | HM module — `xdg.configFile` symlinks `neovim/config/` to `~/.config/nvim`; originally WSL-only, now shared |
 | `zellij.nix`, `zoxide.nix`, `lazygit.nix` | mac config | Moved into `common/` (zellij uses the zjstatus overlay) |
+| `fzf.nix` | common | `programs.fzf` — `defaultCommand`/`fileWidgetCommand` (fd), `defaultOptions` (tokyonight-kanga `--color` flags) |
+| `bat.nix` | common | `programs.bat` — inline `tokyonight-kanga` tmTheme, `batdiff`/`batman`/`batgrep` via `extraPackages` |
+| `theme.nix` | common | Shared tokyonight-kanga palette — bare attrset, imported by `atuin.nix`, `bat.nix`, `fzf.nix` |
 
 ### Platform-specific modules
 
@@ -920,14 +928,19 @@ This repo consolidates two existing configs:
 
 ### packages split
 
-Common subset extracted to `home/modules/common/packages/common.nix`:
-`fzf`, `ripgrep`, `bat`, `eza`, `curl`, `jq`, `btop`, `fd`, `nerd-fonts.jetbrains-mono`, `gh`.
-`nh` moved to `programs.nh` (`modules/nixos/nh.nix` on NixOS, `home/modules/darwin/nh.nix` on
+`home/modules/common/packages/common.nix` holds the shared package list:
+`eza`, `ripgrep`, `fd`, `jq`, `curl`, `btop`, `nerd-fonts.jetbrains-mono`, `gh`.
+`nh` lives in `programs.nh` (`modules/nixos/nh.nix` on NixOS, `home/modules/darwin/nh.nix` on
 darwin), which also exports `NH_FLAKE`/`NH_DARWIN_FLAKE` and owns the GC timer.
 The language toolchains (`nodejs_26`, `pnpm`, `rustup`, `python3`, `just`) are **commented out** —
-now sourced from per-project `nix develop` shells (see the note under [Defaults](#defaults)).
+sourced from per-project `nix develop` shells (see the note under [Defaults](#defaults)).
 
-`yazi` and `claude-code` moved out of the package list — now installed + configured declaratively via `programs.yazi` (`yazi.nix`) and `programs.claude-code` (`slop/claude-code.nix`).
+`yazi`, `claude-code`, `fzf`, and `bat` are installed + configured declaratively via their own modules rather than the package list:
+- `programs.yazi` — `yazi.nix`
+- `programs.claude-code` — `slop/claude-code.nix`
+- `programs.fzf` — `fzf.nix`: `defaultCommand`/`fileWidgetCommand` (fd), `defaultOptions` (tokyonight-kanga `--color` flags)
+- `programs.bat` — `bat.nix`: inline `tokyonight-kanga` tmTheme, `batdiff`/`batman`/`batgrep` via `extraPackages` (batgrep wraps ripgrep, no extra dep)
+- `theme.nix` — bare attrset (no module args) with the shared tokyonight-kanga palette; imported by `atuin.nix`, `bat.nix`, and `fzf.nix`
 
 Platform-only packages stay in `home/modules/darwin/packages.nix` and `home/modules/linux/packages.nix`.
 

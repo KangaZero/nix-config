@@ -1,9 +1,9 @@
 { pkgs, ... }:
 {
   home.packages = with pkgs; [
-    fzf
+    # fzf  # managed by programs.fzf (fzf.nix)
     eza
-    bat
+    # bat  # managed by programs.bat (bat.nix)
     btop
     ripgrep
     fd

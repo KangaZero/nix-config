@@ -16,6 +16,8 @@
     ../../modules/darwin/ollama.nix
     ../../modules/darwin/man.nix
     ../../modules/darwin/nh.nix
+    ../../modules/common/bat.nix
+    ../../modules/common/fzf.nix
     ../../modules/common/packages/common.nix
     ../../modules/common/packages/ns-script.nix
     ../../modules/common/shell/zsh-core.nix

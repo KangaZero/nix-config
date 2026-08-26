@@ -49,12 +49,20 @@
 	"tui": "fullscreen",
 	"theme": "dark-ansi",
 	"editorMode": "vim",
+	"spinnerTipsEnabled": true,
+	"spinnerTipsOverride": {
+		"tips": [
+			"Did you there is a free AI called your brain",
+			"When you sleep you are actually not being awake"
+		]
+	},
 	"skipAutoPermissionPrompt": true,
+	"skipWebFetchPreflight": true,
 	"askUserQuestionTimeout": "5m",
 	"attribution": {
 		"commit": "",
 		"pr": "",
 		"sessionUrl": false
 	},
-	"outputStyle": "Learning"
+	"outputStyle": "Explanatory"
 }

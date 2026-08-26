@@ -1,20 +1,7 @@
 _:
 let
-  # Tokyo Night Moon body + Dracula-purple accent — same palette as
-  # kitty.nix / yazi.nix / oh-my-posh.toml. Keep these in sync by hand.
-  palette = {
-    purple = "#bd93f9"; # signature accent (kitty cursor + border, prompt)
-    violet = "#8b5cf6"; # deeper accent (prompt borders, exec time)
-    fg = "#c8d3f5"; # kitty foreground
-    blue = "#82aaff";
-    yellow = "#ffc777";
-    green = "#c3e88d";
-    red = "#ff757f";
-    orange = "#ff966c";
-    cyan = "#86e1fc";
-    muted = "#828bb8";
-    dim = "#545c7e";
-  };
+  # Single source of truth — see theme.nix
+  palette = import ./theme.nix;
 in
 {
   programs.atuin = {

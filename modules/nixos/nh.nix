@@ -27,7 +27,17 @@
       # than the nix-collect-garbage setup it replaces.
       # --keep 3 is the generation floor (current + two rollback targets);
       # --keep-since is the age cutoff. Whichever keeps more wins.
-      extraArgs = lib.mkDefault "--keep 3 --keep-since 7d";
+      #
+      # --keep-one is not optional here. nh sweeps gcroots matching
+      # `.*/(?:\.direnv|direnv/layouts)/.*`, which includes the
+      # `.direnv/flake-profile-*` link direnv plants for `use flake`. Drop that
+      # root and `nix store gc` reaps the devShell, taking pre-commit, its
+      # python3, and the generated `-pre-commit-config.json` with it — leaving a
+      # dangling `.pre-commit-config.yaml` symlink and `.git/hooks/pre-commit`
+      # exec'ing a store path that no longer exists. --keep-one retains the
+      # newest gcroot per *live* direnv project; roots under deleted project
+      # directories are still collected.
+      extraArgs = lib.mkDefault "--keep 3 --keep-since 7d --keep-one";
     };
   };
 }

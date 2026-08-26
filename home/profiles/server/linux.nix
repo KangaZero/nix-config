@@ -36,6 +36,8 @@
     ../../modules/common/firefox.nix
     ../../modules/common/kitty.nix
     ../../modules/common/neovim/neovim.nix
+    ../../modules/common/bat.nix
+    ../../modules/common/fzf.nix
     ../../modules/common/packages/common.nix
     ../../modules/common/packages/ns-script.nix
     ../../modules/common/shell/zsh-core.nix

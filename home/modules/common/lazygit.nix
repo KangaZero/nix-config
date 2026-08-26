@@ -1,14 +1,24 @@
-_: {
+_:
+let
+  c = import ./theme.nix;
+in
+{
   programs.lazygit = {
     enable = true;
     settings.gui.theme = {
-      lightTheme = true;
+      lightTheme = false;
       activeBorderColor = [
-        "blue"
+        c.purple
         "bold"
       ];
-      inactiveBorderColor = [ "black" ];
-      selectedLineBgColor = [ "default" ];
+      inactiveBorderColor = [ c.bgHighlight ];
+      optionsTextColor = [ c.blue ];
+      selectedLineBgColor = [ c.bgHighlight ];
+      selectedRangeBgColor = [ c.bgHighlight ];
+      cherryPickedCommitBgColor = [ c.violet ];
+      cherryPickedCommitFgColor = [ c.fg ];
+      unstagedChangesColor = [ c.red ];
+      defaultFgColor = [ c.fg ];
     };
   };
 }

@@ -9,7 +9,10 @@
   # /nix/var/nix/profiles/system, which is where darwin-rebuild generations live.
   # Keep clean scheduling in exactly one place — see home/modules/darwin/nh.nix.
   launchd.daemons.nh-clean = {
-    script = "exec ${lib.getExe pkgs.nh} clean all --keep 3 --keep-since 7d";
+    # --keep-one mirrors modules/nixos/nh.nix: without it nh reaps the
+    # `.direnv/flake-profile-*` gcroot, the devShell is collected, and every
+    # git-hooks.nix repo loses its pre-commit binary + config symlink.
+    script = "exec ${lib.getExe pkgs.nh} clean all --keep 3 --keep-since 7d --keep-one";
 
     # nh shells out to `nix store gc`. The Determinate daemon's nix lives in the
     # default profile, not the store, so PATH has to be set explicitly — a launchd

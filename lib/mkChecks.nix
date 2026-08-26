@@ -18,6 +18,15 @@ inputs.git-hooks.lib.${system}.run {
       pass_filenames = false;
       entry = "${pkgs.betterleaks}/bin/betterleaks git --staged --no-banner";
     };
+    nix-eval = {
+      enable = true;
+      name = "Evaluate config";
+      language = "system";
+      always_run = true;
+      stages = [ "pre-commit" ];
+      pass_filenames = false;
+      entry = "${pkgs.writeShellScriptBin "eval-config" "nix eval --raw .#nixosConfigurations.nixos.config.system.build.toplevel.outPath"}/bin/check-author";
+    };
     check-author = {
       enable = true;
       name = "check git author";

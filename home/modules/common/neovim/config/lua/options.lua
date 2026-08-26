@@ -56,6 +56,11 @@ vim.o.list = false
 vim.o.inccommand = "split"
 
 vim.o.smoothscroll = true
+
+vim.o.foldmethod = "expr"
+vim.o.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+vim.o.foldlevel = 99
+vim.o.foldlevelstart = 99
 -- function BasicStatusLine()
 -- 	local git_branch = vim.fn.system("git branch --show-current 2>/dev/null"):gsub("\n", "")
 -- 	local branch_section = git_branch ~= "" and (" (" .. git_branch .. ")") or ""
