@@ -52,8 +52,9 @@
 	"spinnerTipsEnabled": true,
 	"spinnerTipsOverride": {
 		"tips": [
-			"Did you there is a free AI called your brain",
-			"When you sleep you are actually not being awake"
+			"Did you know there is a free AI called your \"brain\"",
+			"When you sleep you are actually in a state of not being awake",
+			"Keep spending your tokens here! Daddy Dario needs another yacht"
 		]
 	},
 	"skipAutoPermissionPrompt": true,

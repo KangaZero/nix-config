@@ -21,6 +21,9 @@ local function layout(width_pct, height_pct)
 	}
 end
 
+--- Check whether given buf win id is a floating window
+--- @param win integer
+--- @return boolean
 local function is_float(win)
 	local cfg = vim.api.nvim_win_get_config(win)
 	return cfg and cfg.relative and cfg.relative ~= ""
@@ -31,8 +34,8 @@ function M.is_open()
 end
 
 function M.close()
-	pcall(vim.cmd, "autocmd! Zen")
-	pcall(vim.cmd, "augroup! Zen")
+	pcall(vim.cmd([[autocmd! Zen]]))
+	pcall(vim.cmd([[augroup! Zen"]]))
 
 	if M.win and vim.api.nvim_win_is_valid(M.win) then
 		-- sync cursor back to parent
@@ -41,12 +44,12 @@ function M.close()
 				vim.api.nvim_win_set_cursor(M.parent, vim.api.nvim_win_get_cursor(M.win))
 			end
 		end
-		vim.api.nvim_win_close(M.win, { force = true })
+		vim.api.nvim_win_close(M.win, true)
 		M.win = nil
 	end
 
 	if M.bg_win and vim.api.nvim_win_is_valid(M.bg_win) then
-		vim.api.nvim_win_close(M.bg_win, { force = true })
+		vim.api.nvim_win_close(M.bg_win, true)
 		M.bg_win = nil
 	end
 
@@ -72,7 +75,9 @@ function M.open(opts)
 	local l = layout(opts.width, opts.height)
 
 	-- backdrop
+	---@type integer
 	M.bg_buf = vim.api.nvim_create_buf(false, true)
+	---@type integer
 	M.bg_win = vim.api.nvim_open_win(M.bg_buf, false, {
 		relative = "editor",
 		width = vim.o.columns,
@@ -84,8 +89,8 @@ function M.open(opts)
 		border = "none",
 		zindex = 39,
 	})
-	vim.api.nvim_win_set_option(M.bg_win, "winblend", opts.backdrop)
-	vim.api.nvim_win_set_option(M.bg_win, "winhighlight", "Normal:ZenBg")
+	vim.api.nvim_set_option_value("winblend", opts.backdrop, { win = M.bg_win })
+	vim.api.nvim_set_option_value("winhighlight", "Normal:ZenBg", { win = M.bg_win })
 
 	-- zen window
 	M.win = vim.api.nvim_open_win(buf, true, {
@@ -98,11 +103,11 @@ function M.open(opts)
 		border = "rounded",
 		zindex = 40,
 	})
-	vim.api.nvim_win_set_option(M.win, "winhighlight", "NormalFloat:Normal")
+	vim.api.nvim_set_option_value("winhighlight", "NormalFloat:Normal", { win = M.win })
 	vim.cmd("norm! zz")
 
 	-- close when leaving the zen window
-	vim.api.nvim_exec(
+	vim.api.nvim_exec2(
 		[[
     augroup Zen
       autocmd!
@@ -111,18 +116,18 @@ function M.open(opts)
       autocmd VimResized * lua require("custom.zen").on_resize()
     augroup end
   ]],
-		false
+		{ output = false }
 	)
 end
 
 function M.on_win_enter()
 	local win = vim.api.nvim_get_current_win()
 	if win ~= M.win and not is_float(win) then
-		vim.defer_fn(function()
-			if vim.api.nvim_get_current_win() ~= M.win then
-				M.close()
-			end
-		end, 10)
+		-- vim.defer_fn(function()
+		-- 	if vim.api.nvim_get_current_win() ~= M.win then
+		M.close()
+		-- 	end
+		-- end, 10)
 	end
 end
 
