@@ -1,84 +1,135 @@
-## 2026-06-19 00:22:28 JST
+## 2026-09-11 07:57:55 UTC
 
-66 derivations with active advisories
+67 derivations with active advisories
 
 ------------------------------------------------------------------------
 Diff-1.0.2
 
-/nix/store/jd4lf8gkjn7r9r338vyjm177dszdrdav-Diff-1.0.2.drv
+/nix/store/rls32ixgsm56dz6bz0dc99zrgvca5rvl-Diff-1.0.2.drv
 CVE                                                CVSSv3
 https://nvd.nist.gov/vuln/detail/CVE-2024-13278    9.1
 
 ------------------------------------------------------------------------
 ShellCheck-0.11.0
 
-/nix/store/zkqbza9w6nck3qb5g77897mjhvwldpxp-ShellCheck-0.11.0.drv
+/nix/store/40jbrj6jc9530qpm71lsbppgrishgjk7-ShellCheck-0.11.0.drv
 CVE                                                CVSSv3
 https://nvd.nist.gov/vuln/detail/CVE-2021-28794    9.8
 
 ------------------------------------------------------------------------
-ada-3.4.4
+ada-4.0.0
 
-/nix/store/54a1qi6ldy34899bbq9kjkvcyjpsq9p5-ada-3.4.4.drv
+/nix/store/za316r1yz8iw2gflqsn5hcl68kqayvqk-ada-4.0.0.drv
 CVE                                                CVSSv3
 https://nvd.nist.gov/vuln/detail/CVE-2024-9410     5.3
 
 ------------------------------------------------------------------------
+apr-util-1.6.3
+
+/nix/store/cm57nnqg42lnkc5yc806g1hrqlly6z0l-apr-util-1.6.3.drv
+CVE                                                CVSSv3
+https://nvd.nist.gov/vuln/detail/CVE-2026-32327    9.1
+https://nvd.nist.gov/vuln/detail/CVE-2026-34191    9.1
+https://nvd.nist.gov/vuln/detail/CVE-2025-49506    7.5
+https://nvd.nist.gov/vuln/detail/CVE-2026-34501    7.5
+https://nvd.nist.gov/vuln/detail/CVE-2026-34502    7.5
+
+------------------------------------------------------------------------
 async-2.2.6
 
-/nix/store/yvgslv5bf0cqvvcvachacxfidryh54ix-async-2.2.6.drv
+/nix/store/qgia6ml69mwzzz0gdvdwhf2kc6s1n4qi-async-2.2.6.drv
 CVE                                                CVSSv3
 https://nvd.nist.gov/vuln/detail/CVE-2021-43138    7.8
 
 ------------------------------------------------------------------------
+binutils-2.46
+
+/nix/store/nszr0sv1v7iqhxc263kh971mxhfr5wmj-binutils-2.46.drv
+CVE                                                CVSSv3
+https://nvd.nist.gov/vuln/detail/CVE-2026-6846     7.8
+https://nvd.nist.gov/vuln/detail/CVE-2025-69649    7.5
+https://nvd.nist.gov/vuln/detail/CVE-2025-69650    7.5
+https://nvd.nist.gov/vuln/detail/CVE-2025-69652    6.2
+https://nvd.nist.gov/vuln/detail/CVE-2025-69651    5.5
+
+------------------------------------------------------------------------
+bison-3.8.2
+
+/nix/store/afk4ymgk322wwsafg6dj4sgyp49mvq98-bison-3.8.2.drv
+CVE                                                CVSSv3
+https://nvd.nist.gov/vuln/detail/CVE-2026-56389    8.6
+https://nvd.nist.gov/vuln/detail/CVE-2026-56390    6.3
+
+------------------------------------------------------------------------
 bytes-1.11.0
 
-/nix/store/hxq04wl3q36j2r1wq2m0jqsvgbmzf2mr-bytes-1.11.0.drv
+/nix/store/4pbyfpj9rma6gnhn2xzip1r0v8hq13rl-bytes-1.11.0.drv
 CVE                                                CVSSv3
 https://nvd.nist.gov/vuln/detail/CVE-2026-25541    7.5
 
 ------------------------------------------------------------------------
-cargo-1.95.0
+cargo-1.97.1
 
-/nix/store/fs1pvpv3gvv6fn6rw9w5fdfixig1lrbs-cargo-1.95.0.drv
+/nix/store/cpw5648l5rn851bdg4ccy9l4nhl0zv5g-cargo-1.97.1.drv
 CVE                                                CVSSv3
-https://nvd.nist.gov/vuln/detail/CVE-2026-5222     6.5
+https://nvd.nist.gov/vuln/detail/CVE-2026-14363    9.8
+https://nvd.nist.gov/vuln/detail/CVE-2026-58521    9.8
 https://nvd.nist.gov/vuln/detail/CVE-2026-39839    6.1
 https://nvd.nist.gov/vuln/detail/CVE-2026-39840    6.1
 https://nvd.nist.gov/vuln/detail/CVE-2026-39841    6.1
 https://nvd.nist.gov/vuln/detail/CVE-2026-39837    5.4
-https://nvd.nist.gov/vuln/detail/CVE-2026-5223     5.3
+https://nvd.nist.gov/vuln/detail/CVE-2026-58519    5.4
 
 ------------------------------------------------------------------------
-cargo-1.95.0-aarch64-apple-darwin
+cargo-1.98.0-aarch64-apple-darwin
 
-/nix/store/nwc5k8399wp609w7rpvwmd3nrbnvcrzw-cargo-1.95.0-aarch64-apple-darwin.drv
+/nix/store/y753mhbr4ss27b1qqzbywjkaxrjhdfsm-cargo-1.98.0-aarch64-apple-darwin.drv
 CVE                                                CVSSv3
-https://nvd.nist.gov/vuln/detail/CVE-2026-5222     6.5
+https://nvd.nist.gov/vuln/detail/CVE-2026-14363    9.8
+https://nvd.nist.gov/vuln/detail/CVE-2026-58521    9.8
 https://nvd.nist.gov/vuln/detail/CVE-2026-39839    6.1
 https://nvd.nist.gov/vuln/detail/CVE-2026-39840    6.1
 https://nvd.nist.gov/vuln/detail/CVE-2026-39841    6.1
 https://nvd.nist.gov/vuln/detail/CVE-2026-39837    5.4
-https://nvd.nist.gov/vuln/detail/CVE-2026-5223     5.3
+https://nvd.nist.gov/vuln/detail/CVE-2026-58519    5.4
+
+------------------------------------------------------------------------
+cjson-1.7.19
+
+/nix/store/4hg43rd0vn93z7dl1yc37kzr2csr8y98-cjson-1.7.19.drv
+CVE                                                CVSSv3
+https://nvd.nist.gov/vuln/detail/CVE-2026-16554    7.8
+https://nvd.nist.gov/vuln/detail/CVE-2026-67215    7.5
+https://nvd.nist.gov/vuln/detail/CVE-2026-67216    5.9
+https://nvd.nist.gov/vuln/detail/CVE-2026-67217    5.3
 
 ------------------------------------------------------------------------
 commonmark-0.2.6.1
 
-/nix/store/2yhsnsgkc2p8q58cspvp39f7vswm0qij-commonmark-0.2.6.1.drv
+/nix/store/amda6inlmnrj3256ya28ld7gsnyf6y75-commonmark-0.2.6.1.drv
 CVE                                                CVSSv3
+https://nvd.nist.gov/vuln/detail/CVE-2026-86430    7.5
 https://nvd.nist.gov/vuln/detail/CVE-2026-30838    6.1
+
+------------------------------------------------------------------------
+coreutils-9.11
+
+/nix/store/ajlyx1mq2bl2slvcmdjbf9h6wyfvcs5b-coreutils-9.11.drv
+CVE                                                CVSSv3
+https://nvd.nist.gov/vuln/detail/CVE-2026-56391    6.1
+https://nvd.nist.gov/vuln/detail/CVE-2026-56392    6.1
 
 ------------------------------------------------------------------------
 cups-2.4.19
 
-/nix/store/qbimvd3zjdkjq35l4sdwkxyqv0ab70na-cups-2.4.19.drv
+/nix/store/pspbf75xk675c6rmpdqwmq1cva5qq3pm-cups-2.4.19.drv
 CVE                                                CVSSv3
 https://nvd.nist.gov/vuln/detail/CVE-2022-26691    6.7
 
 ------------------------------------------------------------------------
 curl-0.4.49
 
-/nix/store/gw961xbmm40lvq4vpn2qqi2dp8akrs9q-curl-0.4.49.drv
+/nix/store/skvgksjnrg6pz5vx1car4006rvldknd2-curl-0.4.49.drv
 CVE                                                CVSSv3
 https://nvd.nist.gov/vuln/detail/CVE-2022-32221    9.8
 https://nvd.nist.gov/vuln/detail/CVE-2022-27781    7.5
@@ -93,63 +144,48 @@ https://nvd.nist.gov/vuln/detail/CVE-2022-35252    3.7
 https://nvd.nist.gov/vuln/detail/CVE-2023-28322    3.7
 
 ------------------------------------------------------------------------
-dash-0.5.13.3
+dash-0.5.13.5
 
-/nix/store/437kgcn8v5w0ab2v6nxpy4ldsci8rmlv-dash-0.5.13.3.drv
+/nix/store/8pc325p4pzrsf8c52fyg76jb7y96x239-dash-0.5.13.5.drv
 CVE                                                CVSSv3
 https://nvd.nist.gov/vuln/detail/CVE-2024-21485    6.5
 
 ------------------------------------------------------------------------
 diff-0.1.13
 
-/nix/store/lwi8119nyjlgfl197wbjf3zyslkiqdyi-diff-0.1.13.drv
+/nix/store/0wipf74lwq913i35zd8a4k5abjpfs11f-diff-0.1.13.drv
 CVE                                                CVSSv3
 https://nvd.nist.gov/vuln/detail/CVE-2024-13278    9.1
 
 ------------------------------------------------------------------------
-ffmpeg-7.1.4
+ffmpeg-9.0.1
 
-/nix/store/m9fap0xpc6svz5yc157mj632xjz159k5-ffmpeg-7.1.4.drv
+/nix/store/vl1sxhjsgs38li0cysrmk2py117k7xdv-ffmpeg-9.0.1.drv
 CVE                                                CVSSv3
-https://nvd.nist.gov/vuln/detail/CVE-2026-30997    7.5
-https://nvd.nist.gov/vuln/detail/CVE-2026-30998    7.5
-https://nvd.nist.gov/vuln/detail/CVE-2026-30999    7.5
 https://nvd.nist.gov/vuln/detail/CVE-2025-25468    6.5
 https://nvd.nist.gov/vuln/detail/CVE-2025-25469    6.5
-https://nvd.nist.gov/vuln/detail/CVE-2025-10256    5.3
-https://nvd.nist.gov/vuln/detail/CVE-2026-40962    4.9
-https://nvd.nist.gov/vuln/detail/CVE-2025-12343    3.3
 
 ------------------------------------------------------------------------
-ffmpeg-8.1
+filelock-0.1.1.9
 
-/nix/store/bw8vxx2rda37rz7vv23rksy7h03pgvi3-ffmpeg-8.1.drv
+/nix/store/03gw7g94yfgby55y5a5b88rsknx528jm-filelock-0.1.1.9.drv
 CVE                                                CVSSv3
-https://nvd.nist.gov/vuln/detail/CVE-2025-25468    6.5
-https://nvd.nist.gov/vuln/detail/CVE-2025-25469    6.5
+https://nvd.nist.gov/vuln/detail/CVE-2025-68146    6.3
+https://nvd.nist.gov/vuln/detail/CVE-2026-22701    5.3
 
 ------------------------------------------------------------------------
 fontforge-20251009
 
-/nix/store/85rw4924w6ggqv5pcgly2rc61zvxz1nw-fontforge-20251009.drv
+/nix/store/1bhi0dz61y2bbxc55y15vkzj374ips94-fontforge-20251009.drv
 CVE                                                CVSSv3
 https://nvd.nist.gov/vuln/detail/CVE-2025-15276    7.8
 https://nvd.nist.gov/vuln/detail/CVE-2025-15277    7.8
 https://nvd.nist.gov/vuln/detail/CVE-2025-15278    7.8
 
 ------------------------------------------------------------------------
-giflib-5.2.2
+git-2.55.0
 
-/nix/store/b2zmc6vr63a6rbycmgwhkbpv3hnnghl5-giflib-5.2.2.drv
-CVE                                                CVSSv3
-https://nvd.nist.gov/vuln/detail/CVE-2026-26740    8.2
-https://nvd.nist.gov/vuln/detail/CVE-2024-45993    6.5
-https://nvd.nist.gov/vuln/detail/CVE-2026-23868    5.1
-
-------------------------------------------------------------------------
-git-2.54.0
-
-/nix/store/p8rrsh13lk5m9igwj65l48b7kvvnk74w-git-2.54.0.drv
+/nix/store/6y4pn4zmy2cafs0wgg9jh76ydmzkqq2c-git-2.55.0.drv
 CVE                                                CVSSv3
 https://nvd.nist.gov/vuln/detail/CVE-2022-36882    8.8
 https://nvd.nist.gov/vuln/detail/CVE-2022-30947    7.5
@@ -161,10 +197,11 @@ https://nvd.nist.gov/vuln/detail/CVE-2022-36884    5.3
 ------------------------------------------------------------------------
 go-1.24.13-darwin-arm64-bootstrap
 
-/nix/store/si02nk844kn4r7138j8fj7fbjqrlib6f-go-1.24.13-darwin-arm64-bootstrap.drv
+/nix/store/syqsyw2284zkv8vhamxj1cv2d4dsyjnn-go-1.24.13-darwin-arm64-bootstrap.drv
 CVE                                                CVSSv3
 https://nvd.nist.gov/vuln/detail/CVE-2026-27143    9.8
 https://nvd.nist.gov/vuln/detail/CVE-2026-27140    8.8
+https://nvd.nist.gov/vuln/detail/CVE-2026-39822    7.8
 https://nvd.nist.gov/vuln/detail/CVE-2026-25679    7.5
 https://nvd.nist.gov/vuln/detail/CVE-2026-32280    7.5
 https://nvd.nist.gov/vuln/detail/CVE-2026-32281    7.5
@@ -185,103 +222,81 @@ https://nvd.nist.gov/vuln/detail/CVE-2026-39817    5.9
 https://nvd.nist.gov/vuln/detail/CVE-2026-32288    5.5
 https://nvd.nist.gov/vuln/detail/CVE-2026-39819    5.3
 https://nvd.nist.gov/vuln/detail/CVE-2026-39825    5.3
+https://nvd.nist.gov/vuln/detail/CVE-2026-42505    5.3
 https://nvd.nist.gov/vuln/detail/CVE-2023-49292    4.9
 https://nvd.nist.gov/vuln/detail/CVE-2026-27139    2.5
 
 ------------------------------------------------------------------------
-go-1.26.3
+go-1.26.7
 
-/nix/store/3wcz439vgpp14pn7jmfnhj1gfjz16pfm-go-1.26.3.drv
+/nix/store/w6w7pzbrnk1j01afyzxjhiwirql5lq6m-go-1.26.7.drv
 CVE                                                CVSSv3
 https://nvd.nist.gov/vuln/detail/CVE-2023-49292    4.9
 
 ------------------------------------------------------------------------
+gzip-1.14
+
+/nix/store/h5r7wc856s9239k9n027n4adj4jx3h1k-gzip-1.14.drv
+CVE                                                CVSSv3
+https://nvd.nist.gov/vuln/detail/CVE-2026-41992    7.5
+https://nvd.nist.gov/vuln/detail/CVE-2026-41991    4.7
+
+------------------------------------------------------------------------
 hedgehog-1.5
 
-/nix/store/a6dpk1l28krvk03xnyma8a2a7vy6iprm-hedgehog-1.5.drv
+/nix/store/b9lb4dwajxc7q53mlj8l22pgj8cl6fvh-hedgehog-1.5.drv
 CVE                                                CVSSv3
 https://nvd.nist.gov/vuln/detail/CVE-2021-4276     4.1
 
 ------------------------------------------------------------------------
 hedgehog-1.5-r2.cabal
 
-/nix/store/pvx7pkv438xsji769ysk3f7194fxh7cv-hedgehog-1.5-r2.cabal.drv
+/nix/store/8mdyq3cnisv30w95kykyva29wh7dpbm4-hedgehog-1.5-r2.cabal.drv
 CVE                                                CVSSv3
 https://nvd.nist.gov/vuln/detail/CVE-2021-4276     4.1
 
 ------------------------------------------------------------------------
-imagemagick-7.1.2-23
+imagemagick-7.1.2-29
 
-/nix/store/88f8nx403rgljnmran8hkd8a86dbq8fa-imagemagick-7.1.2-23.drv
+/nix/store/i25g5vd4aqhzxk7889d4pap9zxkkymaw-imagemagick-7.1.2-29.drv
 CVE                                                CVSSv3
-https://nvd.nist.gov/vuln/detail/CVE-2026-49218    7.5
-https://nvd.nist.gov/vuln/detail/CVE-2026-53460    7.5
-https://nvd.nist.gov/vuln/detail/CVE-2026-53461    7.5
-https://nvd.nist.gov/vuln/detail/CVE-2026-53465    6.2
-https://nvd.nist.gov/vuln/detail/CVE-2026-48994    5.9
-https://nvd.nist.gov/vuln/detail/CVE-2026-53462    5.9
-https://nvd.nist.gov/vuln/detail/CVE-2026-48724    5.5
-https://nvd.nist.gov/vuln/detail/CVE-2026-48734    5.5
-https://nvd.nist.gov/vuln/detail/CVE-2026-49219    5.5
-https://nvd.nist.gov/vuln/detail/CVE-2026-48733    4.7
-https://nvd.nist.gov/vuln/detail/CVE-2026-53463    4.3
-https://nvd.nist.gov/vuln/detail/CVE-2026-53464    4.0
+https://nvd.nist.gov/vuln/detail/CVE-2026-86420    3.7
+https://nvd.nist.gov/vuln/detail/CVE-2026-86421    3.7
+https://nvd.nist.gov/vuln/detail/CVE-2026-86422    3.3
+https://nvd.nist.gov/vuln/detail/CVE-2026-86423    3.3
+https://nvd.nist.gov/vuln/detail/CVE-2026-86425    3.3
+https://nvd.nist.gov/vuln/detail/CVE-2026-86424    2.5
 
 ------------------------------------------------------------------------
-jq-1.8.1
+jq-1.8.2
 
-/nix/store/470mx1v69jzhpsgd94dg4xwh8b30ps3n-jq-1.8.1.drv
+/nix/store/i29w140jxm0ycjpi5x0mix4wnhzhawks-jq-1.8.2.drv
 CVE                                                CVSSv3
-https://nvd.nist.gov/vuln/detail/CVE-2026-43894    6.2
-https://nvd.nist.gov/vuln/detail/CVE-2026-43896    6.2
-https://nvd.nist.gov/vuln/detail/CVE-2026-40612    5.5
-https://nvd.nist.gov/vuln/detail/CVE-2026-41256    5.5
-https://nvd.nist.gov/vuln/detail/CVE-2026-41257    5.5
+https://nvd.nist.gov/vuln/detail/CVE-2026-39979    6.5
 https://nvd.nist.gov/vuln/detail/CVE-2026-44777    5.5
-https://nvd.nist.gov/vuln/detail/CVE-2026-43895    4.4
+https://nvd.nist.gov/vuln/detail/CVE-2026-33948    5.3
 
 ------------------------------------------------------------------------
-kitty-0.47.1
+kitty-0.48.2
 
-/nix/store/l21hg1v2qmrl8psip68rbhcl6p4acpw1-kitty-0.47.1.drv
+/nix/store/iwgnq8yhw2laddrlyrq1k73g5pf2gdrv-kitty-0.48.2.drv
 CVE                                                CVSSv3
 https://nvd.nist.gov/vuln/detail/CVE-2024-23749    7.8
 https://nvd.nist.gov/vuln/detail/CVE-2024-25003    7.8
 https://nvd.nist.gov/vuln/detail/CVE-2024-25004    7.8
-https://nvd.nist.gov/vuln/detail/CVE-2026-54057    7.8
-https://nvd.nist.gov/vuln/detail/CVE-2026-54056    7.6
 https://nvd.nist.gov/vuln/detail/CVE-2023-48795    5.9
-https://nvd.nist.gov/vuln/detail/CVE-2026-54055    5.0
 
 ------------------------------------------------------------------------
 lapack-3
 
-/nix/store/6saviis3199gv8pjp5i7gwc1ixicabzd-lapack-3.drv
+/nix/store/n0mg2v10w9pgz93gx2zy59a7ijldm1dg-lapack-3.drv
 CVE                                                CVSSv3
 https://nvd.nist.gov/vuln/detail/CVE-2021-4048     9.1
 
 ------------------------------------------------------------------------
-ldns-1.9.0
-
-/nix/store/0amwmrh7a0mrms2ljjvidr1cn0i0zlh2-ldns-1.9.0.drv
-CVE                                                CVSSv3
-https://nvd.nist.gov/vuln/detail/CVE-2026-10846    7.5
-
-------------------------------------------------------------------------
-libheif-1.21.2
-
-/nix/store/5pnbndp1mlndzaw7b5f1m2r8vaarijf7-libheif-1.21.2.drv
-CVE                                                CVSSv3
-https://nvd.nist.gov/vuln/detail/CVE-2026-32740    8.8
-https://nvd.nist.gov/vuln/detail/CVE-2026-41071    8.1
-https://nvd.nist.gov/vuln/detail/CVE-2026-32738    6.5
-https://nvd.nist.gov/vuln/detail/CVE-2026-32739    6.5
-https://nvd.nist.gov/vuln/detail/CVE-2026-41069    6.5
-
-------------------------------------------------------------------------
 libraw-0.22.1
 
-/nix/store/q71qcmv9k72rlkawmzdrmibszsf2p5sl-libraw-0.22.1.drv
+/nix/store/bj96xfn85506jljqydhnf5bwwpbdpfq0-libraw-0.22.1.drv
 CVE                                                CVSSv3
 https://nvd.nist.gov/vuln/detail/CVE-2026-20911    9.8
 https://nvd.nist.gov/vuln/detail/CVE-2026-21413    9.8
@@ -291,7 +306,7 @@ https://nvd.nist.gov/vuln/detail/CVE-2026-24450    8.1
 ------------------------------------------------------------------------
 libsndfile-1.2.2
 
-/nix/store/hndqcixiqll65h2rcqkkdplv9fdw2mzq-libsndfile-1.2.2.drv
+/nix/store/xdm0k4gy4as5rx4i1p3br931b43vcqb2-libsndfile-1.2.2.drv
 CVE                                                CVSSv3
 https://nvd.nist.gov/vuln/detail/CVE-2025-52194    7.5
 https://nvd.nist.gov/vuln/detail/CVE-2026-37555    7.5
@@ -300,52 +315,53 @@ https://nvd.nist.gov/vuln/detail/CVE-2024-50612    5.5
 https://nvd.nist.gov/vuln/detail/CVE-2025-56226    5.3
 
 ------------------------------------------------------------------------
-libusb-1.0.29
+libssh2-1.11.1
 
-/nix/store/zdrd91wyp6cv1b2i27an1pipw83q5d0p-libusb-1.0.29.drv
+/nix/store/9anybflmnxaanjdvnbd1absf2dj99r1y-libssh2-1.11.1.drv
 CVE                                                CVSSv3
-https://nvd.nist.gov/vuln/detail/CVE-2026-23679    6.2
-https://nvd.nist.gov/vuln/detail/CVE-2026-47104    4.0
+https://nvd.nist.gov/vuln/detail/CVE-2026-66032    8.8
+https://nvd.nist.gov/vuln/detail/CVE-2026-55200    8.1
+https://nvd.nist.gov/vuln/detail/CVE-2026-66033    7.5
+https://nvd.nist.gov/vuln/detail/CVE-2026-66034    7.5
+https://nvd.nist.gov/vuln/detail/CVE-2026-66035    7.5
+https://nvd.nist.gov/vuln/detail/CVE-2026-7598     7.3
+https://nvd.nist.gov/vuln/detail/CVE-2026-58050    7.0
+https://nvd.nist.gov/vuln/detail/CVE-2025-15661    6.5
+https://nvd.nist.gov/vuln/detail/CVE-2026-58051    6.5
+https://nvd.nist.gov/vuln/detail/CVE-2026-55199    5.9
 
 ------------------------------------------------------------------------
-libxml2-2.15.2
+libxml2-2.15.3
 
-/nix/store/pmshzhdcv9cbpnw4yz5ffcr5wvbd5224-libxml2-2.15.2.drv
+/nix/store/2b5nk5z3qhcgj13wkhgga19fiy334pqv-libxml2-2.15.3.drv
 CVE                                                CVSSv3
-https://nvd.nist.gov/vuln/detail/CVE-2026-6732     6.5
-
-------------------------------------------------------------------------
-lief-0.17.0
-
-/nix/store/0cybrfpa88107spzkrhri1rqazj7yin2-lief-0.17.0.drv
-CVE                                                CVSSv3
-https://nvd.nist.gov/vuln/detail/CVE-2025-15504    3.3
+https://nvd.nist.gov/vuln/detail/CVE-2026-11979    7.8
 
 ------------------------------------------------------------------------
 lua-5.2.4
 
-/nix/store/kdvdqq3smh25hd1cc2x7hqj6cimdkdv1-lua-5.2.4.drv
+/nix/store/z2crmq6ch7dnazbyzkpydi7rfc8qkrb1-lua-5.2.4.drv
 CVE                                                CVSSv3
 https://nvd.nist.gov/vuln/detail/CVE-2021-43519    5.5
 
 ------------------------------------------------------------------------
-mercurial-7.1.2
+lua-5.2.4-env
 
-/nix/store/qa1p39frds5p0r15gdj5p6gj82z8kq53-mercurial-7.1.2.drv
+/nix/store/mjkks3xzlir6swi891c2kja6g5srslm6-lua-5.2.4-env.drv
+CVE                                                CVSSv3
+https://nvd.nist.gov/vuln/detail/CVE-2021-43519    5.5
+
+------------------------------------------------------------------------
+mercurial-7.2.2
+
+/nix/store/mw8mwyhilygsydagdgmx7r90sb9n3y1z-mercurial-7.2.2.drv
 CVE                                                CVSSv3
 https://nvd.nist.gov/vuln/detail/CVE-2022-43410    5.3
 
 ------------------------------------------------------------------------
-neovim-0.12.2
-
-/nix/store/sqi4x2cibmcs89h7hiwn6inbjmbf2cnb-neovim-0.12.2.drv
-CVE                                                CVSSv3
-https://nvd.nist.gov/vuln/detail/CVE-2026-45130    6.6
-
-------------------------------------------------------------------------
 network-3.2.8.0
 
-/nix/store/rsrxkclj75hsnbqhgh68qdm75g9rbgk0-network-3.2.8.0.drv
+/nix/store/07ci44jzhv6xb7jqxgmhca871r9qvh0i-network-3.2.8.0.drv
 CVE                                                CVSSv3
 https://nvd.nist.gov/vuln/detail/CVE-2021-35047    9.9
 https://nvd.nist.gov/vuln/detail/CVE-2021-35049    9.9
@@ -362,79 +378,65 @@ https://nvd.nist.gov/vuln/detail/CVE-2022-0486     4.4
 https://nvd.nist.gov/vuln/detail/CVE-2022-0997     3.9
 
 ------------------------------------------------------------------------
-ninja-1.13.2
+ninja-1.11.1
 
-/nix/store/iy8npw5b1sgk2lnq9cdxmbs28wy1jqxi-ninja-1.13.2.drv
+/nix/store/dgqwa465bh2fipbhbcc6946jixk3hg3j-ninja-1.11.1.drv
 CVE                                                CVSSv3
 https://nvd.nist.gov/vuln/detail/CVE-2021-4336     5.5
 
 ------------------------------------------------------------------------
-oh-my-zsh-2026-02-19
+ninja-1.13.2
 
-/nix/store/jl658fhklzw0y4njjvmg9v5mc70kdfb7-oh-my-zsh-2026-02-19.drv
+/nix/store/0dcd6cz6jjfqwc1skihdm1l506l5ilvd-ninja-1.13.2.drv
+CVE                                                CVSSv3
+https://nvd.nist.gov/vuln/detail/CVE-2021-4336     5.5
+
+------------------------------------------------------------------------
+oh-my-zsh-2026-08-16
+
+/nix/store/gk9m94259nfpyv9h4dxw2wpb4adnzhm2-oh-my-zsh-2026-08-16.drv
 CVE                                                CVSSv3
 https://nvd.nist.gov/vuln/detail/CVE-2021-3727     7.5
 
 ------------------------------------------------------------------------
-openexr-3.4.10
-
-/nix/store/brrlfnrml06p87ppbkg86kapz0y9lrim-openexr-3.4.10.drv
-CVE                                                CVSSv3
-https://nvd.nist.gov/vuln/detail/CVE-2026-42217    9.8
-https://nvd.nist.gov/vuln/detail/CVE-2026-42216    9.1
-https://nvd.nist.gov/vuln/detail/CVE-2026-41142    8.8
-
-------------------------------------------------------------------------
 openmp-21.1.8
 
-/nix/store/2fcj6gglzh695jqg99jcdhpbaz6x80b3-openmp-21.1.8.drv
+/nix/store/n159i6p2z2krgpv6b5cqwnfy8wg4mjrp-openmp-21.1.8.drv
 CVE                                                CVSSv3
 https://nvd.nist.gov/vuln/detail/CVE-2022-26345    6.7
 
 ------------------------------------------------------------------------
-openssl-3.6.2
+patch-2.8
 
-/nix/store/qrdrfcn0qr889bac18zlaxjz8bx6fvf7-openssl-3.6.2.drv
+/nix/store/j1llggr329ddsy6slaid6dwrfxzh71n3-patch-2.8.drv
 CVE                                                CVSSv3
-https://nvd.nist.gov/vuln/detail/CVE-2026-34182    9.1
-https://nvd.nist.gov/vuln/detail/CVE-2026-45447    8.8
-https://nvd.nist.gov/vuln/detail/CVE-2026-7383     8.1
-https://nvd.nist.gov/vuln/detail/CVE-2026-9076     7.5
-https://nvd.nist.gov/vuln/detail/CVE-2026-34180    7.5
-https://nvd.nist.gov/vuln/detail/CVE-2026-34183    7.5
-https://nvd.nist.gov/vuln/detail/CVE-2026-42764    7.5
-https://nvd.nist.gov/vuln/detail/CVE-2026-42765    7.5
-https://nvd.nist.gov/vuln/detail/CVE-2026-45445    7.5
-https://nvd.nist.gov/vuln/detail/CVE-2026-34181    7.4
-https://nvd.nist.gov/vuln/detail/CVE-2026-42766    5.9
-https://nvd.nist.gov/vuln/detail/CVE-2026-42767    5.9
-https://nvd.nist.gov/vuln/detail/CVE-2026-42769    5.3
-https://nvd.nist.gov/vuln/detail/CVE-2026-35188    5.0
-https://nvd.nist.gov/vuln/detail/CVE-2026-45446    4.8
-https://nvd.nist.gov/vuln/detail/CVE-2026-42768    3.7
-https://nvd.nist.gov/vuln/detail/CVE-2026-42770    3.7
+https://nvd.nist.gov/vuln/detail/CVE-2026-56288    5.5
+https://nvd.nist.gov/vuln/detail/CVE-2026-56289    5.5
 
 ------------------------------------------------------------------------
-perl-5.42.0
+perl-5.42.3
 
-/nix/store/i8v7wsbpafyp6ipbf99cdvwby8hmsdc7-perl-5.42.0.drv
+/nix/store/jirk3qg71wsp5rn78480l1y50ir2c983-perl-5.42.3.drv
 CVE                                                CVSSv3
-https://nvd.nist.gov/vuln/detail/CVE-2026-4176     9.8
 https://nvd.nist.gov/vuln/detail/CVE-2026-8376     9.8
+https://nvd.nist.gov/vuln/detail/CVE-2026-13221    9.1
+https://nvd.nist.gov/vuln/detail/CVE-2026-57432    8.4
 
 ------------------------------------------------------------------------
-perl-5.42.0-env
+perl-5.42.3-env
 
-/nix/store/1aslyl2d7pzfz3c7f97kin6lyz42df92-perl-5.42.0-env.drv
+/nix/store/qsgr5bhf5k6q7d1x1gx6bkpkdcf8yk85-perl-5.42.3-env.drv
 CVE                                                CVSSv3
-https://nvd.nist.gov/vuln/detail/CVE-2026-4176     9.8
 https://nvd.nist.gov/vuln/detail/CVE-2026-8376     9.8
+https://nvd.nist.gov/vuln/detail/CVE-2026-13221    9.1
+https://nvd.nist.gov/vuln/detail/CVE-2026-57432    8.4
 
 ------------------------------------------------------------------------
 pip-20.3.4-source
 
-/nix/store/aq73jh40ylcvk8df87qynkbnp0gdhm0b-pip-20.3.4-source.drv
+/nix/store/m39gn42s0k93y0c28kqjisyi4hk1zabl-pip-20.3.4-source.drv
 CVE                                                CVSSv3
+https://nvd.nist.gov/vuln/detail/CVE-2026-13346    6.5
 https://nvd.nist.gov/vuln/detail/CVE-2021-3572     5.7
 https://nvd.nist.gov/vuln/detail/CVE-2023-5752     5.5
 https://nvd.nist.gov/vuln/detail/CVE-2026-8643     5.5
@@ -442,7 +444,7 @@ https://nvd.nist.gov/vuln/detail/CVE-2026-8643     5.5
 ------------------------------------------------------------------------
 python-2.7.18.12
 
-/nix/store/2pwqrbqgf9kf9r88jkzjvv2mr9n0xi2p-python-2.7.18.12.drv
+/nix/store/g4gc3sq0kis179akxzwmfszs10y9c7sd-python-2.7.18.12.drv
 CVE                                                CVSSv3
 https://nvd.nist.gov/vuln/detail/CVE-2022-48565    9.8
 https://nvd.nist.gov/vuln/detail/CVE-2024-49050    8.8
@@ -460,6 +462,7 @@ https://nvd.nist.gov/vuln/detail/CVE-2026-3087     7.5
 https://nvd.nist.gov/vuln/detail/CVE-2026-3644     7.5
 https://nvd.nist.gov/vuln/detail/CVE-2026-4224     7.5
 https://nvd.nist.gov/vuln/detail/CVE-2026-7210     7.5
+https://nvd.nist.gov/vuln/detail/CVE-2026-15308    7.5
 https://nvd.nist.gov/vuln/detail/CVE-2022-26488    7.0
 https://nvd.nist.gov/vuln/detail/CVE-2021-3733     6.5
 https://nvd.nist.gov/vuln/detail/CVE-2022-48564    6.5
@@ -468,36 +471,25 @@ https://nvd.nist.gov/vuln/detail/CVE-2021-23336    5.9
 https://nvd.nist.gov/vuln/detail/CVE-2022-48566    5.9
 https://nvd.nist.gov/vuln/detail/CVE-2025-6075     5.5
 https://nvd.nist.gov/vuln/detail/CVE-2025-13837    5.5
+https://nvd.nist.gov/vuln/detail/CVE-2026-0864     5.5
 https://nvd.nist.gov/vuln/detail/CVE-2023-40217    5.3
 https://nvd.nist.gov/vuln/detail/CVE-2025-12084    5.3
 https://nvd.nist.gov/vuln/detail/CVE-2025-12781    5.3
+https://nvd.nist.gov/vuln/detail/CVE-2026-4360     5.3
 https://nvd.nist.gov/vuln/detail/CVE-2025-13462    3.3
 https://nvd.nist.gov/vuln/detail/CVE-2026-4519     3.3
 
 ------------------------------------------------------------------------
-rsync-3.4.1
-
-/nix/store/6kvhq58klj167sb7hhsa3lny2najsnny-rsync-3.4.1.drv
-CVE                                                CVSSv3
-https://nvd.nist.gov/vuln/detail/CVE-2026-43618    8.1
-https://nvd.nist.gov/vuln/detail/CVE-2026-41035    7.4
-https://nvd.nist.gov/vuln/detail/CVE-2026-29518    7.0
-https://nvd.nist.gov/vuln/detail/CVE-2026-43620    6.5
-https://nvd.nist.gov/vuln/detail/CVE-2026-43619    6.3
-https://nvd.nist.gov/vuln/detail/CVE-2026-43617    4.8
-https://nvd.nist.gov/vuln/detail/CVE-2026-45232    3.1
-
-------------------------------------------------------------------------
 rubygems-3.7.2
 
-/nix/store/md5rz8ndqaysx5l3aclf6vd6qdq50kh4-rubygems-3.7.2.drv
+/nix/store/jgcd84qqprrxx1vjmdwk9x83x60vy7rj-rubygems-3.7.2.drv
 CVE                                                CVSSv3
 https://nvd.nist.gov/vuln/detail/CVE-2022-36073    8.3
 
 ------------------------------------------------------------------------
 safe-0.3.21
 
-/nix/store/amcw19xafi7rzkgilyd7rw5b9dfcxgla-safe-0.3.21.drv
+/nix/store/2lyqys77vjq9plmy01c3088q05liif87-safe-0.3.21.drv
 CVE                                                CVSSv3
 https://nvd.nist.gov/vuln/detail/CVE-2022-38164    6.5
 https://nvd.nist.gov/vuln/detail/CVE-2022-47524    5.4
@@ -517,7 +509,7 @@ https://nvd.nist.gov/vuln/detail/CVE-2022-38163    3.5
 ------------------------------------------------------------------------
 safe-0.3.21-r1.cabal
 
-/nix/store/vf9dc5x03dc4pp8hd4vpyj27aqx7rmwr-safe-0.3.21-r1.cabal.drv
+/nix/store/s5arm5008iwzxhzg88sqf5w0995jm8as-safe-0.3.21-r1.cabal.drv
 CVE                                                CVSSv3
 https://nvd.nist.gov/vuln/detail/CVE-2022-38164    6.5
 https://nvd.nist.gov/vuln/detail/CVE-2022-47524    5.4
@@ -537,71 +529,68 @@ https://nvd.nist.gov/vuln/detail/CVE-2022-38163    3.5
 ------------------------------------------------------------------------
 setuptools-44.0.0-source
 
-/nix/store/615jph3nddmk6l5mbzyhp4sfzck1ivq6-setuptools-44.0.0-source.drv
+/nix/store/fpi93z9g1rlrjnmznvii3j69y4yyhkkk-setuptools-44.0.0-source.drv
 CVE                                                CVSSv3
 https://nvd.nist.gov/vuln/detail/CVE-2025-47273    8.8
+https://nvd.nist.gov/vuln/detail/CVE-2026-59890    6.1
 https://nvd.nist.gov/vuln/detail/CVE-2022-40897    5.9
 
 ------------------------------------------------------------------------
 shellcheck-0.11.0
 
-/nix/store/vxrqivf2qkjbrglzi13ssg4h20g58vb1-shellcheck-0.11.0.drv
+/nix/store/1bnrzqn35mpffpddmini5y5s9bf1c5bc-shellcheck-0.11.0.drv
 CVE                                                CVSSv3
 https://nvd.nist.gov/vuln/detail/CVE-2021-28794    9.8
 
 ------------------------------------------------------------------------
 snappy-1.2.2
 
-/nix/store/wcghnzjpmqvyavx7zklh304mr9wk1s90-snappy-1.2.2.drv
+/nix/store/5n3clzgsg4npjag7kninwa7dqvyaskc3-snappy-1.2.2.drv
 CVE                                                CVSSv3
 https://nvd.nist.gov/vuln/detail/CVE-2023-28115    9.8
 https://nvd.nist.gov/vuln/detail/CVE-2023-41330    9.8
 
 ------------------------------------------------------------------------
-sqlite-3.51.2
-
-/nix/store/xhnpy4zfm5gs8fgplmalpid3mp8pdi5k-sqlite-3.51.2.drv
-CVE                                                CVSSv3
-https://nvd.nist.gov/vuln/detail/CVE-2026-11822    7.8
-https://nvd.nist.gov/vuln/detail/CVE-2026-11824    7.8
-
-------------------------------------------------------------------------
 stringbuilder-0.5.1
 
-/nix/store/lys80vpxmxs2i8a0jg4wgb0jsl1kh09v-stringbuilder-0.5.1.drv
+/nix/store/ic0bs2daw5c3dg9zpz5idkkyd6gqgnhj-stringbuilder-0.5.1.drv
 CVE                                                CVSSv3
 https://nvd.nist.gov/vuln/detail/CVE-2024-21524    8.2
 
 ------------------------------------------------------------------------
 subversion-1.14.5
 
-/nix/store/a5hxqfcvfp72p13xqi9jxpfj3wm6klpq-subversion-1.14.5.drv
+/nix/store/6rh11ahkcwvr39r6jlsj8kh9bi7ms5hn-subversion-1.14.5.drv
 CVE                                                CVSSv3
 https://nvd.nist.gov/vuln/detail/CVE-2021-21698    7.5
 https://nvd.nist.gov/vuln/detail/CVE-2022-29046    5.4
 https://nvd.nist.gov/vuln/detail/CVE-2022-29048    4.3
 
 ------------------------------------------------------------------------
-unbound-1.25.0
+swift-5.10.1
 
-/nix/store/g9fv37hig42ghfriwgbrqjj11xh4m28n-unbound-1.25.0.drv
+/nix/store/ydhkrs7kwwm0jml27j0qsljhf3zmq0fj-swift-5.10.1.drv
 CVE                                                CVSSv3
-https://nvd.nist.gov/vuln/detail/CVE-2026-42960    10.0
-https://nvd.nist.gov/vuln/detail/CVE-2026-33278    9.8
-https://nvd.nist.gov/vuln/detail/CVE-2026-40622    7.5
-https://nvd.nist.gov/vuln/detail/CVE-2026-41292    7.5
-https://nvd.nist.gov/vuln/detail/CVE-2026-42944    7.5
-https://nvd.nist.gov/vuln/detail/CVE-2026-42959    7.5
-https://nvd.nist.gov/vuln/detail/CVE-2026-44608    5.9
-https://nvd.nist.gov/vuln/detail/CVE-2026-32792    5.3
-https://nvd.nist.gov/vuln/detail/CVE-2026-42534    5.3
-https://nvd.nist.gov/vuln/detail/CVE-2026-42923    5.3
-https://nvd.nist.gov/vuln/detail/CVE-2026-44390    5.3
+https://nvd.nist.gov/vuln/detail/CVE-2023-26154    5.9
+
+------------------------------------------------------------------------
+swift-5.10.1-src
+
+/nix/store/cb25bk31j0nhgy3wwhlyrhivdc7yx15l-swift-5.10.1-src.drv
+CVE                                                CVSSv3
+https://nvd.nist.gov/vuln/detail/CVE-2023-26154    5.9
+
+------------------------------------------------------------------------
+tap-1.0.1
+
+/nix/store/s8js60g5dcw4z583qflg0czd4r1l19bk-tap-1.0.1.drv
+CVE                                                CVSSv3
+https://nvd.nist.gov/vuln/detail/CVE-2023-41940    5.4
 
 ------------------------------------------------------------------------
 vault-0.3.1.6
 
-/nix/store/s4cffyq9b5nbhs4310f3w6x6ibkp2w3i-vault-0.3.1.6.drv
+/nix/store/ylibgh79hrw6n7kr1fcs361ghv341dzv-vault-0.3.1.6.drv
 CVE                                                CVSSv3
 https://nvd.nist.gov/vuln/detail/CVE-2024-2048     8.1
 https://nvd.nist.gov/vuln/detail/CVE-2021-27400    7.5
@@ -623,23 +612,9 @@ https://nvd.nist.gov/vuln/detail/CVE-2025-6011     3.7
 https://nvd.nist.gov/vuln/detail/CVE-2021-41802    2.9
 
 ------------------------------------------------------------------------
-vim-9.2.0389
-
-/nix/store/1q5qn5ff82nhrk1p0wnrf7dgir17xbhd-vim-9.2.0389.drv
-CVE                                                CVSSv3
-https://nvd.nist.gov/vuln/detail/CVE-2026-47162    8.8
-https://nvd.nist.gov/vuln/detail/CVE-2026-52859    8.2
-https://nvd.nist.gov/vuln/detail/CVE-2026-52858    7.8
-https://nvd.nist.gov/vuln/detail/CVE-2026-52860    7.8
-https://nvd.nist.gov/vuln/detail/CVE-2026-45130    6.6
-https://nvd.nist.gov/vuln/detail/CVE-2026-44656    5.3
-https://nvd.nist.gov/vuln/detail/CVE-2026-47167    5.3
-https://nvd.nist.gov/vuln/detail/CVE-2026-46483    3.6
-
-------------------------------------------------------------------------
 warp-3.4.9
 
-/nix/store/42sp7sn733b87kksp1pr8cc9b6gzv6c3-warp-3.4.9.drv
+/nix/store/w9q08pq4d842yvs0g5rzf90i9zlr3fvx-warp-3.4.9.drv
 CVE                                                CVSSv3
 https://nvd.nist.gov/vuln/detail/CVE-2022-4428     8.9
 https://nvd.nist.gov/vuln/detail/CVE-2022-2225     8.1
@@ -658,14 +633,14 @@ https://nvd.nist.gov/vuln/detail/CVE-2023-0654     3.9
 ------------------------------------------------------------------------
 wheel-0.37.1-source
 
-/nix/store/w09fj9gdncgav6m659j83d45y6zgfnbl-wheel-0.37.1-source.drv
+/nix/store/sdr80pr4bhyjd08a289rxay4wq2dandj-wheel-0.37.1-source.drv
 CVE                                                CVSSv3
 https://nvd.nist.gov/vuln/detail/CVE-2022-40898    7.5
 
 ------------------------------------------------------------------------
 yaml-0.11.11.2
 
-/nix/store/z8cra6dyx2k7w95mw4giiaynpq5vs12l-yaml-0.11.11.2.drv
+/nix/store/1gycyh1njifc52b8i0m9sb7gh0h8pyl2-yaml-0.11.11.2.drv
 CVE                                                CVSSv3
 https://nvd.nist.gov/vuln/detail/CVE-2022-3064     7.5
 https://nvd.nist.gov/vuln/detail/CVE-2021-4235     5.5
@@ -673,7 +648,7 @@ https://nvd.nist.gov/vuln/detail/CVE-2021-4235     5.5
 ------------------------------------------------------------------------
 yaml-0.11.11.2-r2.cabal
 
-/nix/store/kwcxpnz4jqjia2pbih9a7xwpbjsmyk6b-yaml-0.11.11.2-r2.cabal.drv
+/nix/store/bcfff81jmr0y5rrz4qy2sbv34vhy58if-yaml-0.11.11.2-r2.cabal.drv
 CVE                                                CVSSv3
 https://nvd.nist.gov/vuln/detail/CVE-2022-3064     7.5
 https://nvd.nist.gov/vuln/detail/CVE-2021-4235     5.5
@@ -681,7 +656,7 @@ https://nvd.nist.gov/vuln/detail/CVE-2021-4235     5.5
 ------------------------------------------------------------------------
 yasm-1.3.0
 
-/nix/store/4kh5p1mj5j7g8hjbwa68hszd7f4qx9ph-yasm-1.3.0.drv
+/nix/store/4v11bvmv9yariq2fpafg5x9z49yfl14i-yasm-1.3.0.drv
 CVE                                                CVSSv3
 https://nvd.nist.gov/vuln/detail/CVE-2021-33454    5.5
 https://nvd.nist.gov/vuln/detail/CVE-2021-33455    5.5
@@ -708,7 +683,7 @@ https://nvd.nist.gov/vuln/detail/CVE-2023-31975    3.3
 ------------------------------------------------------------------------
 yoke-0.8.1
 
-/nix/store/w1ifc0zwy4dzvhy52qfk9yblyfykndhl-yoke-0.8.1.drv
+/nix/store/ir2dnk23r3al1mlrrjbrj8xzpmll98gv-yoke-0.8.1.drv
 CVE                                                CVSSv3
 https://nvd.nist.gov/vuln/detail/CVE-2026-26056    8.8
 https://nvd.nist.gov/vuln/detail/CVE-2026-26055    7.5
@@ -716,7 +691,7 @@ https://nvd.nist.gov/vuln/detail/CVE-2026-26055    7.5
 ------------------------------------------------------------------------
 zlib-0.7.1.1
 
-/nix/store/54k096v0wapas6i4dn5fxh86is8i1825-zlib-0.7.1.1.drv
+/nix/store/axcsh2m0yzsq82v4s3xlk5393jkrj3cq-zlib-0.7.1.1.drv
 CVE                                                CVSSv3
 https://nvd.nist.gov/vuln/detail/CVE-2022-37434    9.8
 https://nvd.nist.gov/vuln/detail/CVE-2023-45853    9.8
@@ -727,7 +702,7 @@ https://nvd.nist.gov/vuln/detail/CVE-2023-6992     4.0
 ------------------------------------------------------------------------
 zlib-1.3.2
 
-/nix/store/gnglijw3slh82idxiic7p5r6s1f7p4qv-zlib-1.3.2.drv
+/nix/store/xbca5h0p5sdz8aqm6qwkyjgjjj9qf3fy-zlib-1.3.2.drv
 CVE                                                CVSSv3
 https://nvd.nist.gov/vuln/detail/CVE-2026-27820    9.8
 https://nvd.nist.gov/vuln/detail/CVE-2023-6992     4.0
