@@ -1,6 +1,7 @@
 require("plugins/yazi")
 require("plugins/which-key")
 require("plugins/telescope")
+require("plugins/hlslens")
 require("plugins/completion")
 require("plugins/conform") -- code formatter, could use LSP formatting instead if you prefer
 require("plugins/ai")

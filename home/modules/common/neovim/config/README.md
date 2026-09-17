@@ -44,7 +44,7 @@ new experimental message UI (`vim._core.ui2`). Requires **Neovim ≥ 0.12** (sta
 | **git** | `vim.pack` clones plugins over HTTPS |
 | **A Nerd Font** | statusline / dashboard / completion icons |
 | **ripgrep** (`rg`) | Telescope live grep, grug-far |
-| **fzf** | Telescope find files |
+| **fzf** (non-Nix only) | Telescope find files — not required on NixOS (`telescope-fzf-native` provides the native C sorter instead, managed by Nix) |
 | **yazi** | file manager integration (`<leader><leader>`, `<leader>E`) |
 | **lazygit** | floating git UI (`<leader>gg`) |
 | **Ollama** (macOS only) | local LLM for AI ghost-text completion (`avante.nvim`) — booted on demand via `:AvanteEnable`, never at startup |
@@ -108,7 +108,7 @@ Nix (`neovim.nix`) and Mason is kept for its UI only.
 │   │   ├── init.lua          # requires every plugin module below
 │   │   ├── ai.lua            # legacy copilot config (entirely commented out, not loaded)
 │   │   ├── avante.lua        # avante.nvim + Ollama AI completion (macOS only)
-│   │   ├── completion.lua    # blink.cmp (lazy-loaded on InsertEnter)
+│   │   ├── completion.lua    # blink.cmp (lazy-loaded on InsertEnter) + friendly-snippets
 │   │   ├── conform.lua       # conform.nvim formatters by filetype
 │   │   ├── dashboard.lua     # dashboard-nvim start screen ("hyper" theme; milli.nvim splash commented out — perf)
 │   │   ├── flash.lua         # flash.nvim motions / treesitter jumps
@@ -116,7 +116,8 @@ Nix (`neovim.nix`) and Mason is kept for its UI only.
 │   │   ├── markview.lua      # markview.nvim — in-buffer markdown rendering
 │   │   ├── opencode.lua      # opencode.nvim — OpenCode integration (<leader>o…, go/goo, <S-C-u/d>)
 │   │   ├── snacks.lua        # folke/snacks.nvim (picker, indent, scroll, notifier, …)
-│   │   ├── telescope.lua     # telescope.nvim
+│   │   ├── hlslens.lua       # nvim-hlslens — search match count overlay
+│   │   ├── telescope.lua     # telescope.nvim + telescope-fzf-native
 │   │   ├── which-key.lua     # which-key.nvim
 │   │   └── yazi.lua          # yazi.nvim file manager
 │   │
@@ -165,6 +166,9 @@ them; they are intended to play **no role** in the active config right now:
 | [opencode.nvim](https://github.com/nickjvandyke/opencode.nvim) | OpenCode integration (`<leader>oa` ask, `<leader>os` select, `go`/`goo` append operators, `<S-C-u>`/`<S-C-d>` scroll) |
 | [markview.nvim](https://github.com/OXY2DEV/markview.nvim) | in-buffer markdown rendering |
 | [telescope.nvim](https://github.com/nvim-telescope/telescope.nvim) | fuzzy finder |
+| [telescope-fzf-native.nvim](https://github.com/nvim-telescope/telescope-fzf-native.nvim) | native C fzf sorter for telescope. **NixOS:** managed by `pkgs.vimPlugins.telescope-fzf-native-nvim` in `neovim.nix` (pre-built `libfzf.so`). **Non-Nix:** uncomment the `vim.pack.add` entry in `telescope.lua` and add `build = "make"` |
+| [nvim-hlslens](https://github.com/kevinhwang91/nvim-hlslens) | shows match count and index next to search matches (`n`/`N`/`*`/`#`/`g*`/`g#`) |
+| [friendly-snippets](https://github.com/rafamadriz/friendly-snippets) | VSCode-format snippet collection for 40+ languages; picked up automatically by blink.cmp's `snippets` source via `runtimepath` — no setup call needed |
 | [snacks.nvim](https://github.com/folke/snacks.nvim) | picker, indent guides, scroll, notifier, dashboard, … |
 | [flash.nvim](https://github.com/folke/flash.nvim) | jump motions / treesitter selection |
 | [grug-far.nvim](https://github.com/MagicDuck/grug-far.nvim) | search & replace across project |
@@ -299,6 +303,11 @@ configured LSP servers. Restart once after the initial sync.
 > `neovim.nix` (`home.packages`). Mason finds them on PATH and skips downloading
 > prebuilt binaries — necessary on baremetal NixOS where foreign ELF binaries won't
 > run. No Mason behaviour changes are needed.
+>
+> `telescope-fzf-native.nvim` is also managed by Nix (`programs.neovim.plugins` in
+> `neovim.nix`) because `vim.pack` cannot compile its C extension (`libfzf.so`) at
+> runtime. The `vim.pack.add` entry in `telescope.lua` is intentionally commented out
+> on NixOS — do not uncomment it.
 
 ### Live development (no rebuild)
 

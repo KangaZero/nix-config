@@ -6,6 +6,9 @@
     vimAlias = true;
     # Lets neovim use the default ~/.config/nvim/init.lua — config managed outside Nix
     sideloadInitLua = true;
+    plugins = with pkgs.vimPlugins; [
+      telescope-fzf-native-nvim
+    ];
   };
 
   xdg.configFile."nvim" = {

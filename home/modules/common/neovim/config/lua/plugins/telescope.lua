@@ -1,6 +1,10 @@
 vim.pack.add({
 	"https://github.com/nvim-lua/plenary.nvim",
 	"https://github.com/nvim-telescope/telescope.nvim",
+	-- On NixOS: managed by pkgs.vimPlugins.telescope-fzf-native-nvim in neovim.nix
+	-- (vim.pack cannot compile libfzf.so at runtime; Nix pre-builds it)
+	-- On non-Nix: uncomment to let vim.pack download and build it:
+	-- "https://github.com/nvim-telescope/telescope-fzf-native.nvim",
 })
 
 ---@alias telescope.Theme "dropdown"|"ivy"|"cursor"
@@ -104,3 +108,5 @@ end
 
 apply_telescope_highlights()
 vim.api.nvim_create_autocmd("ColorScheme", { callback = apply_telescope_highlights })
+
+require("telescope").load_extension("fzf")
