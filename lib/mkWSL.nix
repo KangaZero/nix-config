@@ -13,5 +13,6 @@ mkNixOS (
       # ../modules/nixos/wayland/niri.nix
       { security.sudo.wheelNeedsPassword = false; }
     ];
+    allowedPackages = [ "claude-code" ];
   }
 )

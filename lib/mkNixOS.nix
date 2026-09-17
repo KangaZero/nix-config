@@ -4,20 +4,19 @@
   system,
   user,
   extraModules ? [ ],
+  allowedPackages ? [
+    "claude-code"
+    "steam"
+    "steam-unwrapped"
+    "steam-run"
+  ],
 }:
 let
   userMeta = import ../home/profiles/${user}/default.nix;
   username = userMeta.usernames.linux;
   pkgs = import inputs.nixpkgs {
     inherit system;
-    config.allowUnfreePredicate =
-      pkg:
-      builtins.elem (inputs.nixpkgs.lib.getName pkg) [
-        "claude-code"
-        "steam"
-        "steam-unwrapped"
-        "steam-run"
-      ];
+    config.allowUnfreePredicate = pkg: builtins.elem (inputs.nixpkgs.lib.getName pkg) allowedPackages;
     overlays = [ (import ../overlays/zjstatus { inherit inputs; }) ];
   };
 in

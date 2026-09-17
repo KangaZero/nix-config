@@ -79,7 +79,9 @@
   # base retention policy unchanged.
   nix.settings.auto-optimise-store = true;
 
-  environment.variables.EDITOR = "nvim";
+  environment.variables = {
+    EDITOR = "nvim";
+  };
 
   # No system-level packages: git + neovim are provided per-user by home-manager
   # (home/modules/common/git.nix and neovim/neovim.nix); weston was dropped when
