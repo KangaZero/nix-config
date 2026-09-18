@@ -31,6 +31,32 @@ inputs.git-hooks.lib.${system}.run {
       # errored instead of evaluating anything.
       entry = "${pkgs.writeShellScriptBin "eval-config" "nix eval --raw .#nixosConfigurations.nixos.config.system.build.toplevel.outPath"}/bin/eval-config";
     };
+    packages-eval = {
+      enable = true;
+      name = "Evaluate flake packages";
+      language = "system";
+      # `packages.<system>.*` sit outside the system closure that nix-eval and the
+      # pre-push build cover, so a bad option path in packages/nvf/ would otherwise
+      # only surface on `nix run .#nvf`. Evaluating the whole attrset rather than
+      # named packages keeps this correct per host — kitty exists only on darwin.
+      entry = "${pkgs.writeShellScriptBin "eval-packages" ''
+        nix eval --json ".#packages.${system}" --apply 'ps: builtins.mapAttrs (_: p: p.drvPath) ps' >/dev/null
+      ''}/bin/eval-packages";
+      files = "^packages/.*\\.nix$";
+      pass_filenames = false;
+      stages = [ "pre-commit" ];
+    };
+    packages-build = {
+      enable = true;
+      name = "packages build";
+      # Eval alone misses bad fetches and failing nvimRequireCheck — the class that
+      # bit nekonight.nvim. Only runs when packages/ changes.
+      entry = "nix build --no-link --print-build-logs \".#packages.${system}.nvf\"";
+      language = "system";
+      files = "^packages/.*\\.nix$";
+      pass_filenames = false;
+      stages = [ "pre-push" ];
+    };
     check-author = {
       enable = true;
       name = "check git author";
