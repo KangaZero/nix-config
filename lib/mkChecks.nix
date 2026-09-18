@@ -25,7 +25,11 @@ inputs.git-hooks.lib.${system}.run {
       always_run = true;
       stages = [ "pre-commit" ];
       pass_filenames = false;
-      entry = "${pkgs.writeShellScriptBin "eval-config" "nix eval --raw .#nixosConfigurations.nixos.config.system.build.toplevel.outPath"}/bin/check-author";
+      # The binary is named by writeShellScriptBin's first argument, so this must be
+      # /bin/eval-config. It previously read /bin/check-author — copy-pasted from the
+      # neighbouring hook — a path that does not exist in this derivation, so the hook
+      # errored instead of evaluating anything.
+      entry = "${pkgs.writeShellScriptBin "eval-config" "nix eval --raw .#nixosConfigurations.nixos.config.system.build.toplevel.outPath"}/bin/eval-config";
     };
     check-author = {
       enable = true;
