@@ -1,7 +1,60 @@
--- avante.nvim: local-LLM AI assist via Ollama. macOS-only by design
+-- avante.nvim: local-LLM AI assist via Ollama. macOS-only by design.
+--
+-- Registration happens before the platform guard deliberately. vim.pack writes
+-- nvim-pack-lock.json from what is present in pack/core/opt, so an add() reachable
+-- only on Darwin can never be pinned from a Linux host: the lock committed from WSL
+-- silently omitted avante and nui, and macOS then installed them unpinned. Non-Darwin
+-- hosts pay a clone and an rtp entry; nothing is sourced, since `load` defaults to
+-- false while init.lua is being sourced.
+vim.pack.add({
+	"https://github.com/yetone/avante.nvim",
+	"https://github.com/MunifTanjim/nui.nvim",
+})
+
 if vim.uv.os_uname().sysname ~= "Darwin" then
 	return
 end
+
+-- avante ships a native (Rust) matcher built by its Makefile. vim.pack.Spec has no
+-- `build` field — normalize_spec keeps only src/name/version/data — so the
+-- `build = "make"` this used to carry was silently dropped and never ran, meaning
+-- the matcher has never actually been built. PackChanged is the documented hook
+-- (:h PackChanged). Past the Darwin guard, so macOS-only by construction.
+--
+-- TODO: needs `cargo` to actually build. Nothing in the darwin profile provides it
+-- (rustup is per-project by choice, see neovim.nix), so this currently reports a skip
+-- every time. Add `cargo` — or `rustup` — to home/profiles/KangaZero/darwin.nix to
+-- enable it; avante falls back to a pure-Lua matcher until then, which is what it has
+-- silently been using all along.
+vim.api.nvim_create_autocmd("PackChanged", {
+	desc = "build avante's native matcher when its code changes",
+	callback = function(ev)
+		if ev.data.spec.name ~= "avante.nvim" then
+			return
+		end
+		if ev.data.kind ~= "install" and ev.data.kind ~= "update" then
+			return
+		end
+		if vim.fn.executable("cargo") == 0 then
+			vim.notify("[avante] skipping native build: cargo not on PATH", vim.log.levels.WARN)
+			return
+		end
+		-- vim.system is async; without on_exit a non-zero status is discarded, which
+		-- is how a failing build would go unnoticed.
+		vim.system({ "make" }, { cwd = ev.data.path }, function(out)
+			vim.schedule(function()
+				if out.code == 0 then
+					vim.notify("[avante] native matcher built", vim.log.levels.INFO)
+				else
+					vim.notify(
+						("[avante] make failed (%d): %s"):format(out.code, out.stderr or ""),
+						vim.log.levels.ERROR
+					)
+				end
+			end)
+		end)
+	end,
+})
 
 -- NOTE: kept per user choice. This is a *base* (non-instruct) model, so it follows
 -- edit/chat prompts loosely; because AI is on-demand (:AvanteEnable) its weight never
@@ -85,11 +138,6 @@ local function ensure_ollama()
 	end
 	return true
 end
-
-vim.pack.add({
-	{ src = "https://github.com/yetone/avante.nvim", build = "make" },
-	"https://github.com/MunifTanjim/nui.nvim",
-})
 
 -- Setup runs at load (cheap, no network) so :Avante* commands always exist.
 require("avante").setup(opts)
