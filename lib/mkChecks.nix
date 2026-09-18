@@ -29,7 +29,11 @@ inputs.git-hooks.lib.${system}.run {
       # /bin/eval-config. It previously read /bin/check-author — copy-pasted from the
       # neighbouring hook — a path that does not exist in this derivation, so the hook
       # errored instead of evaluating anything.
-      entry = "${pkgs.writeShellScriptBin "eval-config" "nix eval --raw .#nixosConfigurations.nixos.config.system.build.toplevel.outPath"}/bin/eval-config";
+      # Uses buildTarget rather than a hardcoded host: this hook previously always
+      # evaluated .#nixosConfigurations.nixos, so on darwin it checked the WSL config
+      # and never the one being committed to. buildTarget is already a buildable
+      # flake ref per host, so .outPath makes it evaluable.
+      entry = "${pkgs.writeShellScriptBin "eval-config" "nix eval --raw ${buildTarget}.outPath"}/bin/eval-config";
     };
     packages-eval = {
       enable = true;
