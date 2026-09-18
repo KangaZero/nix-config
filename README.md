@@ -29,7 +29,7 @@
 > and the argument-free `nh` commands break. Relocating means editing those files.
 
 > [!TIP]
-> **Just want the Neovim config?** → [`home/modules/common/neovim/config/`](home/modules/common/neovim/config/README.md) — standalone, no Nix required.
+> **Just want the Neovim config?** → [`home/modules/common/neovim/config/`](home/modules/common/neovim/config/README.md) — it is a plain `init.lua` tree and runs without Nix, but not unaided: treesitter grammars, `telescope-fzf-native`'s `libfzf.so` and `.luarc.json` all come from Nix here, so off Nix you supply the `tree-sitter` CLI and a C toolchain yourself. See that README's *Extra requirements without Nix*.
 
 > [!NOTE]
 > **There are two Neovims in this repo.**
