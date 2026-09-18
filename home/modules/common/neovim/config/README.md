@@ -44,8 +44,8 @@ new experimental message UI (`vim._core.ui2`). Requires **Neovim ≥ 0.12** (sta
 | **git** | `vim.pack` clones plugins over HTTPS |
 | **A Nerd Font** | statusline / dashboard / completion icons |
 | **ripgrep** (`rg`) | Telescope live grep, grug-far |
-| **fzf** (non-Nix only) | Telescope find files — not required on NixOS (`telescope-fzf-native` provides the native C sorter instead, managed by Nix) |
-| **yazi** | file manager integration (`<leader><leader>`, `<leader>E`) |
+| **fd** | Telescope `find_files` uses it when present (`telescope.lua`), falling back to Telescope's own walker otherwise. Unrelated to `telescope-fzf-native`, which is a compiled C sorter, not the `fzf` binary — nothing here shells out to `fzf` |
+| **yazi** | file manager integration (`<leader>E` cwd, `<leader>e` current buffer, `<C-Up>` resume) |
 | **lazygit** | floating git UI (`<leader>gg`) |
 | **Ollama** (macOS only) | local LLM for AI ghost-text completion (`avante.nvim`) — booted on demand via `:AvanteEnable`, never at startup |
 | **node / cargo / etc.** | runtimes for the LSP servers you enable |
@@ -87,7 +87,8 @@ Nix (`neovim.nix`) and Mason is kept for its UI only.
 ├── scripts/                  # check-syntax.lua, load-test.sh, install-hooks.sh, hooks/pre-commit
 │
 ├── lua/
-│   ├── core.lua              # vim.pack.add for core plugins + treesitter/highlight-colors setup
+│   ├── core.lua              # vim.pack.add for core plugins + treesitter/highlight-colors setup;
+│   │                         #   also appends nvim-treesitter runtime/ to rtp so its queries resolve
 │   ├── options.lua           # vim.o / vim.opt settings, diagnostic signs
 │   ├── keymaps.lua           # all keymaps (windows, LSP, flash, treesitter textobjects, …)
 │   ├── autocmds.lua          # yank highlight, format-on-save, autosave, close-with-q, …
@@ -106,18 +107,20 @@ Nix (`neovim.nix`) and Mason is kept for its UI only.
 │   │
 │   ├── plugins/
 │   │   ├── init.lua          # requires every plugin module below
-│   │   ├── ai.lua            # legacy copilot config (entirely commented out, not loaded)
+│   │   ├── ai.lua            # legacy copilot config (entirely commented out; copilot.lua no longer installed)
 │   │   ├── avante.lua        # avante.nvim + Ollama AI completion (macOS only)
 │   │   ├── completion.lua    # blink.cmp (lazy-loaded on InsertEnter) + friendly-snippets
 │   │   ├── conform.lua       # conform.nvim formatters by filetype
-│   │   ├── dashboard.lua     # dashboard-nvim start screen ("hyper" theme; milli.nvim splash commented out — perf)
+│   │   ├── dashboard.lua     # dashboard-nvim start screen ("hyper" theme; milli.nvim splash commented out — perf, and no longer installed)
 │   │   ├── flash.lua         # flash.nvim motions / treesitter jumps
 │   │   ├── grug-far.lua      # project-wide search & replace
 │   │   ├── markview.lua      # markview.nvim — in-buffer markdown rendering
 │   │   ├── opencode.lua      # opencode.nvim — OpenCode integration (<leader>o…, go/goo, <S-C-u/d>)
 │   │   ├── snacks.lua        # folke/snacks.nvim (picker, indent, scroll, notifier, …)
 │   │   ├── hlslens.lua       # nvim-hlslens — search match count overlay
+│   │   ├── otter.lua         # otter.nvim — LSP for Lua/bash embedded in Nix strings
 │   │   ├── telescope.lua     # telescope.nvim + telescope-fzf-native
+│   │   ├── tiny-inline-diagnostic.lua  # inline virtual-text diagnostics
 │   │   ├── which-key.lua     # which-key.nvim
 │   │   └── yazi.lua          # yazi.nvim file manager
 │   │
@@ -166,7 +169,7 @@ them; they are intended to play **no role** in the active config right now:
 | [opencode.nvim](https://github.com/nickjvandyke/opencode.nvim) | OpenCode integration (`<leader>oa` ask, `<leader>os` select, `go`/`goo` append operators, `<S-C-u>`/`<S-C-d>` scroll) |
 | [markview.nvim](https://github.com/OXY2DEV/markview.nvim) | in-buffer markdown rendering |
 | [telescope.nvim](https://github.com/nvim-telescope/telescope.nvim) | fuzzy finder |
-| [telescope-fzf-native.nvim](https://github.com/nvim-telescope/telescope-fzf-native.nvim) | native C fzf sorter for telescope. **NixOS:** managed by `pkgs.vimPlugins.telescope-fzf-native-nvim` in `neovim.nix` (pre-built `libfzf.so`). **Non-Nix:** uncomment the `vim.pack.add` entry in `telescope.lua` and add `build = "make"` |
+| [telescope-fzf-native.nvim](https://github.com/nvim-telescope/telescope-fzf-native.nvim) | native C fzf sorter for telescope. **NixOS:** managed by `pkgs.vimPlugins.telescope-fzf-native-nvim` in `neovim.nix` (pre-built `libfzf.so`). **Non-Nix:** uncomment the `vim.pack.add` entry in `telescope.lua`. Note `build` is *not* a `vim.pack.Spec` field (`normalize_spec` keeps only `src`/`name`/`version`/`data`), so it is silently dropped — compile `libfzf.so` from a `PackChanged` autocmd instead, as `avante.lua` does |
 | [nvim-hlslens](https://github.com/kevinhwang91/nvim-hlslens) | shows match count and index next to search matches (`n`/`N`/`*`/`#`/`g*`/`g#`) |
 | [friendly-snippets](https://github.com/rafamadriz/friendly-snippets) | VSCode-format snippet collection for 40+ languages; picked up automatically by blink.cmp's `snippets` source via `runtimepath` — no setup call needed |
 | [snacks.nvim](https://github.com/folke/snacks.nvim) | picker, indent guides, scroll, notifier, dashboard, … |
@@ -174,10 +177,19 @@ them; they are intended to play **no role** in the active config right now:
 | [grug-far.nvim](https://github.com/MagicDuck/grug-far.nvim) | search & replace across project |
 | [yazi.nvim](https://github.com/mikavilpas/yazi.nvim) | yazi file-manager integration |
 | [which-key.nvim](https://github.com/folke/which-key.nvim) | keymap hints |
-| [dashboard-nvim](https://github.com/nvimdev/dashboard-nvim) | start screen (`hyper` theme; [milli.nvim](https://github.com/amansingh-afk/milli.nvim) animated splash is present but commented out for performance) |
+| [dashboard-nvim](https://github.com/nvimdev/dashboard-nvim) | start screen (`hyper` theme) |
+| [tiny-inline-diagnostic.nvim](https://github.com/rachartier/tiny-inline-diagnostic.nvim) | inline virtual-text diagnostics |
+| [otter.nvim](https://github.com/jmbuhr/otter.nvim) | LSP for Lua/bash embedded in Nix strings — see below |
 | [plenary.nvim](https://github.com/nvim-lua/plenary.nvim) | lua utility dep (yazi) |
 
 Exact pinned commits live in `nvim-pack-lock.json`.
+
+Four plugins were pruned from disk and the lock with `vim.pack.del`: `blink-copilot`,
+`copilot.lua` and `milli.nvim` (all commented out in Lua, so fetched but never loaded —
+~331 MB between them), plus the old `nvim` entry pointing at `neko-night/nvim`, whose
+upstream now 404s. Editing the lock alone does not uninstall anything: `vim.pack` derives
+it from what is present in `pack/core/opt`, so a removed entry is re-added on the next
+start. Re-enabling any of them means uncommenting the Lua *and* letting `vim.pack` refetch.
 
 ---
 
@@ -206,16 +218,24 @@ aimed at:
 - **Bash / shell** — `bashls` (`sh`, `bash`, `zsh`)
 - **Nix** — `nixd` (flake-aware). Settings are built at startup from the live hostname
   (`vim.uv.os_gethostname()`, DNS suffix stripped) against the flake at `~/.config/multi-nix`, so
-  the same file serves `nixos` / `server` / `KangaZero`. Three exprs: `nixpkgs` (`import
-  <flake>.inputs.nixpkgs { }`), `options.nixos` (or `options.darwin` on macOS), and
-  `options.home-manager`. Home Manager runs as a NixOS/nix-darwin **module** here, so its option
-  tree is reached via `options.home-manager.users.type.getSubOptions []` — see
+  the same file serves `nixos` / `server` / `KangaZero`. Four exprs: `nixpkgs` (`import
+  <flake>.inputs.nixpkgs { }`), `options.nixos` (or `options.darwin` on macOS),
+  `options.home-manager`, and `options.nvf` — the last built from
+  `(<flake>.inputs.nvf.lib.neovimConfiguration { … modules = [ ]; }).options`, which is the
+  declaration tree for `packages/nvf/*.nix`. Home Manager runs as a NixOS/nix-darwin **module**
+  here, so its option tree is reached via `options.home-manager.users.type.getSubOptions []` — see
   [nixd's configuration docs](https://github.com/nix-community/nixd/blob/main/nixd/docs/configuration.md)
   (case "B")
 - **Swift** — `sourcekit` (enabled, expects a system install)
 
 Formatters (`conform.nvim`): `stylua` (lua), `ruff` (python), `rustfmt` (rust),
-`biome`/`prettier` (js/ts/json). Formatting runs on `BufWritePre`.
+`biome`/`prettier` (js/ts/json), `nixfmt` (nix). Formatting runs on `BufWritePre`.
+
+Telescope pickers carry no per-picker `theme`, so they inherit the `defaults`:
+`layout_strategy = "horizontal"` at 87% × 80% of the window with `preview_width = 0.75`.
+Setting `theme = "dropdown"` on a picker silently overrides that — dropdown forces
+`layout_strategy = "center"` and caps the window at 80 columns × 15 rows, which is why it
+was removed. `diagnostics` keeps `theme = "cursor"` deliberately.
 
 ---
 
@@ -272,11 +292,38 @@ Leader is **`<Space>`**.
 - **Message UI** uses the experimental `vim._core.ui2` to route messages between the
   cmdline, a message window, and a pager (configured in `init.lua`).
 
+### LSP inside Nix strings (otter.nvim)
+
+`packages/nvf/*.nix` embeds real Lua in `''…''` strings. nvim-treesitter's nix
+`injections.scm` already turns a comment immediately before a string into a language
+injection, so a `# lua` hint makes that region a genuine Lua tree and `otter.nvim` hands it
+to `lua_ls`:
+
+```nix
+setup = # lua
+  ''
+    require("nekonight").setup({})
+  '';
+```
+
+The hint must sit **immediately** before the `''` — `= # lua` ahead of
+`mkLuaInline ''…''` does not match. `handle_leading_whitespace = true` is required because
+Nix indents these blocks and otter maps positions by column. `otter.lua` activates `lua`
+and `bash` on `FileType nix`; bash covers derivation phases (`buildPhase`, `preFixup`,
+`writeShellScript`), which the same query injects.
+
 ### Autocmds worth knowing
 - **Format on save** via conform (`BufWritePre`).
 - **Autosave + auto-reload**: on `BufLeave`, modified normal buffers are written; any
   saved file under the config dir is re-`source`d (live config reload).
 - Yank highlight, `help` opens as a right vsplit, `q` closes utility filetypes.
+- **Treesitter start** on `FileType`: skips filetypes with no parser (normal for
+  `help`/`qf`/prompt buffers) but *reports* a parser that loads and then fails to start,
+  since that means broken queries. It previously swallowed everything via a bare `pcall`,
+  which hid a real failure for some time.
+- **LSP log truncation** on `VimEnter`: truncates `vim.lsp.log.get_filename()` past 50 MB.
+  Neovim never rotates it, and a chatty server's stderr is logged at ERROR regardless of
+  `vim.lsp.log.set_level`, so it grows unbounded.
 
 ---
 
@@ -286,9 +333,11 @@ This config is managed by **Home Manager** inside the `multi-nix` flake. There i
 manual clone step — HM symlinks `home/modules/common/neovim/config/` to
 `~/.config/nvim` via `xdg.configFile."nvim".source` in `neovim.nix`.
 
-Home Manager is integrated into the system configuration (not standalone), so it is
-applied as part of the normal system rebuild — there is no separate
-`home-manager switch`:
+On darwin and WSL, Home Manager is integrated into the system configuration rather than
+standalone, so it is applied as part of the normal system rebuild — there is no separate
+`home-manager switch` on those hosts. (The bare-metal `server` host is the exception: the
+flake also exposes `homeConfigurations."KangaZero"`, so `home-manager switch --flake
+.#KangaZero` works there for home-only changes.)
 
 ```sh
 # macOS — Home Manager runs as part of the darwin system
@@ -305,7 +354,9 @@ configured LSP servers. Restart once after the initial sync.
 > **NixOS:** All LSP servers, formatters, and linters are provided via Nix in
 > `neovim.nix` (`home.packages`). Mason finds them on PATH and skips downloading
 > prebuilt binaries — necessary on baremetal NixOS where foreign ELF binaries won't
-> run. No Mason behaviour changes are needed.
+> run. `lsp.lua` does change Mason's behaviour for this: `ensure_installed` is gated on
+> `/etc/NIXOS` (empty there, the full list off Nix), and `automatic_enable` excludes
+> `vtsls` so it cannot attach alongside the hand-enabled `tsc` and duplicate diagnostics.
 >
 > `telescope-fzf-native.nvim` is also managed by Nix (`programs.neovim.plugins` in
 > `neovim.nix`) because `vim.pack` cannot compile its C extension (`libfzf.so`) at

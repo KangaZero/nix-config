@@ -108,8 +108,8 @@ inputs here (`home-manager`/`darwin` track `nixpkgs` via `follows`). Re-enable b
 |---|---|---|---|
 | **Shell** | zsh + oh-my-zsh | — | — |
 | **Prompt** | oh-my-posh (TOML config in `home/modules/common/oh-my-posh.toml`) | — | — |
-| **Editor** | neovim — `defaultEditor`, `sideloadInitLua = true`; config HM-managed via `xdg.configFile` → `~/.config/nvim` (recursive copy); `vi`/`vim` aliases; `nvimPackLock` activation replaces `nvim-pack-lock.json` symlink with writable copy after each switch (nvim 0.12 `vim.pack` writes it at startup — read-only store symlink caused EROFS crash); treesitter folding (`foldmethod=expr`, `vim.treesitter.foldexpr()`, `foldlevel=99`) | — | root nvim symlinked to user config via activation script |
-| **Terminal** | kitty — Tokyo Night Moon, JetBrains Mono, 85% opacity | animated pixel-art gif bg | static `moon_dark.png` bg |
+| **Editor** | neovim — `defaultEditor`, `sideloadInitLua = true`; config HM-managed via `xdg.configFile` → `~/.config/nvim` (recursive copy); `vi`/`vim` aliases; `nvimPackLock` activation replaces `nvim-pack-lock.json` symlink with writable copy after each switch (nvim 0.12 `vim.pack` writes it at startup — read-only store symlink caused EROFS crash); treesitter folding (`foldmethod=expr`, `vim.treesitter.foldexpr()`, `foldlevel=99`). `programs.neovim.plugins` also supplies 21 prebuilt treesitter parsers (incl. `markdown_inline`, which `markdown`'s queries inject) and `telescope-fzf-native-nvim`, so nothing is compiled at runtime; `core.lua` appends nvim-treesitter's `runtime/` to `runtimepath` so its queries resolve against those parsers. otter.nvim gives LSP inside Lua/bash embedded in Nix strings | — | root nvim symlinked to user config via activation script |
+| **Terminal** | kitty — Tokyo Night Moon, JetBrains Mono, 85% opacity | animated pixel-art gif bg | **commented out** — `kitty.nix` import is disabled in `KangaZero/linux.nix`; only the inert `programs.kitty.settings` block remains (WSL is CLI-only, see note below) |
 | **Font** | `nerd-fonts.jetbrains-mono` | — | `fonts.fontconfig.enable = true` |
 | **Multiplexer** | zellij | — | — |
 | **Nav** | zoxide | — | — |
@@ -122,10 +122,10 @@ inputs here (`home-manager`/`darwin` track `nixpkgs` via `follows`). Re-enable b
 | **Bar / launcher / notifications** | — | — | — (disabled with niri — see `server` below) |
 | **Clipboard** | — | — | — (disabled with niri — see `server` below) |
 | **Languages** | none in global profile — per-project `nix develop` + direnv (see note below) | — | — |
-| **Local LLM** | — | ollama (Metal, launchd agent) — models pulled manually | ollama (`ollama-vulkan`, systemd user service) — `qwen2.5:7b` pulled manually post-activation |
+| **Local LLM** | — | ollama (Metal, launchd agent) — models pulled manually | **commented out** — `modules/linux/ollama.nix` import is disabled in `KangaZero/linux.nix`; the module still exists for the `server` host |
 | **Dev database** | — | — | `services.postgresql` (`postgresql_18`, in `hosts/nixos/default.nix`) — declarative `ccui` role + db (`ensureDBOwnership`), `listen_addresses = "*"` (native + Docker can connect), scram auth from localhost + Docker bridge (`172.16.0.0/12`), TCP `5432` opened. **Role password is set out-of-band** (`sudo -u postgres psql -c "ALTER ROLE ccui PASSWORD '<dev-pw>';"`) — never committed (repo is public) |
-| **LSP / formatters** | `lua-language-server` `bash-language-server` `pyright` `ruff` `clang-tools` `vtsls` `typescript` (`tsc`, TS 7 native Go port) `vscode-langservers-extracted` `biome` `tailwindcss-language-server` `nixd` `stylua` `nixfmt-rfc-style` (all in `neovim.nix` — self-contained nix packages, bundle their own runtime; unaffected by dropping global `nodejs`); `rust-analyzer` via `rustup component add rust-analyzer` — but `rustup` is now per-project (`neovim.nix` notes this), so add it via a project devShell first. **TS/JS: `tsc` (TypeScript 7, the native Go port) is the primary server, `vtsls` the fallback — only one attaches per buffer (`lsp.lua` prefers `tsc` on NixOS when it's on `PATH`), so no duplicate diagnostics** | — | — |
-| **CLI toolkit** | `eza` `btop` `ripgrep` `fd` `jq` `curl` `gh` — **`fzf`** via `programs.fzf` (`fzf.nix` — defaultCommand/fileWidget/defaultOptions with tokyonight-kanga colors); **`bat`** via `programs.bat` (`bat.nix` — tokyonight-kanga tmTheme, `batdiff`/`batman`/`batgrep` via `extraPackages`); yazi via `programs.yazi`; `nh` via `programs.nh` — system-level on NixOS, home-manager on darwin, which also exports `NH_FLAKE`; claude-code is WSL-only | + `ani-cli` `vim` `fastfetch` `tree` `ffmpeg-full` `imagemagick` `_7zz` `yt-dlp` `resvg` `poppler` `odysseus` | + `wget` `openssh` `tldr` `ffmpeg-full` `unzip` `azure-cli` (+ DevOps + `containerapp` exts — `containerapp` needs `pythonRelaxDeps = ["kubernetes"]` to build) `gcc` `gnumake` (treesitter parser compilation) `wl-clipboard` (`uv` removed — now per-project, see note below) |
+| **LSP / formatters** | `lua-language-server` `bash-language-server` `pyright` `ruff` `clang-tools` `vtsls` `typescript` (`tsc`, TS 7 native Go port) `vscode-langservers-extracted` `biome` `tailwindcss-language-server` `nixd` `stylua` `nixfmt` (all in `neovim.nix` — self-contained nix packages, bundle their own runtime; unaffected by dropping global `nodejs`); `rust-analyzer` via `rustup component add rust-analyzer` — but `rustup` is now per-project (`neovim.nix` notes this), so add it via a project devShell first. **TS/JS: `tsc` (TypeScript 7, the native Go port) is the primary server, `vtsls` the fallback — only one attaches per buffer (`lsp.lua` prefers `tsc` on NixOS when it's on `PATH`), so no duplicate diagnostics** | — | — |
+| **CLI toolkit** | `eza` `btop` `ripgrep` `fd` `jq` `curl` `gh` — **`fzf`** via `programs.fzf` (`fzf.nix` — defaultCommand/fileWidget/defaultOptions with tokyonight-kanga colors); **`bat`** via `programs.bat` (`bat.nix` — tokyonight-kanga tmTheme, `batdiff`/`batman`/`batgrep` via `extraPackages`); yazi via `programs.yazi`; `nh` via `programs.nh` — system-level on NixOS, home-manager on darwin, which also exports `NH_FLAKE`; claude-code is WSL-only | + `ani-cli` `vim` `fastfetch` `tree` `ffmpeg-full` `imagemagick` `_7zz` `yt-dlp` `resvg` `poppler` `odysseus` | + `openssh` `tldr` `ffmpeg-full` `unzip` `azure-cli` (+ DevOps + `containerapp` exts — `containerapp` needs `pythonRelaxDeps = ["kubernetes"]` to build) `gcc` `gnumake` `wl-clipboard` (`uv` removed — now per-project, see note below) |
 | **Git** | LFS, `pull.rebase = true`, `autoSetupRemote = true`, identity from `userMeta`; **delta** as pager (`programs.git.delta`) — tokyonight-kanga syntax theme, side-by-side, line numbers, hunk navigation | — | — |
 | **Nix daemon** | — | Determinate Systems installer (`nix.enable = false`) | NixOS-managed |
 | **GC** | `nh clean all` — see [Garbage Collection](#garbage-collection-nh) | root `launchd.daemons.nh-clean` (`modules/darwin/nh-clean.nix`) — Sundays 15:00, `--keep 3 --keep-since 7d` | `programs.nh.clean` systemd timer (`modules/nixos/nh.nix`) — weekly, `--keep 3 --keep-since 7d` |
@@ -202,7 +202,7 @@ longer listed per-host — `mkNixOS` imports it for every NixOS host.)
 | **Portals** | `xdg-desktop-portal-gtk` + `-gnome` |
 | **GC** | `programs.nh.clean`, weekly, `--keep 5 --keep-since 30d` — the only host that overrides the base retention (`programs.nh.clean.extraArgs` in `hosts/server/default.nix`; the base value is `lib.mkDefault`, so a plain assignment wins instead of erroring on a merge conflict). WSL takes the base window |
 | **Dropped vs old box** | fcitx5/ja input, Steam |
-| **Aliases** | `nh-switch`/`nh-build`/`nh-test`/`nh-boot`/`nh-rollback`/`nh-info` (primary) + `nix-switch`/`home-switch`/`edit-nix`/`nvim-dev` — shared with WSL via `home/modules/linux/zsh-aliases.nix`. The `nh-*` aliases take **no flake argument**: `programs.nh.flake` exports `NH_FLAKE` and nh resolves the attribute from the running hostname, so nothing host-specific is interpolated. `${hostname}` is still injected into the legacy `nix-switch` alias (WSL → `#nixos`, server → `#server`) |
+| **Aliases** | `nh-switch`/`nh-build`/`nh-test`/`nh-boot`/`nh-rollback`/`nh-info`/`nh-clean`/`nh-clean-dry` (primary) + `nix-switch`/`home-switch`/`edit-nix`/`nvim-dev` — shared with WSL via `home/modules/linux/zsh-aliases.nix`. The `nh-*` aliases take **no flake argument**: `programs.nh.flake` exports `NH_FLAKE` and nh resolves the attribute from the running hostname, so nothing host-specific is interpolated. `${hostname}` is still injected into the legacy `nix-switch` alias (WSL → `#nixos`, server → `#server`) |
 
 Because home-manager is wired through `nixos-rebuild`, home-only tweaks can also be applied fast
 without sudo/reboot via the standalone `homeConfigurations."KangaZero"` output — see
@@ -581,7 +581,8 @@ attribute from the hostname.
 | Any host — garbage collect now | `nix-gc [age]` → `nh clean all --keep 3 --keep-since <age>` | — |
 | NixOS server — home-only (no sudo) | `nh home switch -c KangaZero` | `home-manager switch --flake .#KangaZero` (alias `home-switch`) |
 | NixOS server — remote | — | `nixos-rebuild switch --flake .#server --target-host user@host --use-remote-sudo` |
-| kitty wrapper | — | `nix run .#kitty` |
+| kitty wrapper | — | `nix run .#kitty` (darwin only — the package is not in `packages.x86_64-linux`) |
+| nvf Neovim | `nix run .#nvf` | `nix run .#nvf` |
 | nvim live config (no rebuild) | — | `nvim-dev` (alias for `NVIM_APPNAME=multi-nix/home/modules/common/neovim/config nvim`) |
 
 ## Repository Structure
@@ -627,7 +628,7 @@ multi-nix/
 │   │   ├── KangaZero/
 │   │   │   ├── default.nix           # User metadata: usernames, git identities, stateVersion
 │   │   │   ├── darwin.nix            # Darwin home-manager entry point
-│   │   │   └── linux.nix             # Linux (WSL) home-manager entry point — imports weston, LIBGL sw
+│   │   │   └── linux.nix             # Linux (WSL) home-manager entry point — weston/kitty/ollama imports commented out; LIBGL sw (vestigial)
 │   │   └── server/
 │   │       ├── default.nix           # Re-exports KangaZero/default.nix (shared identity)
 │   │       └── linux.nix             # Bare-metal profile — KangaZero minus weston/LIBGL, + noctalia idle + polkit agent
@@ -675,7 +676,7 @@ multi-nix/
 │       │   ├── opencode.nix          # programs.opencode — shadcn + playwright MCP, nodejs/pnpm/typescript toolchain
 │       │   └── ollama.nix            # ollama (Metal) — launchd agent (port 11434)
 │       └── linux/                    # Linux home-manager modules
-│           ├── packages.nix          # azure-cli (+ devops + containerapp exts), openssh, wget, tldr, gcc, gnumake, wl-clipboard (uv removed — now per-project)
+│           ├── packages.nix          # azure-cli (+ devops + containerapp exts), openssh, tldr, gcc, gnumake, wl-clipboard (wget + uv commented out)
 │           ├── ollama.nix            # ollama-vulkan — systemd user service (port 11434)
 │           ├── bash.nix              # zsh trampoline
 │           ├── shell.nix             # linux-specific aliases (ez, nixRebuildStatus/Kill, cheatsheet-az) + shell helpers (weston fn, kill-port, ff)
@@ -687,10 +688,23 @@ multi-nix/
 ├── overlays/
 │   └── zjstatus/                     # zellij status-bar overlay — applied in mkNixOS + mkHome (and mkDarwin)
 ├── packages/
-│   └── kitty.nix                     # nix-wrapper-modules standalone kitty
+│   ├── kitty.nix                     # nix-wrapper-modules standalone kitty (darwin only)
+│   └── nvf/                          # Declarative nvf Neovim — `nix run .#nvf` (see packages/nvf/README.md)
+│       ├── default.nix               # Entry point; mirrors config/init.lua's module list
+│       ├── core.nix  lsp.nix  options.nix  colorscheme.nix
+│       ├── statusline.nix  autocmds.nix  keymaps.nix
+│       ├── dashboard-logo.txt        # ASCII logo for the dashboard footer
+│       └── plugins/                  # One .nix per lua/plugins/*.lua (17 files)
 ├── assets/
 │   ├── mac/                          # macOS assets (background gif, etc.)
 │   └── linux/                        # Linux assets (NixOwO.png fastfetch logo, wallpapers)
+├── scripts/
+│   └── vulnix-flake.sh               # CVE scan over the flake closure (see Security)
+├── CHANGE_LOG.md
+├── CVE_REPORT_WSL.md                 # Generated by the weekly cron workflow
+├── CVE_REPORT_DARWIN.md              # Generated by the weekly cron workflow
+├── flake.lock
+├── .pre-commit-config.yaml           # Symlink into the store — generated by git-hooks.nix
 ├── .envrc                            # direnv: use flake .
 ├── .gitignore
 └── .github/
@@ -734,6 +748,8 @@ Pre-commit hooks (block the commit if they fail):
 | `statix` | Lints for anti-patterns — enforces `inherit` over explicit assignment |
 | `nvim-lua-syntax` | Parses every staged `.lua` file under `neovim/config/` via `nvim --clean`; fails on syntax errors |
 | `check-leaks` | `betterleaks git --staged` — blocks committed secrets/credentials (`always_run`) |
+| `nix-eval` | Evaluates `.#nixosConfigurations.nixos.config.system.build.toplevel` (`always_run`) |
+| `packages-eval` | Evaluates every `packages.<system>.*` derivation — scoped to `^packages/`. These sit outside the system closure the other two cover, so a bad nvf option path would otherwise only surface on `nix run .#nvf` |
 
 Pre-push hooks (block the push if they fail):
 
@@ -741,6 +757,7 @@ Pre-push hooks (block the push if they fail):
 |---|---|
 | `home-build` (darwin) | `nix build --no-link .#darwinConfigurations.KangaZero.system` |
 | `home-build` (linux) | `nix build --no-link .#nixosConfigurations.nixos.config.system.build.toplevel` |
+| `packages-build` | `nix build .#packages.<system>.nvf` — scoped to `^packages/`. Catches what eval cannot: bad fetches and failing `nvimRequireCheck` |
 | `check-author` | Rejects the push unless **every** incoming commit is authored *and* committed by `KangaZero <samuelyongw@gmail.com>` — keeps the work identity out of this public repo |
 
 > [!WARNING]
@@ -900,7 +917,20 @@ Every home-manager module receives via `extraSpecialArgs`:
      user     = "KangaZero";
    };
    ```
-3. For bare metal NixOS, add a `hosts/<hostname>/hardware.nix` generated by `nixos-generate-config`
+3. If the host introduces a **new system string**, add it to `systems` in `flake.nix`:
+   ```nix
+   systems = nixpkgs.lib.unique [
+     darwinSystem
+     wslSystem
+     serverSystem
+   ];
+   forAllSystems = nixpkgs.lib.genAttrs systems;
+   ```
+   `packages`, `devShells` and `formatter` are all built with `forAllSystems`, so a system
+   missing from that list silently gets **none** of those outputs. (This is exactly how
+   `aarch64-darwin` once vanished — `systems` listed `darwinHostname` instead of
+   `darwinSystem`, taking the `kitty` package with it.)
+4. For bare metal NixOS, add a `hosts/<hostname>/hardware.nix` generated by `nixos-generate-config`
 
 ---
 
@@ -991,6 +1021,7 @@ nix flake check                                                    # all outputs
 nh darwin build                                                    # macOS dry-run (or darwin-rebuild build --flake .#KangaZero)
 nh os build                                                        # NixOS dry-run  (or nixos-rebuild dry-build --flake .#nixos)
 nix-gc                                                             # nh clean all --keep 3 --keep-since 7d
-nix run .#kitty                                                    # kitty wrapper
+nix run .#kitty                                                    # kitty wrapper (aarch64-darwin only)
+nix run .#nvf                                                      # declarative nvf Neovim (both systems)
 statix check . && deadnix . && nixfmt --check .                   # lints
 ```

@@ -1,4 +1,4 @@
-# nvf — secondary editor
+# nvf — alternative editor
 
 A declarative Neovim built with [nvf](https://github.com/notashelf/nvf), exposed as a
 flake package rather than installed into a profile.
@@ -62,7 +62,13 @@ Mirrors `home/modules/common/neovim/config/` one-for-one.
 | `autocmds.nix` | `lua/autocmds.lua` |
 | `keymaps.nix` | `lua/keymaps.lua` |
 | `plugins/default.nix` | `lua/plugins/init.lua` |
-| `plugins/*.nix` | `lua/plugins/*.lua` |
+| `plugins/*.nix` (17) | `lua/plugins/*.lua` |
+| `dashboard-logo.txt` | inline in `lua/plugins/dashboard.lua` |
+
+Two deliberate asymmetries: the real config's `lua/plugins/otter.lua` has no
+`plugins/otter.nix` here (otter is a first-class nvf option, so it lives in `lsp.nix`),
+and `plugins/milli.nix` exists here while `milli.nvim` has been pruned from the real
+config's lock.
 
 `nvf.lib.neovimConfiguration` calls `lib.evalModules`, so each file is a real
 nixpkgs module and `imports` composes them the way `require()` does. Unlike
@@ -81,9 +87,11 @@ declaring module read before use — not guessed.
 | --- | --- |
 | `lua/options.lua` | `vim.options` (freeform submodule), plus curated `lineNumberMode`, `searchCase`, `preventJunkFiles`, `undoFile.enable` |
 | `lua/autocmds.lua` | `vim.autocmds` / `vim.augroups`, `callback` via `mkLuaInline` |
-| `lua/keymaps.lua` | `vim.keymaps` |
+| `lua/keymaps.lua` | `vim.keymaps` (52 bindings) |
+| `lua/core.lua` | `vim.treesitter` (`enable`, `fold`), `vim.treesitter.textobjects`, `vim.ui.nvim-highlight-colors`, and `viAlias`/`vimAlias = false` |
 | diagnostics config | `vim.diagnostics.config` |
-| `plugins/telescope.lua` | `vim.telescope` — `setupOpts`, `mappings`, `extensions` (fzf-native built by Nix) |
+| `plugins/otter.lua` | `vim.lsp.otter-nvim` — `handle_leading_whitespace`, plus a `<leader>lo` toggle. Set in `lsp.nix`, not `plugins/` |
+| `plugins/telescope.lua` | `vim.telescope` — `setupOpts`, `mappings`, `extensions` (fzf-native built by Nix). Carries no per-picker `theme`, so pickers inherit `layout_strategy = "horizontal"` with `preview_width = 0.75`; adding a `theme` silently overrides that |
 | `plugins/completion.lua` | `vim.autocomplete.blink-cmp.setupOpts` |
 | `plugins/flash.lua` | `vim.utility.motion.flash-nvim.setupOpts` |
 | `plugins/snacks.lua` | `vim.utility.snacks-nvim.setupOpts` |
@@ -112,6 +120,7 @@ string, ordered with the `after` DAG field.
 | tiny-inline-diagnostic.nvim | `pkgs.vimPlugins.tiny-inline-diagnostic-nvim` |
 | opencode.nvim | `pkgs.vimPlugins.opencode-nvim` |
 | avante.nvim | `pkgs.vimPlugins.avante-nvim` |
+| friendly-snippets | `pkgs.vimPlugins.friendly-snippets` — package only, no `setup`: blink's `snippets` source reads them off the runtimepath |
 | milli.nvim | hand-packaged with `pkgs.vimUtils.buildVimPlugin` (not in nixpkgs) |
 | nekonight.nvim | hand-packaged; not in nvf's theme enum, so `vim.theme.enable = false` |
 
@@ -132,7 +141,7 @@ colorscheme does not need; milli needed no skips.
 | `<leader>p` | `vim.pack.update` — nvf has no vim.pack. |
 | ~50 `BlinkCmp*` highlight groups | Hand-tuned to nekonight's palette, plus a `ColorScheme` autocmd to reapply them. ~60 lines of embedded Lua for no declarative gain. |
 | Telescope highlight overrides | Same reasoning — the real config repaints Telescope in a Catppuccin Macchiato palette from a `ColorScheme` autocmd. |
-| treesitter-textobjects keymaps | ~45 manual bindings; nvf's `vim.treesitter.textobjects` ships its own. |
+| treesitter-textobjects keymaps | 41 manual bindings; nvf's `vim.treesitter.textobjects` ships its own. |
 | `after/queries/*.scm` | No option path for treesitter query overlays. |
 | `vim.pack` + `nvim-pack-lock.json` | Structurally incompatible. nvf uses mnw, which builds `$out/pack/mnw/{start,opt}` at derivation time; plugins are pinned by nvf's npins plus `flake.lock`. No runtime lockfile, no runtime updates. |
 
@@ -149,6 +158,26 @@ colorscheme does not need; milli needed no skips.
   same option and nvf's declared one wins.
 - **Renamed options must be avoided**, e.g. `vim.statusline.lualine.theme` →
   `setupOpts.options.theme`. `nix eval` prints these as evaluation warnings.
+- **Keep the `# lua` hints.** 17 of them across 9 files mark the embedded-Lua strings so
+  nvim-treesitter's nix `injections.scm` treats those regions as Lua and `otter.nvim` can
+  hand them to `lua_ls`. They look like stray comments and are easy to "tidy" away —
+  deleting one costs you LSP on that block. The hint must sit **immediately** before the
+  `''`:
+
+  ```nix
+  setup = # lua
+    ''
+      require("nekonight").setup({})
+    '';
+
+  callback = lib.generators.mkLuaInline # lua
+    ''
+      function() vim.hl.on_yank() end
+    '';
+  ```
+
+  `= # lua` placed ahead of `mkLuaInline ''…''` does **not** match — the comment has to be
+  adjacent to the string node itself. `nixfmt` preserves the working placement.
 
 ### TypeScript: the real config is ahead
 
@@ -169,17 +198,20 @@ config's `tsc` setup is better; do not treat this tree as a reference for it.
 
 ## Bottom line
 
-Every plugin in the real config is now present here: 16 through first-class options,
-6 through `vim.extraPlugins`. Options, autocmds, keymaps and diagnostics are
-declarative.
+Every plugin the real config actually loads is present here — most through first-class
+options, the rest through `vim.extraPlugins`. One omission is deliberate:
+`blink-copilot` is absent because it is fully commented out in the real config (as is
+`ai.lua` in its entirety), so leaving it out *is* parity. `friendly-snippets` was a
+genuine gap and is now wired in `plugins/completion.nix`.
 
-What does not survive is the hand-written Lua — the statusline, the `custom/`
-modules, the `util.lua` helpers, the two palettes' worth of highlight overrides — and
-the `vim.pack` runtime-lockfile workflow. Those are roughly a third of the real
-config by volume, and the parts most specific to it.
+What does not survive is the hand-written Lua — the statusline, the `custom/` modules,
+the `util.lua` helpers, the 48 `BlinkCmp*` and Telescope highlight overrides — plus the
+`vim.pack` runtime-lockfile workflow and `after/queries/`. Those are the parts most
+specific to this config, and the ones a framework cannot type.
 
-So this works as a standing alternative but a poor wholesale migration target: the last third would
-be rewritten into Nix strings, losing `lua-ls` while editing, for no capability gain.
+So this works as a standing alternative but a poor wholesale migration target: that
+remainder would be rewritten into Nix strings, losing `lua-ls` while editing it, for no
+capability gain.
 Keep the primary config on `programs.neovim`.
 
 ## Verifying a change
