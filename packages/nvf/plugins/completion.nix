@@ -39,72 +39,74 @@
           border = "rounded";
           winhighlight = "Normal:BlinkCmpMenu,FloatBorder:BlinkCmpMenuBorder,CursorLine:BlinkCmpMenuSelection,Search:None";
           scrollbar = true;
-          draw = lib.generators.mkLuaInline ''
-            {
-              align_to = "label",
-              padding = { 0, 1 },
-              gap = 1,
-              treesitter = { "lsp" },
-              columns = {
-                { "kind_icon" },
-                { "label", "label_description", gap = 1 },
-                { "source_name" },
-              },
-              components = {
-                kind_icon = {
-                  ellipsis = false,
-                  text = function(ctx)
-                    if ctx.source_name == "Snippets" then
-                      return "󱄽 "
-                    end
-                    return ctx.kind_icon .. ctx.icon_gap
-                  end,
-                  highlight = function(ctx)
-                    return { { group = ctx.kind_hl, priority = 20000 } }
-                  end,
-                },
-                label = {
-                  width = { fill = true, max = 60 },
-                  text = function(ctx)
-                    return ctx.label .. (ctx.label_detail or "")
-                  end,
-                  highlight = function(ctx)
-                    local label = ctx.label
-                    local highlights = {
-                      {
-                        0,
-                        #label,
-                        group = ctx.deprecated and "BlinkCmpLabelDeprecated" or "BlinkCmpLabel",
-                      },
-                    }
-                    if ctx.label_detail then
-                      table.insert(highlights, {
-                        #label,
-                        #label + #ctx.label_detail,
-                        group = "BlinkCmpLabelDetail",
-                      })
-                    end
-                    return highlights
-                  end,
-                },
-                source_name = {
-                  width = { max = 6 },
-                  text = function(ctx)
-                    local labels = {
-                      LSP = "lsp",
-                      Path = "path",
-                      Snippets = "snip",
-                      Buffer = "buf",
-                    }
-                    return labels[ctx.source_name] or ctx.source_name:lower():sub(1, 4)
-                  end,
-                  highlight = function(_)
-                    return "BlinkCmpLabelDescription"
-                  end,
-                },
-              },
-            }
-          '';
+          draw =
+            lib.generators.mkLuaInline # lua
+              ''
+                {
+                  align_to = "label",
+                  padding = { 0, 1 },
+                  gap = 1,
+                  treesitter = { "lsp" },
+                  columns = {
+                    { "kind_icon" },
+                    { "label", "label_description", gap = 1 },
+                    { "source_name" },
+                  },
+                  components = {
+                    kind_icon = {
+                      ellipsis = false,
+                      text = function(ctx)
+                        if ctx.source_name == "Snippets" then
+                          return "󱄽 "
+                        end
+                        return ctx.kind_icon .. ctx.icon_gap
+                      end,
+                      highlight = function(ctx)
+                        return { { group = ctx.kind_hl, priority = 20000 } }
+                      end,
+                    },
+                    label = {
+                      width = { fill = true, max = 60 },
+                      text = function(ctx)
+                        return ctx.label .. (ctx.label_detail or "")
+                      end,
+                      highlight = function(ctx)
+                        local label = ctx.label
+                        local highlights = {
+                          {
+                            0,
+                            #label,
+                            group = ctx.deprecated and "BlinkCmpLabelDeprecated" or "BlinkCmpLabel",
+                          },
+                        }
+                        if ctx.label_detail then
+                          table.insert(highlights, {
+                            #label,
+                            #label + #ctx.label_detail,
+                            group = "BlinkCmpLabelDetail",
+                          })
+                        end
+                        return highlights
+                      end,
+                    },
+                    source_name = {
+                      width = { max = 6 },
+                      text = function(ctx)
+                        local labels = {
+                          LSP = "lsp",
+                          Path = "path",
+                          Snippets = "snip",
+                          Buffer = "buf",
+                        }
+                        return labels[ctx.source_name] or ctx.source_name:lower():sub(1, 4)
+                      end,
+                      highlight = function(_)
+                        return "BlinkCmpLabelDescription"
+                      end,
+                    },
+                  },
+                }
+              '';
         };
 
         documentation = {

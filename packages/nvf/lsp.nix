@@ -13,6 +13,19 @@
   config.vim = {
     lsp = {
       enable = true;
+
+      # LSP inside embedded code. Nix indents its `'''...'''` blocks, so
+      # handle_leading_whitespace must be on or positions map to the wrong column.
+      otter-nvim = {
+        enable = true;
+        setupOpts = {
+          handle_leading_whitespace = true;
+          lsp.diagnostic_update_event = [
+            "BufWritePost"
+            "InsertLeave"
+          ];
+        };
+      };
       lspkind.enable = true;
       trouble.enable = true;
     };

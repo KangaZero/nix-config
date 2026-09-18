@@ -8,9 +8,28 @@ nix run .#nvf                    # from this repo
 nix run ~/.config/multi-nix#nvf  # from anywhere
 ```
 
-This is **not** a replacement for `programs.neovim` (`home/modules/common/neovim/`).
-It is a scratch / fallback editor: a known-good Neovim that cannot be broken by an
-in-progress change to the real config.
+This is an **alternative** to `programs.neovim` (`home/modules/common/neovim/`), not a
+replacement for it: the same setup expressed declaratively in Nix instead of Lua. It
+exists so a working Nix-native path is already there if I ever want to configure Neovim
+that way. Both editors are installed side by side and share nothing at runtime.
+
+> [!IMPORTANT]
+> **This tree started as a mirror of the primary config and will drift from it.**
+>
+> The file layout and settings were ported one-for-one from
+> `home/modules/common/neovim/config/`, but it is a snapshot, not a sync. Divergence is
+> expected and in places deliberate:
+>
+> - nvf has no module for some plugins, and no way to express others at all — see
+>   [Portability status](#portability-status) for the current tally.
+> - Changes to the primary config do not propagate here. When the two disagree, the
+>   primary config is correct and this one is stale.
+> - A few settings differ on purpose where nvf's option is better or its enum leaves no
+>   choice (the TypeScript server, for one).
+>
+> ⚠️ I am far less fluent in nvf than in plain Lua, and this tree was written with heavy
+> AI assistance. It builds and has been smoke-tested, but it is experimental — not a
+> reference for idiomatic nvf.
 
 ## Why it is a flake package, not `programs.nvf`
 
@@ -159,7 +178,7 @@ modules, the `util.lua` helpers, the two palettes' worth of highlight overrides 
 the `vim.pack` runtime-lockfile workflow. Those are roughly a third of the real
 config by volume, and the parts most specific to it.
 
-So this is a good fallback editor and a poor migration target: the last third would
+So this works as a standing alternative but a poor wholesale migration target: the last third would
 be rewritten into Nix strings, losing `lua-ls` while editing, for no capability gain.
 Keep the primary config on `programs.neovim`.
 

@@ -14,7 +14,7 @@
 
     mappings = {
       findFiles = "<leader>ff";
-      liveGrep = "<leader>fg";
+      liveGrep = "<leader>sg";
       buffers = "<leader>fb";
       gitStatus = "<leader>fG";
       lspDefinitions = "<leader>gd";
@@ -51,9 +51,12 @@
         ];
       };
 
+      # No per-picker `theme` on purpose: dropdown forces layout_strategy = "center"
+      # and caps the window at 80 columns x 15 rows, overriding the defaults above
+      # and leaving no room for the preview. Without it these inherit the
+      # horizontal layout and its 75% preview pane.
       pickers = {
         find_files = {
-          theme = "dropdown";
           hidden = true;
           find_command = [
             "fd"
@@ -66,23 +69,13 @@
             ".git"
           ];
         };
-        live_grep.theme = "dropdown";
         buffers = {
-          theme = "dropdown";
           sort_mru = true;
           ignore_current_buffer = true;
         };
-        git_status.theme = "dropdown";
-        git_branches.theme = "dropdown";
-        lsp_definitions = {
-          theme = "dropdown";
-          jump_type = "never";
-        };
-        lsp_references = {
-          theme = "dropdown";
-          show_line = false;
-        };
-        lsp_implementations.theme = "dropdown";
+        lsp_definitions.jump_type = "never";
+        lsp_references.show_line = false;
+        # cursor (not dropdown): diagnostics are most useful anchored where you are.
         diagnostics.theme = "cursor";
       };
     };

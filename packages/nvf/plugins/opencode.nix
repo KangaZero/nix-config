@@ -9,9 +9,10 @@
   config.vim.extraPlugins.opencode = {
     package = pkgs.vimPlugins.opencode-nvim;
     after = [ "tiny-inline-diagnostic" ];
-    setup = ''
-      ---@type opencode.Opts
-      vim.g.opencode_opts = {}
-    '';
+    setup = # lua
+      ''
+        ---@type opencode.Opts
+        vim.g.opencode_opts = {}
+      '';
   };
 }

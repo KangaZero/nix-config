@@ -20,17 +20,19 @@ in
         wrap = true;
         mode = "exact";
         incremental = false;
-        exclude = mkLuaInline ''
-          {
-            "notify",
-            "cmp_menu",
-            "noice",
-            "flash_prompt",
-            function(win)
-              return not vim.api.nvim_win_get_config(win).focusable
-            end,
-          }
-        '';
+        exclude =
+          # lua
+          mkLuaInline ''
+            {
+              "notify",
+              "cmp_menu",
+              "noice",
+              "flash_prompt",
+              function(win)
+                return not vim.api.nvim_win_get_config(win).focusable
+              end,
+            }
+          '';
         trigger = "";
         max_length = false;
       };
@@ -58,11 +60,13 @@ in
           enabled = true;
           shade = 3;
         };
-        format = mkLuaInline ''
-          function(opts)
-            return { { opts.match.label, opts.hl_group } }
-          end
-        '';
+        format =
+          # lua
+          mkLuaInline ''
+            function(opts)
+              return { { opts.match.label, opts.hl_group } }
+            end
+          '';
       };
 
       highlight = {

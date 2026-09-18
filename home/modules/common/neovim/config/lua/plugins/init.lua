@@ -13,4 +13,5 @@ require("plugins/dashboard")
 require("plugins/flash")
 require("plugins/snacks")
 require("plugins/grug-far")
+require("plugins/otter") -- LSP for Lua/bash embedded in Nix strings
 -- require("plugins/treesitter-textobjects")

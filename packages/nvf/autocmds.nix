@@ -27,30 +27,34 @@ in
         group = "nvf_user";
         pattern = [ "*" ];
         desc = "open help pages as a vertical split on the far right";
-        callback = mkLuaInline ''
-          function()
-            if vim.bo.filetype == "help" then
-              vim.cmd("wincmd L")
+        callback =
+          # lua
+          mkLuaInline ''
+            function()
+              if vim.bo.filetype == "help" then
+                vim.cmd("wincmd L")
+              end
             end
-          end
-        '';
+          '';
       }
 
       {
         event = [ "VimEnter" ];
         group = "nvf_user";
         desc = "Truncate the LSP log when it grows past 50 MB (nvim never rotates it)";
-        callback = mkLuaInline ''
-          function()
-            local path = vim.lsp.log.get_filename()
-            local st = vim.uv.fs_stat(path)
-            if st and st.size > 50 * 1024 * 1024 then
-              vim.uv.fs_open(path, "w", 420, function(_, fd)
-                if fd then vim.uv.fs_close(fd) end
-              end)
+        callback =
+          # lua
+          mkLuaInline ''
+            function()
+              local path = vim.lsp.log.get_filename()
+              local st = vim.uv.fs_stat(path)
+              if st and st.size > 50 * 1024 * 1024 then
+                vim.uv.fs_open(path, "w", 420, function(_, fd)
+                  if fd then vim.uv.fs_close(fd) end
+                end)
+              end
             end
-          end
-        '';
+          '';
       }
 
       {
@@ -78,20 +82,22 @@ in
           "tsplayground"
         ];
         desc = "close scratch-ish filetypes with q";
-        callback = mkLuaInline ''
-          function(event)
-            vim.bo[event.buf].buflisted = false
-            vim.schedule(function()
-              if vim.bo.filetype == "TelescopePrompt" then
-                vim.bo.complete = ""
-              end
-              vim.keymap.set("n", "q", function()
-                vim.cmd("close")
-                pcall(vim.api.nvim_buf_delete, event.buf, { force = true })
-              end, { buffer = event.buf, silent = true, desc = "Quit buffer" })
-            end)
-          end
-        '';
+        callback =
+          # lua
+          mkLuaInline ''
+            function(event)
+              vim.bo[event.buf].buflisted = false
+              vim.schedule(function()
+                if vim.bo.filetype == "TelescopePrompt" then
+                  vim.bo.complete = ""
+                end
+                vim.keymap.set("n", "q", function()
+                  vim.cmd("close")
+                  pcall(vim.api.nvim_buf_delete, event.buf, { force = true })
+                end, { buffer = event.buf, silent = true, desc = "Quit buffer" })
+              end)
+            end
+          '';
       }
 
       {
@@ -99,11 +105,13 @@ in
         group = "nvf_user";
         pattern = [ "*" ];
         desc = "format on write via conform";
-        callback = mkLuaInline ''
-          function(args)
-            require("conform").format({ bufnr = args.buf })
-          end
-        '';
+        callback =
+          # lua
+          mkLuaInline ''
+            function(args)
+              require("conform").format({ bufnr = args.buf })
+            end
+          '';
       }
 
       {
@@ -111,18 +119,20 @@ in
         group = "nvf_user";
         nested = true;
         desc = "autosave modified buffers, and re-source this config's own Lua";
-        callback = mkLuaInline ''
-          function()
-            if vim.bo.modified and vim.bo.buftype == "" then
-              vim.cmd("silent! w")
-              vim.lsp.buf.format()
+        callback =
+          # lua
+          mkLuaInline ''
+            function()
+              if vim.bo.modified and vim.bo.buftype == "" then
+                vim.cmd("silent! w")
+                vim.lsp.buf.format()
+              end
+              local file = vim.fn.expand("%:p")
+              if file:match("^" .. vim.fn.stdpath("config") .. "/.*%.lua$") then
+                vim.cmd("source %")
+              end
             end
-            local file = vim.fn.expand("%:p")
-            if file:match("^" .. vim.fn.stdpath("config") .. "/.*%.lua$") then
-              vim.cmd("source %")
-            end
-          end
-        '';
+          '';
       }
     ];
   };

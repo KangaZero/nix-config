@@ -24,60 +24,66 @@
       config = {
         header = lib.splitString "\n" (builtins.readFile ../dashboard-logo.txt);
 
-        shortcut = lib.generators.mkLuaInline ''
-          {
-            {
-              desc = " Purgatory Time",
-              group = "DiagnosticHint",
-              key = "f",
-              action = "Telescope",
-            },
-            { desc = " New Hell", group = "DiagnosticInfo", key = "n", action = "ene | startinsert" },
-            {
-              desc = " Nightmares",
-              group = "DiagnosticWarn",
-              key = "r",
-              action = "",
-            },
-            {
-              desc = " Config",
-              group = "DiagnosticError",
-              key = "c",
-              action = function()
-                require("telescope.builtin").find_files({ cwd = vim.fn.stdpath("config") })
-              end,
-            },
-            { desc = " Theme", group = "Number", key = "t", action = "Telescope colorscheme" },
-            {
-              desc = " Abandon Hope",
-              group = "Error",
-              key = "q",
-              action = function()
-                local msgs = {
-                  "YOU THINK THERE IS AN EXIT?",
-                  "PURGATORY IS ETERNAL.",
-                  "ERROR: SOUL_BOUND_TO_VIM",
-                  "NICE TRY, MORTAL.",
-                }
-                math.randomseed(os.time())
-                vim.notify(msgs[math.random(#msgs)], vim.log.levels.ERROR, {
-                  title = "QUIT ATTEMPT DETECTED",
-                  timeout = 5000,
-                })
-              end,
-            },
-          }
-        '';
+        shortcut =
+          lib.generators.mkLuaInline # lua
 
-        project = lib.generators.mkLuaInline ''
-          {
-            enable = true,
-            limit = 8,
-            icon = " ",
-            label = "Recent Purgatories",
-            action = function() end,
-          }
-        '';
+            ''
+              {
+                {
+                  desc = " Purgatory Time",
+                  group = "DiagnosticHint",
+                  key = "f",
+                  action = "Telescope",
+                },
+                { desc = " New Hell", group = "DiagnosticInfo", key = "n", action = "ene | startinsert" },
+                {
+                  desc = " Nightmares",
+                  group = "DiagnosticWarn",
+                  key = "r",
+                  action = "",
+                },
+                {
+                  desc = " Config",
+                  group = "DiagnosticError",
+                  key = "c",
+                  action = function()
+                    require("telescope.builtin").find_files({ cwd = vim.fn.stdpath("config") })
+                  end,
+                },
+                { desc = " Theme", group = "Number", key = "t", action = "Telescope colorscheme" },
+                {
+                  desc = " Abandon Hope",
+                  group = "Error",
+                  key = "q",
+                  action = function()
+                    local msgs = {
+                      "YOU THINK THERE IS AN EXIT?",
+                      "PURGATORY IS ETERNAL.",
+                      "ERROR: SOUL_BOUND_TO_VIM",
+                      "NICE TRY, MORTAL.",
+                    }
+                    math.randomseed(os.time())
+                    vim.notify(msgs[math.random(#msgs)], vim.log.levels.ERROR, {
+                      title = "QUIT ATTEMPT DETECTED",
+                      timeout = 5000,
+                    })
+                  end,
+                },
+              }
+            '';
+
+        project =
+          lib.generators.mkLuaInline # lua
+
+            ''
+              {
+                enable = true,
+                limit = 8,
+                icon = " ",
+                label = "Recent Purgatories",
+                action = function() end,
+              }
+            '';
 
         mru = {
           enable = true;
@@ -88,16 +94,19 @@
 
         packages.enable = true;
 
-        footer = lib.generators.mkLuaInline ''
-          function()
-            local count = #vim.api.nvim_get_runtime_file("pack/*/*/*", true)
-            return {
-              "",
-              "" .. count .. " PLUGINS INFECTED 󰯆 ",
-              '"Y̶O̶U̶ ̶C̶A̶N̶ ̶N̶E̶V̶E̶R̶ ̶Q̶U̶I̶T̶.̶ ̶Y̶O̶U̶ ̶A̶R̶E̶ ̶H̶E̶R̶E̶ ̶F̶O̶R̶E̶V̶E̶R̶.̶"',
-            }
-          end
-        '';
+        footer =
+          lib.generators.mkLuaInline # lua
+
+            ''
+              function()
+                local count = #vim.api.nvim_get_runtime_file("pack/*/*/*", true)
+                return {
+                  "",
+                  "" .. count .. " PLUGINS INFECTED 󰯆 ",
+                  '"Y̶O̶U̶ ̶C̶A̶N̶ ̶N̶E̶V̶E̶R̶ ̶Q̶U̶I̶T̶.̶ ̶Y̶O̶U̶ ̶A̶R̶E̶ ̶H̶E̶R̶E̶ ̶F̶O̶R̶E̶V̶E̶R̶.̶"',
+                }
+              end
+            '';
       };
     };
   };

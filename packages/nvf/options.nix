@@ -55,23 +55,26 @@
         virtual_text = true;
         # Keys are vim.diagnostic.severity.* constants, not strings, so the whole
         # table has to arrive as Lua rather than as a converted Nix attrset.
-        signs = lib.generators.mkLuaInline ''
-          {
-            text = {
-              [vim.diagnostic.severity.ERROR] = " ",
-              [vim.diagnostic.severity.WARN]  = " ",
-              [vim.diagnostic.severity.INFO]  = " ",
-              [vim.diagnostic.severity.HINT]  = " ",
-            },
-          }
-        '';
+        signs =
+          lib.generators.mkLuaInline # lua
+            ''
+              {
+                text = {
+                  [vim.diagnostic.severity.ERROR] = " ",
+                  [vim.diagnostic.severity.WARN]  = " ",
+                  [vim.diagnostic.severity.INFO]  = " ",
+                  [vim.diagnostic.severity.HINT]  = " ",
+                },
+              }
+            '';
       };
     };
 
     # No nvf option for the LSP log level.
-    luaConfigRC.lsp-log-level = ''
-      -- "debug" writes huge volumes to the LSP log (disk + slowdown).
-      vim.lsp.log.set_level("warn")
-    '';
+    luaConfigRC.lsp-log-level = # lua
+      ''
+        -- "debug" writes huge volumes to the LSP log (disk + slowdown).
+        vim.lsp.log.set_level("warn")
+      '';
   };
 }

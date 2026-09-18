@@ -4,7 +4,7 @@
 
 **A unified Nix flake monorepo — macOS (nix-darwin) + NixOS, multi-platform, multi-user.**
 
-[Platforms](#supported-platforms) • [Defaults](#defaults) • [Setup](#setup--usage) • [Structure](#repository-structure) • [Safety](#safety--checks) • [CI](#ci-pipeline) • [Security](#security) • [Neovim config →](home/modules/common/neovim/config/README.md)
+[Platforms](#supported-platforms) • [Defaults](#defaults) • [Setup](#setup--usage) • [Structure](#repository-structure) • [Safety](#safety--checks) • [CI](#ci-pipeline) • [Security](#security) • [Neovim config →](home/modules/common/neovim/config/README.md) • [nvf config →](packages/nvf/README.md)
 
 ![Nix Flakes](https://img.shields.io/badge/Nix-flakes-5277C3?style=flat-square&logo=nixos&logoColor=white)
 ![Platforms](https://img.shields.io/badge/platforms-aarch64--darwin%20%7C%20x86__64--linux-blueviolet?style=flat-square)
@@ -30,6 +30,25 @@
 
 > [!TIP]
 > **Just want the Neovim config?** → [`home/modules/common/neovim/config/`](home/modules/common/neovim/config/README.md) — standalone, no Nix required.
+
+> [!NOTE]
+> **There are two Neovims in this repo.**
+>
+> | | what | how it is built | run it |
+> | --- | --- | --- | --- |
+> | **Primary** | [`home/modules/common/neovim/config/`](home/modules/common/neovim/config/README.md) | hand-written Lua, plugins via `vim.pack` + a runtime `nvim-pack-lock.json` | `nvim` |
+> | **Alternative** | [`packages/nvf/`](packages/nvf/README.md) | declarative [nvf](https://github.com/notashelf/nvf) modules, plugins pinned by `flake.lock` | `nix run .#nvf` |
+>
+> The primary one is the daily driver. The nvf build is an **alternative** — the same
+> setup expressed declaratively in Nix instead of Lua, so a working Nix-native path
+> already exists if I ever decide to configure Neovim that way. It is a flake package,
+> never installed into a profile, so its `bin/nvim` cannot collide with `programs.neovim`;
+> `NVIM_APPNAME=nvf` keeps its state in `~/.config/nvf`, and the two run side by side.
+>
+> ⚠️ **Caveat on the nvf config:** I am considerably less fluent in nvf than in plain Lua,
+> and that tree was written with heavy AI assistance. It builds and has been smoke-tested,
+> but treat it as experimental — expect rough edges, and do not read it as a reference for
+> how nvf is best used. The primary config is the one I actually understand end to end.
 
 ## Table of Contents
 
