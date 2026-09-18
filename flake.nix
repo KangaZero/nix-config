@@ -40,6 +40,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    nvf = {
+      url = "github:notashelf/nvf";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     zjstatus = {
       url = "github:dj95/zjstatus";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -202,7 +207,13 @@
 
       packages = forAllSystems (
         system:
-        nixpkgs.lib.optionalAttrs (system == darwinSystem) {
+        {
+          nvf = import ./packages/nvf {
+            pkgs = nixpkgs.legacyPackages.${system};
+            inherit (inputs) nvf;
+          };
+        }
+        // nixpkgs.lib.optionalAttrs (system == darwinSystem) {
           # Darwin needs a custom .app bundle via nix-wrapper-modules: bakes in theme (Tokyo Night Moon),
           # font (JetBrains Mono), animated GIF background, and transparency settings at the derivation
           # level so macOS Spotlight/Finder see a proper .app and the assets are store-pinned.

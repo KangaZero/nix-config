@@ -235,6 +235,17 @@ local function nixd_hm_expr(flake_attr)
 	return string.format("%s.%s.%s.options.home-manager.users.type.getSubOptions []", nixd_ref, flake_attr, nixd_host)
 end
 
+-- nvf's option tree, for packages/nvf/*.nix. neovimConfiguration returns the raw
+-- evalModules result, so `.options` is the declaration tree nixd wants; the empty
+-- `modules` list is deliberate — we want declarations, not our own values.
+local function nixd_nvf_expr()
+	return string.format(
+		"(%s.inputs.nvf.lib.neovimConfiguration { pkgs = import %s.inputs.nixpkgs { }; modules = [ ]; }).options",
+		nixd_ref,
+		nixd_ref
+	)
+end
+
 -- `options` keys are arbitrary labels (nixd merges every entry for completion), but each
 -- entry is one lazy full-config eval — nixpkgs alone is 200~300MB of names per nixd's
 -- docs — so keep the map minimal: the dropped `nixos_wsl` entry pointed at `options.wsl`,
@@ -246,6 +257,7 @@ local function nixd_settings(label, flake_attr)
 		options = {
 			[label] = { expr = string.format("%s.%s.%s.options", nixd_ref, flake_attr, nixd_host) },
 			["home-manager"] = { expr = nixd_hm_expr(flake_attr) },
+			["nvf"] = { expr = nixd_nvf_expr() },
 		},
 	}
 end
