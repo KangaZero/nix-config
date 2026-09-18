@@ -10,8 +10,13 @@
 # reapplies them. Those exist to make blink match nekonight's deep-ocean palette by
 # hand; nvf's theme handling covers the same ground for the themes it manages, and
 # reproducing them here would be ~60 lines of embedded Lua for no declarative gain.
-{ lib, ... }:
+{ lib, pkgs, ... }:
 {
+  # friendly-snippets has no nvf module, but blink's `snippets` source reads
+  # VSCode-format snippets straight off the runtimepath, so the package alone is
+  # enough — no setup call, matching how the real config adds it.
+  config.vim.extraPlugins.friendly-snippets.package = pkgs.vimPlugins.friendly-snippets;
+
   config.vim.autocomplete.blink-cmp = {
     enable = true;
     setupOpts = {
