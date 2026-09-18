@@ -250,6 +250,29 @@ local function nixd_settings(label, flake_attr)
 	}
 end
 
+-- Local nixpkgs checkout. A different workspace entirely: completion must resolve
+-- against that tree, not this flake's pinned nixpkgs, or every `lib.`/`stdenv.`
+-- lookup answers from the wrong revision. nixd 2.x ignores .nixd.json (v1 legacy,
+-- "nixd won't even read such files anymore"), so this has to arrive as LSP settings.
+local nixpkgs_checkout = vim.fs.normalize("~/Documents/nixpkgs")
+
+local function nixd_nixpkgs_checkout_settings()
+	return {
+		nixpkgs = { expr = string.format("import %s { }", nixpkgs_checkout) },
+		formatting = { command = { "nixfmt" } },
+		options = {
+			-- eval-config.nix defaults `system` to builtins.currentSystem, so this
+			-- stays correct on both x86_64-linux and aarch64-darwin.
+			nixos = {
+				expr = string.format(
+					"(import %s/nixos/lib/eval-config.nix { modules = [ ]; }).options",
+					nixpkgs_checkout
+				),
+			},
+		},
+	}
+end
+
 local nixd_opts
 if is_nixos then
 	-- NixOS (WSL or bare metal)
@@ -264,6 +287,16 @@ vim.lsp.config("nixd", {
 	filetypes = { "nix" },
 	root_markers = { "flake.nix", ".git" },
 	settings = { nixd = nixd_opts },
+	-- Make the static `settings` table root-aware. before_init runs per client, after
+	-- root_dir resolves. It must mutate the existing table IN PLACE: the client
+	-- snapshots `settings = config.settings` at construction (vim/lsp/client.lua),
+	-- and before_init fires later, so reassigning `config.settings` to a fresh table
+	-- silently has no effect — only the shared reference's contents are seen.
+	before_init = function(_, config)
+		if config.root_dir and vim.fs.normalize(config.root_dir) == nixpkgs_checkout then
+			config.settings.nixd = nixd_nixpkgs_checkout_settings()
+		end
+	end,
 })
 
 vim.lsp.enable("nixd")

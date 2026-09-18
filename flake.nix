@@ -34,10 +34,12 @@
     };
 
     nix-homebrew.url = "github:zhaofengli/nix-homebrew";
+
     nix-wrapper-modules = {
       url = "github:BirdeeHub/nix-wrapper-modules";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
     zjstatus = {
       url = "github:dj95/zjstatus";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -97,6 +99,15 @@
       # Distinct from serverUser ("server", the profile dir): the resolved Linux username
       # is "KangaZero" (userMeta.usernames.linux), so `home-manager switch --flake .#KangaZero`.
       serverHomeManagerUser = "KangaZero";
+
+      # `lib` here is ./lib (mkDarwin/mkNixOS/...), not nixpkgs.lib — genAttrs and
+      # unique have to come from nixpkgs explicitly.
+      systems = nixpkgs.lib.unique [
+        darwinSystem
+        wslSystem
+        serverSystem
+      ];
+      forAllSystems = nixpkgs.lib.genAttrs systems;
     in
     {
       darwinConfigurations."${darwinHostname}" = lib.mkDarwin {
@@ -170,18 +181,11 @@
               { }
           );
 
-      devShells."${darwinSystem}".default = lib.mkDevShell {
-        system = darwinSystem;
-        inherit self;
-      };
+      devShells = forAllSystems (system: {
+        default = lib.mkDevShell { inherit system self; };
+      });
 
-      devShells."${wslSystem}".default = lib.mkDevShell {
-        system = wslSystem;
-        inherit self;
-      };
-
-      formatter."${darwinSystem}" = nixpkgs.legacyPackages."${darwinSystem}".nixfmt-tree;
-      formatter."${wslSystem}" = nixpkgs.legacyPackages."${wslSystem}".nixfmt-tree;
+      formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.nixfmt-tree);
 
       # Standalone home-manager for the bare-metal `server` host. Lets `home-manager switch`
       # apply home-only changes fast, without sudo/nixos-rebuild. Loads home/profiles/server/linux.nix
@@ -196,14 +200,19 @@
         hostname = serverHostname;
       };
 
-      # macOS only — Linux kitty is pkgs.kitty from nixpkgs.
-      # Darwin needs a custom .app bundle via nix-wrapper-modules: bakes in theme (Tokyo Night Moon),
-      # font (JetBrains Mono), animated GIF background, and transparency settings at the derivation
-      # level so macOS Spotlight/Finder see a proper .app and the assets are store-pinned.
-      packages."${darwinSystem}".kitty = import ./packages/kitty.nix {
-        pkgs = nixpkgs.legacyPackages."${darwinSystem}";
-        inherit (inputs) nix-wrapper-modules;
-        assetsDir = ./assets/mac;
-      };
+      packages = forAllSystems (
+        system:
+        nixpkgs.lib.optionalAttrs (system == darwinSystem) {
+          # Darwin needs a custom .app bundle via nix-wrapper-modules: bakes in theme (Tokyo Night Moon),
+          # font (JetBrains Mono), animated GIF background, and transparency settings at the derivation
+          # level so macOS Spotlight/Finder see a proper .app and the assets are store-pinned.
+          # macOS only — Linux kitty is pkgs.kitty from nixpkgs.
+          kitty = import ./packages/kitty.nix {
+            pkgs = nixpkgs.legacyPackages.${system};
+            inherit (inputs) nix-wrapper-modules;
+            assetsDir = ./assets/mac;
+          };
+        }
+      );
     };
 }
