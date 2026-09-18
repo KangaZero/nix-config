@@ -32,6 +32,7 @@
   imports = [
     ../../modules/common/atuin.nix
     ../../modules/common/git.nix
+    ../../modules/common/ssh.nix
     ../../modules/common/direnv.nix
     ../../modules/common/firefox.nix
     ../../modules/common/kitty.nix
