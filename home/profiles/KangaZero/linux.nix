@@ -13,7 +13,7 @@
     ../../modules/common/direnv.nix
     # Commented out as not in use and to reduce bulid time
     # ../../modules/common/firefox.nix
-    ../../modules/common/kitty.nix
+    # ../../modules/common/kitty.nix
     ../../modules/common/yazi.nix
     ../../modules/common/neovim/neovim.nix
     ../../modules/common/bat.nix
@@ -26,7 +26,7 @@
     ../../modules/common/zellij.nix
     ../../modules/common/zoxide.nix
     ../../modules/common/lazygit.nix
-    ../../modules/linux/ollama.nix
+    # ../../modules/linux/ollama.nix
     ../../modules/linux/packages.nix
     ../../modules/linux/bash.nix
     ../../modules/linux/shell.nix

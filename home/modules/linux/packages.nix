@@ -1,7 +1,7 @@
 { pkgs, ... }:
 {
   home.packages = with pkgs; [
-    wget
+    # wget
     openssh
     tldr
     ffmpeg-full
