@@ -65,10 +65,15 @@
     #   nbump <attr> --version <ver>  (update to a specific version)
     nbump() { nix-shell -p nix-update --run "nix-update $*"; }
 
-    # Format / check-format nix files with the nixpkgs formatter (pkgs.nixfmt).
-    #   nfmt <file...>   |   nfmtc <file...>
-    nfmt()  { nix-shell -p nixfmt --run "nixfmt $*"; }
-    nfmtc() { nix-shell -p nixfmt --run "nixfmt --check $*"; }
+    # Format / check-format nix files. Goes through nixfmt-tree (treefmt with nixfmt
+    # wired in) rather than bare nixfmt: passing a directory to nixfmt is deprecated
+    # and "will be unsupported soon". treefmt takes files or directories, and
+    # --fail-on-change replaces --check.
+    # Requires being inside a git repository — treefmt resolves its tree root from
+    # git, so a loose .nix file outside a repo needs plain `nixfmt <file>`.
+    #   nfmt <path...>   |   nfmtc <path...>
+    nfmt()  { nix-shell -p nixfmt-tree --run "treefmt $*"; }
+    nfmtc() { nix-shell -p nixfmt-tree --run "treefmt --fail-on-change $*"; }
 
     # Linters (take a path).
     nstatix()      { nix-shell -p statix --run "statix check $*"; }
