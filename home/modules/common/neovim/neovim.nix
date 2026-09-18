@@ -6,9 +6,36 @@
     vimAlias = true;
     # Lets neovim use the default ~/.config/nvim/init.lua — config managed outside Nix
     sideloadInitLua = true;
-    plugins = with pkgs.vimPlugins; [
-      telescope-fzf-native-nvim
-    ];
+    plugins =
+      with pkgs.vimPlugins;
+      [
+        telescope-fzf-native-nvim
+      ]
+      ++ builtins.attrValues {
+        inherit (pkgs.vimPlugins.nvim-treesitter-parsers)
+          tsx
+          typescript
+          javascript
+          jsdoc
+          luadoc
+          nix
+          lua
+          bash
+          python
+          markdown
+          markdown_inline
+          c
+          rust
+          cpp
+          toml
+          regex
+          json
+          yaml
+          html
+          css
+          comment
+          ;
+      };
   };
 
   xdg.configFile."nvim" = {
@@ -66,7 +93,7 @@
     ruff
     clang-tools # provides clangd
     vtsls
-    typescript # `tsgo` — native Go TS (TS 7) LSP, run alongside vtsls for A/B
+    typescript # TS 7: `tsc` is the native Go port, and serves LSP via `--lsp --stdio`
     vscode-langservers-extracted # cssls, jsonls, eslint, html
     biome
     tailwindcss-language-server

@@ -190,12 +190,15 @@ every server comes from Nix (see the NixOS note under [Install](#install)). The 
 aimed at:
 
 - **Lua** — `lua_ls` (+ `stylua` fmt)
-- **TypeScript / JavaScript** — `tsgo` (typescript-go, native TS 7 port) **primary**,
-  `vtsls` **fallback** — only one attaches per buffer (`lsp.lua` enables `tsgo` when it is
-  on `PATH`, else `vtsls`), so no duplicate diagnostics. Plus `eslint`, `biome` (lint/format).
-  On NixOS `tsgo` comes from the `typescript-go` package; off Nix, install it with
-  `npm i -g @typescript/native-preview` (Mason has no `tsgo` package — `vtsls` is the
-  Mason-managed fallback)
+- **TypeScript / JavaScript** — `tsc` (TypeScript 7, the native Go port) **primary**,
+  `vtsls` **fallback** — only one attaches per buffer (`lsp.lua` enables `tsc` on NixOS
+  when it is on `PATH`, else `vtsls`), so no duplicate diagnostics. Plus `eslint`,
+  `biome` (lint/format). `tsc` comes from the `typescript` package and serves LSP via
+  `--lsp --stdio`. The enable is gated on NixOS on purpose: only Nix pins TS >= 7, and
+  a stale global TS <= 6 `tsc` would pass an `executable()` check then fail the LSP
+  handshake. Mason cannot install it, so off Nix the server is always `vtsls`.
+  nvim-lspconfig still ships only the pre-rename `lsp/tsgo.lua`, so `lsp.lua` defines
+  `tsc` in full rather than layering on a shipped default
 - **Web** — `html`, `cssls`, `tailwindcss`, `jsonls`
 - **Python** — `pyright` (+ `ruff` lint/fmt)
 - **Rust** — `rust_analyzer` (+ `rustfmt`)

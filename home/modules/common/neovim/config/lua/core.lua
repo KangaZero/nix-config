@@ -8,6 +8,14 @@ vim.pack.add({
 	"https://github.com/nvim-treesitter/nvim-treesitter-textobjects",
 })
 
+-- nvim-treesitter (main) keeps its queries in runtime/queries, and vim.pack only
+-- puts the plugin root on 'runtimepath'. Parsers come from Nix, so :TSInstall
+-- never runs to symlink those queries into stdpath('data')/site — without this,
+-- every parser loads but highlights.scm resolves to nothing.
+for _, dir in ipairs(vim.api.nvim_get_runtime_file("runtime/queries", true)) do
+	vim.opt.rtp:append(vim.fs.dirname(dir))
+end
+
 require("nvim-highlight-colors").setup({
 	render = "background", -- switch to 'virtual' to allow for 'virtual symbol'
 	-- virtual_symbol = "⚫︎",

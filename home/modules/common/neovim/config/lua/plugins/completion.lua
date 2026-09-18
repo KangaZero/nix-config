@@ -31,21 +31,21 @@ vim.pack.add({
 
 -- Nekonight deep-ocean palette — mirrors colorscheme.lua so blink windows feel native
 local p = {
-	bg_dark = "#090B10",  -- darkest bg: menu/doc window background
-	bg      = "#0F111A",  -- base bg
-	bg_hl   = "#1b1524",  -- hover / selection row
-	fg      = "#c0caf5",  -- primary text
-	fg_dark = "#a9b1d6",  -- secondary text / descriptions
-	comment = "#546E7A",  -- muted / ghost text
-	blue    = "#82AAFF",  -- functions, methods, files
-	cyan    = "#7dcfff",  -- operators, references
-	teal    = "#4fd6be",  -- folders, type params
-	green   = "#C3E88D",  -- fields, variables, properties
-	yellow  = "#efbd5d",  -- classes, enums, values
-	orange  = "#dd9046",  -- constants, events
-	magenta = "#c099ff",  -- keywords, selection border (matches WinSeparator)
-	purple  = "#C792EA",  -- constructors, snippets
-	red     = "#f65866",  -- errors / deprecated
+	bg_dark = "#090B10", -- darkest bg: menu/doc window background
+	bg = "#0F111A", -- base bg
+	bg_hl = "#1b1524", -- hover / selection row
+	fg = "#c0caf5", -- primary text
+	fg_dark = "#a9b1d6", -- secondary text / descriptions
+	comment = "#546E7A", -- muted / ghost text
+	blue = "#82AAFF", -- functions, methods, files
+	cyan = "#7dcfff", -- operators, references
+	teal = "#4fd6be", -- folders, type params
+	green = "#C3E88D", -- fields, variables, properties
+	yellow = "#efbd5d", -- classes, enums, values
+	orange = "#dd9046", -- constants, events
+	magenta = "#c099ff", -- keywords, selection border (matches WinSeparator)
+	purple = "#C792EA", -- constructors, snippets
+	red = "#f65866", -- errors / deprecated
 }
 
 -- Source label short-names shown in the menu's rightmost column

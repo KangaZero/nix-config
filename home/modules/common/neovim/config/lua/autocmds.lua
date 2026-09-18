@@ -15,9 +15,34 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
 	end,
 })
 
-vim.api.nvim_create_autocmd("FileType", {
+vim.api.nvim_create_autocmd("VimEnter", {
+	desc = "Truncate the LSP log when it grows past 50 MB (nvim never rotates it)",
 	callback = function()
-		pcall(vim.treesitter.start)
+		local path = vim.lsp.log.get_filename()
+		local st = vim.uv.fs_stat(path)
+		if st and st.size > 50 * 1024 * 1024 then
+			vim.uv.fs_open(path, "w", 420, function(_, fd) -- "w" flag truncates
+				if fd then
+					vim.uv.fs_close(fd)
+				end
+			end)
+		end
+	end,
+})
+
+vim.api.nvim_create_autocmd("FileType", {
+	desc = "Start treesitter highlighting when a parser is available",
+	callback = function(ev)
+		local lang = vim.treesitter.language.get_lang(ev.match)
+		-- No parser is the normal case for help/qf/prompt buffers, so stay quiet.
+		-- A parser that loads but fails to start means broken queries: report it.
+		if not lang or not vim.treesitter.language.add(lang) then
+			return
+		end
+		local ok, err = pcall(vim.treesitter.start, ev.buf, lang)
+		if not ok then
+			vim.notify(("treesitter %s: %s"):format(lang, err), vim.log.levels.WARN)
+		end
 	end,
 })
 --

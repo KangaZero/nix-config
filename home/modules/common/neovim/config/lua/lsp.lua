@@ -12,8 +12,9 @@ require("mason").setup()
 -- `vim.lsp.enable()`; explicit enables below are redundant but harmless.
 require("mason-lspconfig").setup({
 	-- On NixOS every binary is on PATH from Nix, so Mason installs nothing.
-	-- Off NixOS, Mason installs this set (vtsls included as the TS fallback;
-	-- tsgo is NOT here — get it via `npm i -g @typescript/native-preview`).
+	-- Off NixOS, Mason installs this set. The native TS 7 server is not here: it
+	-- ships as `tsc` in the `typescript` package, which Mason does not carry, so
+	-- off NixOS the TS server is always vtsls.
 	ensure_installed = is_nixos and {} or {
 		"lua_ls",
 		"bashls",
@@ -29,9 +30,10 @@ require("mason-lspconfig").setup({
 		"rust_analyzer",
 		"html",
 	},
-	-- vtsls + tsgo are enabled by hand below (tsgo primary, vtsls fallback), so
-	-- stop automatic_enable from attaching either and duplicating diagnostics.
-	automatic_enable = { exclude = { "vtsls", "tsgo" } },
+	-- vtsls is enabled by hand below, so stop automatic_enable from attaching it
+	-- and duplicating diagnostics. `tsc` needs no exclusion: Mason cannot install
+	-- it, so automatic_enable never sees it.
+	automatic_enable = { exclude = { "vtsls" } },
 })
 
 -- Non-LSP tools (formatters/linters) that mason-lspconfig can't install.
@@ -139,12 +141,47 @@ vim.lsp.config("vtsls", {
 	end,
 })
 
--- TypeScript/JavaScript: tsgo (typescript-go, the native TS 7 port) is the PRIMARY
--- server; vtsls above is the fallback (see the enable logic at the bottom — only one
--- attaches per buffer). Uses nvim-lspconfig's shipped `tsgo` defaults
--- (cmd = { "tsgo", "--lsp", "--stdio" }, prefers node_modules/.bin/tsgo then global
--- `tsgo`). Formatting handed to conform (biome/prettier), so disable the server's.
-vim.lsp.config("tsgo", {
+-- TypeScript/JavaScript: `tsc` is the PRIMARY server; vtsls above is the fallback
+-- (see the enable logic at the bottom — only one attaches per buffer). Formatting
+-- handed to conform (biome/prettier), so disable the server's.
+--
+-- TypeScript 7 is the native Go port and serves LSP over `--lsp --stdio`; plain
+-- `--stdio` is rejected without `--lsp`. nvim-lspconfig ships no `lsp/tsc.lua` (only
+-- the pre-rename `tsgo`), so this is defined in full rather than layered on a
+-- shipped default — including the inlay hints that default used to supply.
+vim.lsp.config("tsc", {
+	cmd = function(dispatchers, config)
+		local bin = "tsc"
+		local root = (config or {}).root_dir
+		if root then
+			local local_bin = vim.fs.joinpath(root, "node_modules/.bin", bin)
+			if vim.fn.executable(local_bin) == 1 then
+				bin = local_bin
+			end
+		end
+		return vim.lsp.rpc.start({ bin, "--lsp", "--stdio" }, dispatchers)
+	end,
+	filetypes = { "javascript", "javascriptreact", "typescript", "typescriptreact" },
+	-- One instance serves a whole monorepo, so root at the package manager lockfile
+	-- and fall back to a tsconfig only when there is no lockfile. Nested tables are
+	-- priority groups: every marker in a group ranks equally.
+	root_markers = {
+		{ "package-lock.json", "yarn.lock", "pnpm-lock.yaml", "bun.lock", "bun.lockb" },
+		{ "tsconfig.json", "jsconfig.json" },
+		{ ".git" },
+	},
+	settings = {
+		typescript = {
+			inlayHints = {
+				parameterNames = { enabled = "literals", suppressWhenArgumentMatchesName = true },
+				parameterTypes = { enabled = true },
+				variableTypes = { enabled = true },
+				propertyDeclarationTypes = { enabled = true },
+				functionLikeReturnTypes = { enabled = true },
+				enumMemberValues = { enabled = true },
+			},
+		},
+	},
 	on_init = function(client)
 		client.server_capabilities.documentFormattingProvider = false
 		client.server_capabilities.documentRangeFormattingProvider = false
@@ -234,12 +271,13 @@ vim.lsp.enable("lua_ls")
 vim.lsp.enable("pyright")
 vim.lsp.enable("sourcekit")
 
--- TS/JS server priority: prefer tsgo (native TS 7), fall back to vtsls when the
--- tsgo binary isn't on PATH. Exactly one attaches, so no duplicate diagnostics,
--- hover, or completion. (node_modules-local tsgo isn't seen by this global check;
--- it falls back to vtsls in that case.)
-if vim.fn.executable("tsgo") == 1 then
-	vim.lsp.enable("tsgo")
+-- TS/JS server priority: prefer the native TS 7 server, fall back to vtsls.
+-- Exactly one attaches, so no duplicate diagnostics, hover, or completion.
+-- Gated on is_nixos because `tsc` on PATH only guarantees `--lsp` support when it
+-- comes from Nix (pinned TS >= 7) — a stale global TS <= 6 `tsc` passes an
+-- executable() check and then fails the LSP handshake.
+if is_nixos and vim.fn.executable("tsc") == 1 then
+	vim.lsp.enable("tsc")
 else
 	vim.lsp.enable("vtsls")
 end
