@@ -21,7 +21,7 @@ jobs:
       - uses: DeterminateSystems/magic-nix-cache-action@main
       - name: Run vulnix
         run: bash scripts/vulnix-flake.sh
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: cve-report-linux
           path: CVE_REPORT_WSL.md
@@ -37,7 +37,7 @@ jobs:
       - uses: DeterminateSystems/magic-nix-cache-action@main
       - name: Run vulnix
         run: bash scripts/vulnix-flake.sh
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: cve-report-darwin
           path: CVE_REPORT_DARWIN.md
@@ -48,11 +48,11 @@ jobs:
     needs: [cve-linux, cve-darwin]
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: cve-report-linux
           path: .
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: cve-report-darwin
           path: .
