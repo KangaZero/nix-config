@@ -23,7 +23,7 @@ jobs:
       - name: Deadnix
         run: nix run nixpkgs#deadnix -- --fail .
       # - name: Build darwin config
-        # run: nix build --no-link --print-build-logs .#darwinConfigurations.samuelwaiweng.system
+        # run: nix build --no-link --print-build-logs .#darwinConfigurations.KangaZero.system
 
   check-linux:
     name: Check (x86_64-linux)
