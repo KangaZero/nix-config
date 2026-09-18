@@ -66,7 +66,7 @@
     ruff
     clang-tools # provides clangd
     vtsls
-    typescript-go # `tsgo` — native Go TS (TS 7) LSP, run alongside vtsls for A/B
+    typescript # `tsgo` — native Go TS (TS 7) LSP, run alongside vtsls for A/B
     vscode-langservers-extracted # cssls, jsonls, eslint, html
     biome
     tailwindcss-language-server
