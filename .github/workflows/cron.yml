@@ -13,18 +13,29 @@ jobs:
   cve-linux:
     name: CVE Report (x86_64-linux)
     runs-on: ubuntu-latest
+    # Nix comes from the image, so nix-installer-action is redundant here. The image
+    # ships bash/git/nix 2.35 with flakes already enabled; it has no node, but GitHub
+    # mounts the runner's externals into container jobs, which is what lets checkout
+    # and upload-artifact still run.
+    #
+    # magic-nix-cache is deliberately absent: it is what broke this job through
+    # Aug 2026 (GitHub Actions Cache answered 429, nix then saw HTTP 418 on every
+    # narinfo). cache.nixos.org still serves the bulk of the closure, so the only
+    # loss is reuse of this repo's own derivations between runs.
+    container: nixos/nix:latest
     steps:
       - uses: actions/checkout@v5
-      - uses: DeterminateSystems/nix-installer-action@main
-        with:
-          determinate: false
-      - uses: DeterminateSystems/magic-nix-cache-action@main
+      # checkout runs as root inside the container while the workspace is owned by
+      # the runner user, so git refuses it as dubious ownership — and
+      # vulnix-flake.sh opens with `git rev-parse --show-toplevel`.
+      - name: Trust the workspace
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: Run vulnix
         run: bash scripts/vulnix-flake.sh
       - uses: actions/upload-artifact@v7
         with:
           name: cve-report-linux
-          path: CVE_REPORT_WSL.md
+          path: CVE_REPORT_X86.md
 
   cve-darwin:
     name: CVE Report (aarch64-darwin)
@@ -60,9 +71,11 @@ jobs:
         run: |
           git config user.name "Github bot"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add CVE_REPORT_WSL.md CVE_REPORT_DARWIN.md
+          git add CVE_REPORT_X86.md CVE_REPORT_DARWIN.md
           git diff --staged --quiet && { echo "reports unchanged, nothing to commit"; exit 0; }
-          git commit -m "<chore> Retrieved latest CVE Reports"
+          # %F is ISO-8601 (YYYY-MM-DD). UTC, matching the runner's clock and the
+          # cron schedule, so the date always lines up with the run that produced it.
+          git commit -m "<chore> Retrieved latest CVE Reports ($(date -u +%F))"
           # The scan jobs take ~30-60 min, so main can move underneath this job.
           # Rebase onto whatever is on the remote now, otherwise the push is
           # rejected as non-fast-forward.

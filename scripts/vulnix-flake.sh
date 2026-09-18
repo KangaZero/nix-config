@@ -11,7 +11,7 @@ OS="$(uname)"
 case "$OS" in
 Linux)
 	BUILD_ATTR=".#nixosConfigurations.nixos.config.system.build.toplevel"
-	REPORT="$REPO_DIR/CVE_REPORT_WSL.md"
+	REPORT="$REPO_DIR/CVE_REPORT_X86.md"
 	;;
 Darwin)
 	BUILD_ATTR=".#darwinConfigurations.KangaZero.system"
