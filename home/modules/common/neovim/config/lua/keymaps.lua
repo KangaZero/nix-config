@@ -100,6 +100,11 @@ vim.keymap.set({ "n", "v", "t" }, "<C-/>", function()
 end, { desc = "Toggle terminal" })
 vim.keymap.set("t", "<Esc>", "<C-\\><C-n>", { desc = "Enter normal mode in terminal" })
 
+-- Exit out of hlsearch
+vim.keymap.set("n", "<Esc>", function()
+	return vim.v.hlsearch == 1 and "<Cmd>nohlsearch<CR>" or "<Esc>"
+end, { desc = "Execute nohlsearch" })
+
 local ok_snacks, Snacks = pcall(require, "snacks")
 if ok_snacks then
 	vim.keymap.set({ "n", "v" }, "<leader>sk", function()
