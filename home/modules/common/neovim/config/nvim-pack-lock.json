@@ -4,6 +4,10 @@
       "rev": "0def14bce856ae25b878890d36d3ba547f27a0dc",
       "src": "https://github.com/yetone/avante.nvim"
     },
+    "blink-copilot": {
+      "rev": "7ad8209b2f880a2840c94cdcd80ab4dc511d4f39",
+      "src": "https://github.com/fang2hou/blink-copilot"
+    },
     "blink.cmp": {
       "rev": "78336bc89ee5365633bcf754d93df01678b5c08f",
       "src": "https://github.com/saghen/blink.cmp",
@@ -12,6 +16,10 @@
     "conform.nvim": {
       "rev": "619363c30309d29ffa631e67c8183f2a72caa373",
       "src": "https://github.com/stevearc/conform.nvim"
+    },
+    "copilot.lua": {
+      "rev": "b54c05349d406f7af11b150824efa8e4f90015c6",
+      "src": "https://github.com/zbirenbaum/copilot.lua"
     },
     "dashboard-nvim": {
       "rev": "f787e3462c2ee2b6117b17c1aa4ddf66cb6f57fe",
@@ -41,6 +49,10 @@
       "rev": "16ba83bfc8a25f52bb545134f5bee082b195c460",
       "src": "https://github.com/mason-org/mason.nvim"
     },
+    "milli.nvim": {
+      "rev": "00274623b76a66356e31e1861360b269987a7f64",
+      "src": "https://github.com/amansingh-afk/milli.nvim"
+    },
     "nekonight.nvim": {
       "rev": "37b542b26eaf10524379bae75c590018f47a3613",
       "src": "https://github.com/KangaZero/nekonight.nvim"
@@ -48,6 +60,10 @@
     "nui.nvim": {
       "rev": "10fc361835c856ba4233ef5ea135b919bf3dce97",
       "src": "https://github.com/MunifTanjim/nui.nvim"
+    },
+    "nvim": {
+      "rev": "df1c6af5e1df601232a2c0fc7198ea1342e95f29",
+      "src": "https://github.com/neko-night/nvim"
     },
     "nvim-highlight-colors": {
       "rev": "e4c7af0211866162d999ce0bdd6a029302e19139",

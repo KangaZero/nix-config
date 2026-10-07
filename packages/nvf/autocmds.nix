@@ -125,7 +125,7 @@ in
             function()
               if vim.bo.modified and vim.bo.buftype == "" then
                 vim.cmd("silent! w")
-                vim.lsp.buf.format()
+                -- vim.lsp.buf.format() # lsp.formatOnSave is enabled, so this is not needed
               end
               local file = vim.fn.expand("%:p")
               if file:match("^" .. vim.fn.stdpath("config") .. "/.*%.lua$") then

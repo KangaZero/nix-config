@@ -19,7 +19,7 @@
     ./plugins
     ./options.nix
     ./colorscheme.nix
-    ./statusline.nix
+    ./ui.nix
     ./autocmds.nix
     ./keymaps.nix
   ];

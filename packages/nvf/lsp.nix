@@ -26,8 +26,10 @@
           ];
         };
       };
-      lspkind.enable = true;
-      trouble.enable = true;
+      formatOnSave = true;
+      lspkind.enable = false;
+      lspsaga.enable = false;
+      trouble.enable = false;
     };
 
     languages = {
@@ -57,6 +59,8 @@
       html.enable = true;
       json.enable = true;
       yaml.enable = true;
+      toml.enable = true;
+      # go.enable = true;
     };
   };
 }

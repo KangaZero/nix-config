@@ -1,13 +1,16 @@
 # ≈ lua/plugins/init.lua — same file list, same order.
 {
   imports = [
+    ./autopairs.nix
     ./yazi.nix
+    ./git.nix
     ./which-key.nix
     ./telescope.nix
     ./hlslens.nix
     ./completion.nix
     ./conform.nix
     ./tiny-inline-diagnostic.nix
+    ./terminal.nix
     ./ai.nix
     ./markview.nix
     ./avante.nix

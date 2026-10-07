@@ -11,6 +11,5 @@
       textobjects.enable = true;
     };
 
-    ui.nvim-highlight-colors.enable = true;
   };
 }

@@ -21,5 +21,6 @@
     # working tree. Data/state isolated under ~/.local/share/multi-nix/... so this
     # dev session can't disturb the rebuilt ~/.config/nvim.
     "nvim-dev" = "NVIM_APPNAME=multi-nix/home/modules/common/neovim/config nvim";
+    "nvf" = "nix run ~/.config/multi-nix#nvf";
   };
 }
