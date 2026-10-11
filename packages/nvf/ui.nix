@@ -2,6 +2,7 @@
 {
   config.vim = {
     ui = {
+      ui2.enable = true;
       illuminate.enable = true;
       nvim-highlight-colors.enable = true;
     };
@@ -13,6 +14,29 @@
       integrations.breadcrumbs = {
         lspsaga.enable = false;
       };
+      setupOpts.options.theme =
+        lib.generators.mkLuaInline # lua
+          ''
+            function()
+              local style = (vim.g.colors_name or "nekonight-night"):gsub("^nekonight%-", "")
+              local ok, theme = pcall(function()
+                return require("lualine.themes._nekonight").get(style)
+              end)
+              if not ok then
+                return "auto"
+              end
+              for _, mode in pairs(theme) do
+                if mode.b then mode.b.bg = "NONE" end
+                if mode.c then mode.c.bg = "NONE" end
+              end
+              if theme.inactive then
+                for _, section in ipairs({ "a", "b", "c" }) do
+                  if theme.inactive[section] then theme.inactive[section].bg = "NONE" end
+                end
+              end
+              return theme
+            end
+          '';
     };
     extraPlugins.undo-glow = {
       package = pkgs.vimUtils.buildVimPlugin {
@@ -37,6 +61,11 @@
       setup =
         # lua
         ''
+            local Util = require("nekonight.util")
+            local colors = require("nekonight.colors").setup({ style = "deep-ocean" })
+            local tint = function(color, amount)
+                    return Util.blend_bg(color, amount, colors.bg)
+            end
           require("undo-glow").setup({
             animation = {
               enabled = true,
@@ -45,13 +74,13 @@
               window_scoped = true,
             },
             highlights = {
-              undo = { hl_color = { bg = "#f38ba8" } },
-              redo = { hl_color = { bg = "#f9e2af" } },
-              yank = { hl_color = { bg = "#c999ff" } },
-              paste = { hl_color = { bg = "#325B5B" } },
-              search = { hl_color = { bg = "#5C475C" } },
-              comment = { hl_color = { bg = "#7A5A3D" } },
-              cursor = { hl_color = { bg = "#793D54" } },
+                    undo = { hl_color = { bg = tint(colors.red, 0.25) } },
+                    redo = { hl_color = { bg = tint(colors.green, 0.25) } },
+                    yank = { hl_color = { bg = tint(colors.yellow, 0.25) } },
+                    paste = { hl_color = { bg = tint(colors.cyan, 0.25) } },
+                    search = { hl_color = { bg = tint(colors.purple, 0.25) } },
+                    comment = { hl_color = { bg = tint(colors.orange, 0.25) } },
+                    cursor = { hl_color = { bg = tint(colors.magenta, 0.25) } },
             },
             priority = 2048 * 3,
           })

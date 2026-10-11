@@ -3,6 +3,7 @@
     toggleterm = {
       enable = true;
       lazygit.enable = true;
+      mappings.open = "<c-/>";
     };
   };
 }
