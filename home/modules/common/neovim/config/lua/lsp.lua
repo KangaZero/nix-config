@@ -115,8 +115,52 @@ vim.lsp.config("rust_analyzer", {
 
 -- TypeScript/JavaScript: vtsls. Inlay hints + auto-complete function calls.
 -- Formatting handed to conform (biome/prettier), so disable the server's.
+-- One instance serves a whole monorepo, so root at the package manager lockfile
+-- and fall back to a tsconfig only when there is no lockfile. Nested tables are
+-- priority groups: every marker in a group ranks equally. Shared by both TS
+-- servers so they always agree on the root.
+local ts_root_markers = {
+	{ "package-lock.json", "yarn.lock", "pnpm-lock.yaml", "bun.lock", "bun.lockb" },
+	{ "tsconfig.json", "jsconfig.json" },
+	{ ".git" },
+}
+
+local function local_ts_major(root)
+	local pkg = vim.fs.joinpath(root, "node_modules/typescript/package.json")
+	local ok_read, lines = pcall(vim.fn.readfile, pkg)
+	if not ok_read then
+		return nil
+	end
+	local ok_json, data = pcall(vim.json.decode, table.concat(lines, "\n"))
+	if not ok_json or type(data) ~= "table" or type(data.version) ~= "string" then
+		return nil
+	end
+	local v = vim.version.parse(data.version)
+	return v and v.major or nil
+end
+
+-- `tsc --lsp` exists only in TS >= 7. A project pinned to TS <= 6 has a local
+-- `tsc` that fails the LSP handshake, so it gets vtsls instead, which loads that
+-- project's own tsserver.js and so matches its CI diagnostics. `tsc` on PATH only
+-- guarantees `--lsp` support when it comes from Nix, hence the is_nixos gate.
+local native_tsc = is_nixos and vim.fn.executable("tsc") == 1
+local function use_native_tsc(root)
+	if not native_tsc then
+		return false
+	end
+	local major = local_ts_major(root)
+	return major == nil or major >= 7
+end
+
 vim.lsp.config("vtsls", {
+	root_dir = function(bufnr, on_dir)
+		local root = vim.fs.root(bufnr, ts_root_markers)
+		if root and not use_native_tsc(root) then
+			on_dir(root)
+		end
+	end,
 	settings = {
+		vtsls = { autoUseWorkspaceTsdk = true },
 		typescript = {
 			updateImportsOnFileMove = { enabled = "always" },
 			suggest = { completeFunctionCalls = true },
@@ -142,7 +186,7 @@ vim.lsp.config("vtsls", {
 })
 
 -- TypeScript/JavaScript: `tsc` is the PRIMARY server; vtsls above is the fallback
--- (see the enable logic at the bottom — only one attaches per buffer). Formatting
+-- (see `use_native_tsc` — only one attaches per buffer). Formatting
 -- handed to conform (biome/prettier), so disable the server's.
 --
 -- TypeScript 7 is the native Go port and serves LSP over `--lsp --stdio`; plain
@@ -162,14 +206,12 @@ vim.lsp.config("tsc", {
 		return vim.lsp.rpc.start({ bin, "--lsp", "--stdio" }, dispatchers)
 	end,
 	filetypes = { "javascript", "javascriptreact", "typescript", "typescriptreact" },
-	-- One instance serves a whole monorepo, so root at the package manager lockfile
-	-- and fall back to a tsconfig only when there is no lockfile. Nested tables are
-	-- priority groups: every marker in a group ranks equally.
-	root_markers = {
-		{ "package-lock.json", "yarn.lock", "pnpm-lock.yaml", "bun.lock", "bun.lockb" },
-		{ "tsconfig.json", "jsconfig.json" },
-		{ ".git" },
-	},
+	root_dir = function(bufnr, on_dir)
+		local root = vim.fs.root(bufnr, ts_root_markers)
+		if root and use_native_tsc(root) then
+			on_dir(root)
+		end
+	end,
 	settings = {
 		typescript = {
 			inlayHints = {
@@ -316,13 +358,6 @@ vim.lsp.enable("lua_ls")
 vim.lsp.enable("pyright")
 vim.lsp.enable("sourcekit")
 
--- TS/JS server priority: prefer the native TS 7 server, fall back to vtsls.
--- Exactly one attaches, so no duplicate diagnostics, hover, or completion.
--- Gated on is_nixos because `tsc` on PATH only guarantees `--lsp` support when it
--- comes from Nix (pinned TS >= 7) — a stale global TS <= 6 `tsc` passes an
--- executable() check and then fails the LSP handshake.
-if is_nixos and vim.fn.executable("tsc") == 1 then
-	vim.lsp.enable("tsc")
-else
-	vim.lsp.enable("vtsls")
-end
+-- TS/JS: both enabled; each root_dir rejects the roots `use_native_tsc` gives
+-- the other, so exactly one attaches per buffer (no duplicate diagnostics).
+vim.lsp.enable({ "tsc", "vtsls" })
