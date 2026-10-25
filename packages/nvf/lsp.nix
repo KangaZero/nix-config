@@ -60,6 +60,12 @@
       json.enable = true;
       yaml.enable = true;
       toml.enable = true;
+      rust = {
+        enable = true;
+        # Can only be enabled if lsp.enable = false
+        extensions.rustaceanvim.enable = false;
+        extensions.crates-nvim.enable = true;
+      };
       # go.enable = true;
     };
   };
