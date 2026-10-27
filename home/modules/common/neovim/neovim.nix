@@ -1,4 +1,19 @@
-{ pkgs, lib, ... }: {
+{ pkgs, lib, ... }:
+let
+  # Version 2.6.5 bumped up by r-ryantm bot will not build. Eventually biome build will fail after several hours
+  biome-pinned = pkgs.biome.overrideAttrs (finalAttrs: {
+    version = "2.6.4";
+
+    src = pkgs.fetchFromGitHub {
+      owner = "biomejs";
+      repo = "biome";
+      rev = "@biomejs/biome@${finalAttrs.version}";
+      hash = "sha256-/oaXa8UrmKFM431oWMQj1acCgwGwYBn9eTqzlr4xwYs=";
+    };
+    cargoHash = "sha256-U7sufX7qaMZLkq64ct8rgD8O7p5JokCOhnImhzg77GY=";
+  });
+in
+{
   programs.neovim = {
     enable = true;
     defaultEditor = true;
@@ -85,24 +100,26 @@
   # servers (vtsls, vscode-langservers-extracted, tailwindcss, pyright, bashls)
   # are wrapped by nixpkgs with a store-pinned node, so no global `nodejs` is
   # needed. Off NixOS, Mason installs everything itself (and would need node).
-  home.packages = with pkgs; [
-    # LSP servers
-    lua-language-server
-    bash-language-server
-    pyright
-    ruff
-    clang-tools # provides clangd
-    vtsls
-    typescript # TS 7: `tsc` is the native Go port, and serves LSP via `--lsp --stdio`
-    vscode-langservers-extracted # cssls, jsonls, eslint, html
-    biome
-    tailwindcss-language-server
-    # If rust is needed add `rustup`
-    # rust-analyzer omitted — rustup provides it via `rustup component add rust-analyzer`
-    nixd
+  home.packages =
+    with pkgs;
+    [
+      # LSP servers
+      lua-language-server
+      bash-language-server
+      pyright
+      ruff
+      clang-tools # provides clangd
+      vtsls
+      typescript # TS 7: `tsc` is the native Go port, and serves LSP via `--lsp --stdio`
+      vscode-langservers-extracted # cssls, jsonls, eslint, html
+      tailwindcss-language-server
+      # If rust is needed add `rustup`
+      # rust-analyzer omitted — rustup provides it via `rustup component add rust-analyzer`
+      nixd
 
-    # Formatters
-    stylua
-    nixfmt
-  ];
+      # Formatters
+      stylua
+      nixfmt
+    ]
+    ++ [ biome-pinned ];
 }
